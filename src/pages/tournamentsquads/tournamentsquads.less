@@ -1,0 +1,214 @@
+@import url('@style/fumbbl');
+
+#vuecontent {
+
+
+}
+
+.panel {
+    margin-bottom: 10px;
+    width: 80%;
+    
+    .header {
+        position: relative;
+        background: #030;
+        color: white;
+        padding: 3px 10px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        font-size: 20px;
+        line-height: 25px;
+
+        .tournament {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            line-height: 18px;
+            font-size: 12px;
+        }
+    }
+    .content {
+        background: @OldLace;
+        padding: 0 0.5rem;
+        padding-bottom: 0.5rem;
+
+        .squad {
+            position: relative;
+
+            .members {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                place-items: center;
+                justify-items: stretch;
+
+                .member {
+                    position: relative;
+                    background: #fff;
+                    display: block;
+                    border-radius: 10px;
+                    border: solid 1px #999;
+                    padding: 5px 10px;
+                    margin: 5px;
+
+                    .coach {
+                        font-size: 16px;
+                        .captainMarker {
+                            color: #d7be37;
+                        }
+                    }
+                    .teamlogo {
+                        position: absolute;
+                        top: 3px;
+                        right: 3px;
+                    }
+                    .teamroster {
+                        position: absolute;
+                        bottom: 0;
+                        right: 5px;
+                        font-size: 10px;
+                    }
+                }
+            }
+
+            .inviteWrap {
+                display: flex;
+                .inviteInfo {
+                    display: inline-block;
+                    line-height: 17.5px;
+                }
+            }
+            .memberWrap {
+                place-self: end;
+            }
+
+            .memberCount {
+                position: relative;
+                display: inline-block;
+                font-size: 18px;
+                line-height: 32px;
+                width: 35px;
+                height: 35px;
+                text-align: center;
+                background: lighten(@OldLace, 5%);
+                padding-left: 10px;
+                padding-top: 3px;
+                border-radius: 10px;
+
+                .accepted {
+                    position: absolute;
+                    display: inline-block;
+                    font-size: 18px;
+                    padding-left: 0px;
+                    top: 0px;
+                    left: 0px;
+                    height: 25px;
+                    line-height: 25px;
+                    width: 25px;
+                }
+                .cap {
+                    position: absolute;
+                    display: inline-block;
+                    font-size: 11px;
+                    padding-right: 1px;
+                    bottom: 0;
+                    right: 0;
+                    height: 15px;
+                    width: 15px;
+                    line-height: 11px;
+                }
+            }
+
+            .invited {
+                display: block;
+            }
+
+            .requested {
+                display: block;
+            }
+
+            .squadfooter {
+                display: grid;
+                place-items: begin;
+                grid-template-columns: repeat(2, 1fr);
+                line-height: 35px;
+                margin: 0 10px;
+
+                .settingsButton {
+                    width: 35px;
+                    height: 35px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    background: @Forest;
+                    color: white;
+                    display: inline-block;
+                    margin-right: 5px;
+
+                    &:hover {
+                        background: lighten(@Forest, 5%);
+                    }
+                }
+            }
+        }
+    }
+}
+
+#header {
+    text-align: center;
+    background: @OldLace;
+    height: 105px;
+    position: relative;
+    border-bottom: solid 1px #bcb29d;
+    margin-bottom: 5px;
+
+    .pagenav {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        top: 63px;
+        line-height: 16px;
+        left: 120px;
+        font-size: 14px;
+        color: #900;
+
+        li {
+            display: inline-block;
+            list-style: none;
+            min-width: 120px;
+            padding: 0;
+            margin: 0;
+            font-weight: 700;
+            text-align: center;
+            height: 41px;
+            line-height: 31px;
+
+            &:hover {
+                background-color: #a5a39a;
+            }
+
+            a:hover {
+                text-decoration: none;
+            }
+        }
+    }
+
+    .pagemarker {
+        position: absolute;
+        bottom: -1px;
+        left: 154px;
+        display: none;
+    }
+
+    .pageheader {
+        font-size: 18pt;
+        text-align: center;
+
+        a,
+        select {
+            font-size: 1rem;
+            line-height: 18pt;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    }
+}

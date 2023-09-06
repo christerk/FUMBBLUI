@@ -1,0 +1,81 @@
+@import '@style/fumbbl';
+
+.pageheader {
+    text-align: center;
+    background: @OldLace;
+    height: 105px;
+    position: relative;
+    border-bottom: solid 1px #bcb29d;
+    margin-bottom: 10px;
+
+    .left {
+        position: absolute;
+        left: 2px;
+        top: 2px;
+        height: 100px;
+        width: 100px;
+    }
+
+    .right {
+        position: absolute;
+        right: 2px;
+        top: 2px;
+        height: 100px;
+        width: 100px;
+    }
+
+    .pagenav {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        top: 63px;
+        line-height: 16px;
+        left: 0;
+        width: 100%;
+        font-size: 14px;
+        color: #900;
+        display: flex;
+        justify-content: center;
+
+        li {
+            display: inline-block;
+            list-style: none;
+            min-width: 120px;
+            padding: 0;
+            margin: 0;
+            font-weight: 700;
+            text-align: center;
+            height: 41px;
+            line-height: 31px;
+
+            &:hover {
+                background-color: #a5a39a;
+            }
+
+            a:hover {
+                text-decoration: none;
+            }
+        }
+    }
+
+    .pagemarker {
+        position: absolute;
+        bottom: -1px;
+        left: 154px;
+        display: none;
+    }
+
+    .title {
+        font-size: 18pt;
+        text-align: center;
+
+        a,
+        select {
+            font-size: 1rem;
+            line-height: 18pt;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    }
+}
