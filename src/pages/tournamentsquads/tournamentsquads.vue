@@ -82,10 +82,10 @@ import {PageHeader, TitledPanel} from '@components/fumbblcomponents'
 })
 class TournamentSquads extends Vue {
     public apiBase: string = ''
-    public coachName: string = null
+    public coachName: string|null = null
     public page: string = 'squads'
 
-    protected navItems: any = [
+    public navItems: any = [
         { label: 'Some Label', page: 'squads' },
         { label: 'Another page', page: 'something' }
     ]
@@ -111,7 +111,7 @@ class TournamentSquads extends Vue {
         }
     }
 
-    public setPage(newPage) {
+    public setPage(newPage: string) {
         this.page = newPage
 
         switch (newPage) {

@@ -43,10 +43,10 @@ class PageHeader extends Vue {
     navItems: any = []
 
     @Prop
-    defaultPage: string
+    defaultPage: string = ""
 
-    private page: string = ''
-    private pageMarkerPosition: number = 0
+    public page: string = ''
+    public pageMarkerPosition: number = 0
 
     public mounted() {
         this.setPage(this.defaultPage)
@@ -58,7 +58,9 @@ class PageHeader extends Vue {
 
         let element = document.getElementById('nav-' + newPage)
 
-        this.pageMarkerPosition = element.offsetLeft + element.offsetWidth / 2 - 9
+        if (element != null) {
+            this.pageMarkerPosition = element.offsetLeft + element.offsetWidth / 2 - 9
+        }
         return newPage
     }
 }
