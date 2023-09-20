@@ -1,12 +1,12 @@
 <template>
-    <div class="panel">
-        <div class="header">
-            <slot name="header"></slot>
-        </div>
-        <div class="content">
-            <slot name="content"></slot>
-        </div>
+  <div class="panel">
+    <div class="header">
+      <slot name="header"></slot>
     </div>
+    <div class="content">
+      <slot name="content"></slot>
+    </div>
+  </div>
 </template>
 
 <style scoped>
