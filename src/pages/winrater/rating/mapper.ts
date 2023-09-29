@@ -20,6 +20,7 @@ import {
   Unranked
 } from './match'
 import Color from 'color'
+import {FumbblMatch} from "@/pages/winrater/coachLocator/fumbblMatch";
 
 export function category(input: FumbblMatch): Category {
   switch (input.division) {

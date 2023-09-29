@@ -6,6 +6,7 @@ import { useMatchStore } from '../pinia/store'
 import { storeToRefs } from 'pinia'
 import * as Plot from '@observablehq/plot'
 import { Line } from '@observablehq/plot'
+import {FumbblMatch} from "@/pages/winrater/coachLocator/fumbblMatch";
 
 function updateCounter() {
   const { modificationCounter } = storeToRefs(useMatchStore())
