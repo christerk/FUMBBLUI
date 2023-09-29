@@ -1,0 +1,72 @@
+@import '@style/fumbbl';
+
+// variables
+
+@CarmineGradient: linear-gradient(to bottom, #670000, #990000);
+@CarmineRadialGradient: radial-gradient(#670000, #990000 70%);
+@ForestGradient: linear-gradient(to bottom,  #242, #464);
+@FontSize: 15px;
+@LineHeight: 25px;
+
+// mixins
+.bolder {
+  font-weight: 700;
+}
+
+.box-header {
+  .rounded-border-top();
+  font-size: @FontSize;
+  line-height: @LineHeight;
+  position: relative;
+  text-align: center;
+  user-select: none;
+}
+
+.button-pos-base {
+  position: absolute;
+  top: 2px;
+}
+
+.ranking-button-pos-right {
+  .button-pos-base();
+  right: 0;
+}
+
+.ranking-button-pos-left {
+  .button-pos-base();
+  left: 0;
+}
+
+.content-layer-1 {
+  .rounded-border();
+  background: @OldLace;
+  border: 1px solid @Quicksilver;
+}
+
+.content-layer-2 {
+  .rounded-border();
+  background: @White;
+  border: 1px solid @Quicksilver;
+}
+
+.h-rule {
+  background: @Jet;
+  height: 2px;
+  margin-top: 5px;
+}
+
+.rounded-border {
+  .rounded-border-top();
+  .rounded-border-bottom();
+}
+
+.rounded-border-bottom {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.rounded-border-top {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+

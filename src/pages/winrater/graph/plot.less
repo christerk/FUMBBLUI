@@ -1,0 +1,71 @@
+@import '../styles';
+
+#content {
+  .rounded-border-bottom();
+    background: @White;
+    font-weight: bold;
+    width: 100%;
+    margin: auto;
+  }
+  
+  #content :last-child {
+    .rounded-border-bottom();
+  }
+  
+  .content-item,
+  .multi-content-item {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .content-item {
+    padding: 0.2em 0;
+  }
+  
+  .explanation {
+    font-size: 0.7em;
+    font-weight: normal;
+    line-height: calc(@LineHeight * 0.75);
+  }
+  
+  .even {
+    background: @OldLace;
+  }
+  
+  .item-part {
+    padding: 0 0.7em;
+  }
+  
+  .odd {
+    background: @Eggshell;
+  }
+  
+  #time {
+    justify-items: center;
+  }
+  
+  #time > span {
+    display: block;
+    font-size: 0.9em;
+    text-align: center;
+  }
+  
+  #time-label {
+    margin: auto 0;
+  }
+  
+  #title {
+    .rounded-border-top();
+    padding: 0.2em 1.5em;
+    text-align: center;
+  }
+  
+  #tooltip {
+    display: none;
+  }
+  
+  #tooltip-content {
+    .content-layer-2();
+  }
