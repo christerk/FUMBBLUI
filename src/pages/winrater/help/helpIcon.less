@@ -1,0 +1,31 @@
+@import '../styles';
+
+.help {
+    @Factor: 0.6;
+    color: @White;
+    background: @CarmineRadialGradient;
+    border: 1px solid black;
+    border-radius: 100%;
+    font-weight: bolder;
+    font-size: calc(@FontSize * @Factor);
+    height: calc(@LineHeight * @Factor);
+    line-height: calc(@LineHeight * @Factor);
+    text-align: center;
+    user-select: none;
+    width: calc(@LineHeight * @Factor);
+  }
+  
+  .help-container {
+    vertical-align: center;
+    height: @LineHeight;
+  }
+  
+  .tooltip-content {
+    background-color: @OldLace;
+    border: @Black 1px solid;
+    border-radius: 0.5em;
+    color: @Black;
+    font-size: 0.9em;
+    line-height: calc(@LineHeight * 0.9);
+    padding: 0.25em;
+  }
