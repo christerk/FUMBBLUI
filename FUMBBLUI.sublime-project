@@ -8,9 +8,15 @@
     "build_systems":
     [
         {
-            "name": "npm build",
+            "name": "npm build DEV",
             "working_dir": "$project_path",
             "shell_cmd": "npm run build-only"
+        },
+        {
+            "name": "npm build LIVE",
+            "working_dir": "$project_path",
+            "shell_cmd": "npm run deploy"
         }
+
     ]
 }

@@ -11,17 +11,17 @@ export default defineConfig({
   plugins: [
     vue(),
     handlebars({
-        partialDirectory: resolve(__dirname, 'src', 'partials'),
+      partialDirectory: resolve(__dirname, 'src', 'partials')
     })
   ],
-  root: "htdocs",
+  root: 'htdocs',
   css: {
     preprocessorOptions: {
-        less: {
-            math: "always",
-            relativeUrls: true,
-            javascriptEnabled: true,
-        }
+      less: {
+        math: 'always',
+        relativeUrls: true,
+        javascriptEnabled: true
+      }
     }
   },
   resolve: {
@@ -29,26 +29,27 @@ export default defineConfig({
       '/src': resolve(process.cwd(), 'src'),
       '@': fileURLToPath(new URL('../src', import.meta.url)),
       '@style': resolve(__dirname, 'src', 'style'),
-      '@components': resolve(__dirname, 'src', 'components'),
+      '@components': resolve(__dirname, 'src', 'components')
     }
   },
   publicDir: '../public',
   assetsInclude: ['**/*.png'],
   build: {
-      outDir: '../dist',
-      emptyOutDir: true,
-      rollupOptions: {
-        external: [/^\/i\//, /^\/FUMBBL\//],
-        input: {
-            tournamentsquads: resolve(__dirname, 'htdocs', 'tournamentsquads.html'),
-            winrater: resolve(__dirname, 'htdocs', 'winrater.html'),
-        },
-        output: {
-          format: 'esm',
-          entryFileNames: 'entries/[name].js',
-          chunkFileNames: 'chunks/[name].js',
-          assetFileNames: 'assets/[name].[ext]'
-        }
+    outDir: '../dist',
+    emptyOutDir: false,
+    manifest: true,
+    rollupOptions: {
+      external: [/^\/i\//, /^\/FUMBBL\//],
+      input: {
+        tournamentsquads: resolve(__dirname, 'htdocs', 'tournamentsquads.html'),
+        winrater: resolve(__dirname, 'htdocs', 'winrater.html')
+      },
+      output: {
+        format: 'esm',
+        //entryFileNames: 'entries/[name].js',
+        //chunkFileNames: 'chunks/[name].js',
+        //assetFileNames: 'assets/[name].[ext]'
       }
+    }
   }
 })

@@ -32,7 +32,7 @@
               </div>
               <div class="squadfooter">
                 <div class="inviteWrap" v-if="coachName == squad.captain">
-                  <div class="settingsButton">
+                  <div class="settingsButton" @click="toggleSettings(squad)">
                     <img src="https://fumbbl.com/i/718507" />
                   </div>
                   <div
@@ -55,6 +55,9 @@
                   &#x2571;
                   <div class="cap">{{ squad.memberCap }}</div>
                 </div>
+              </div>
+              <div v-if="squad.settingsVisible" class="squadsettings">
+                Settings
               </div>
             </div>
           </div>
@@ -121,6 +124,10 @@ class TournamentSquads extends Vue {
     default:
       break
     }
+  }
+
+  public toggleSettings(squad) {
+    squad.settingsVisible = !squad.settingsVisible;
   }
 
   public loadSquads() {
