@@ -36,7 +36,7 @@ export default defineConfig({
   assetsInclude: ['**/*.png'],
   build: {
     outDir: '../dist',
-    emptyOutDir: false,
+    emptyOutDir: true,
     manifest: true,
     rollupOptions: {
       external: [/^\/i\//, /^\/FUMBBL\//],
