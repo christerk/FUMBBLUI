@@ -1,0 +1,1274 @@
+<template>
+    <div class="team" v-if="dataPropertiesInitialized">
+        <div class="teamheader">
+            <img class="rosterlogo" :src="`https://fumbbl.com/i/${teamManagementSettings.logoIdLarge}`" :alt="`Roster logo for ${teamManagementSettings.rosterName}`" :title="`Roster logo for ${teamManagementSettings.rosterName}`">
+            <div class="teamheadermain">
+                <div class="teamheadermaincontent">
+                    <editteamname
+                        :fumbbl-api="fumbblApi"
+                        :team-name="team.getName()"
+                        :can-edit="accessControl.canCreate()"
+                        @edit="handleEditTeamName"
+                        @begin="handleBeginEditTeamName"
+                        @cancel="handleCancelEditTeamName"
+                    ></editteamname>
+                    <div class="rosterinfo" style="margin-top: 0.5em;">
+                        <img v-if="team.getTeamStatus().isNew()" src="https://fumbbl.com/FUMBBL/Images/New_small.gif" alt="Roster" title="New team">
+                        <img v-else-if="team.getTeamStatus().isActive()" src="https://fumbbl.com/FUMBBL/Images/Roster_small.gif" alt="Roster" title="Ready / View Roster">
+                        <img v-else-if="team.getTeamStatus().isPostMatch()" src="https://fumbbl.com/FUMBBL/Images/p_small.png" alt="Roster" title="Post match sequence">
+                        <img v-else-if="team.getTeamStatus().isRetired()" src="https://fumbbl.com/FUMBBL/Images/Retired_small.gif" alt="Roster" title="Retired">
+                        <span :title="team.getDivision()"> [{{ team.getDivisionAbbreviated() }}]</span> {{ teamManagementSettings.rosterName }}
+                    </div>
+                    <ul class="teamnav">
+                        <li v-if="false"><a href="/p/team?team_id=1085077">Refresh</a></li>
+                        <li v-if="accessControl.canViewHistory()" class="menu" @mouseenter="menuShow('show')" @mouseleave="menuHide('show')">
+                            <a href="#">Show<img src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"></a>
+                            <ul class="submenu" v-show="mainMenuShow === 'show'">
+                                <li><a :href="`https://fumbbl.com/p/team?op=log&team_id=${team.getId()}`">Log</a></li>
+                                <li><a :href="`https://fumbbl.com/p/team?op=view&showmatches=1&team_id=${team.getId()}`">Matches</a></li>
+                                <li><a :href="`https://fumbbl.com/p/team?op=view&showstats=1&team_id=${team.getId()}`">Stats</a></li>
+                                <li><a :href="`https://fumbbl.com/p/team?op=development&team_id=${team.getId()}`">Development</a></li>
+                                <li><a :href="`https://fumbbl.com/p/team?op=pastplayers&team_id=${team.getId()}`">Past Players</a></li>
+                                <li><a :href="`https://fumbbl.com/~${team.getCoach().name}/${team.getName()}`">View Roster</a></li>
+                                <li><a :href="`https://fumbbl.com/p/yearbook?team_id=${team.getId()}`">Yearbook</a></li>
+                            </ul>
+                        </li>
+                        <li v-if="team.isLeagueDivision()" class="menu">
+                            <a :href="`https://fumbbl.com/p/teamoptions?id=${team.getId()}`">Team options</a>
+                        </li>
+                        <li class="menu" @mouseenter="menuShow('misc')" @mouseleave="menuHide('misc')">
+                            <a href="#">Misc<img src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"></a>
+                            <ul class="submenu" v-show="mainMenuShow === 'misc'">
+                                <li><a :href="`https://fumbbl.com/p/gallery3?team=${team.getId()}`">Change Image</a></li>
+                                <li><a :href="`https://fumbbl.com/p/team?op=editbio&amp;team_id=${team.getId()}`">Edit Bio</a></li>
+                                <li><a :href="`https://fumbbl.com/p/team?op=reportteam&team_id=${team.getId()}`">Report</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <img class="divisionlogo" :src="divisionLogoImageUrl" :alt="`Division logo for ${team.getDivision()}.`" :title="`Division logo for ${team.getDivision()}.`">
+        </div>
+        <div v-if="accessControl.canCreate()" class="createteamstats">
+            <div class="playerinfo">
+                <div class="currentplayercount">{{ team.getRosteredPlayers().length }}</div> <div class="currentplayercountlabel">Players ({{ teamManagementSettings.startPlayers }} required) <a href="#" @click.prevent="removeAllPlayers">Remove all players</a></div>
+            </div>
+            <div class="costinfo">
+                <div class="currentteamcostlabel">Treasury spent (Max {{ teamManagementSettings.startTreasury/1000 }}k)</div> <div class="currentteamcost">{{ teamCreationCost/1000 }}k</div>
+            </div>
+        </div>
+        <div v-if="false" class="redraft">
+             <div class="redraftcalculation">
+                <div class="budgetlabel">Re-drafting Budget</div>
+                <div class="playercostlabel">Player (re-)hiring cost</div>
+                <div class="othercostlabel">Team staff cost</div>
+                <div class="remainingbudgetlabel">Remaining budget</div>
+                <div class="budget">1145k</div>
+                <div class="subtract1">-</div>
+                <div class="playercost">1470k</div>
+                <div class="subtract2">-</div>
+                <div class="othercost">210k</div>
+                <div class="equals">=</div>
+                <div class="remainingbudget">-535k</div>
+                <div class="errormessage"><template v-if="true">⚠ Not enough money to cover team cost.</template></div>
+            </div>
+
+            <div class="redraftactions">
+                <div class="restartredraft"><a href="#">Restart redraft</a> (clears all changes)</div>
+                <div class="finishredraft" v-if="true"><a href="#">Finish redraft</a> (saves your changes)</div>
+            </div>
+        </div>
+
+        <div :class="{showhirerookies: showHireRookiesWithPermissionsCheck}">
+            <hirerookies
+                v-if="showHireRookiesWithPermissionsCheck"
+                :roster-position-data-for-buying-player="rosterPositionDataForBuyingPlayer"
+                :roster-icon-manager="rosterIconManager"
+                :has-empty-team-sheet-entry="teamSheet.findFirstEmptyTeamSheetEntry() !== null"
+                :max-big-guys="teamManagementSettings.maxBigGuys"
+                @hire-rookie="handleHireRookie"
+            ></hirerookies>
+            <div class="playerrowsouter">
+                <div class="playerrows">
+                    <div class="playerrowsheader">
+                        <template v-if="! showHireRookiesWithPermissionsCheck">
+                            <div class="cell draghandle"></div>
+                            <div class="cell playernumber"></div>
+                            <div class="cell playericoncontainer"></div>
+                            <div class="cell playerdetails"></div>
+                            <div class="cell statma">Ma</div>
+                            <div class="cell statst">St</div>
+                            <div class="cell statag">Ag</div>
+                            <div class="cell statpa">Pa</div>
+                            <div class="cell statav">Av</div>
+                            <div class="cell skills">Skills</div>
+                            <div class="cell injuries">Inj</div>
+                            <div class="cell spp">SPP</div>
+                            <div class="cell cost">Cost</div>
+                            <div v-if="accessControl.canCreate()" class="cell removenewplayer">Remove</div>
+                            <div v-else-if="accessControl.canEdit()" class="cell removenewplayer">Retire</div>
+                        </template>
+                        <template v-else>
+                            <div class="cell">...</div>
+                        </template>
+                    </div>
+                    <template v-if="teamSheet !== null">
+                        <player v-for="teamSheetEntry in teamSheet.getEntries()" :key="teamSheetEntry.getNumber()"
+                            :fumbbl-api="fumbblApi"
+                            :team-sheet-entry="teamSheetEntry"
+                            :access-control="accessControl"
+                            :all-fold-outs-closed="teamSheet.allFoldOutsClosed()"
+                            :is-any-player-drag-in-progress="teamSheet.getDragSourcePlayerNumber() !== null"
+                            :use-active-seperator-for-drag-drop="teamSheet.useActiveSeperatorForDragDrop(teamSheetEntry)"
+                            :roster-icon-manager="rosterIconManager"
+                            :name-generator="teamManagementSettings.nameGenerator"
+                            :compact-view="showHireRookiesWithPermissionsCheck"
+                            @remove-player="handleRemovePlayer"
+                            @nominate-retire-player="handleNominateRetirePlayer"
+                            @hire-journeyman="handleHireJourneyman"
+                            @make-player-draggable="handleMakePlayerDraggable"
+                            @drag-enter="handlePlayerDragEnter"
+                            @drop="handlePlayerDrop"
+                            @drag-end="handlePlayerDragEnd"
+                            @end-player-draggable="handleEndPlayerDraggable"
+                            @fold-out="handleFoldOut"
+                        ></player>
+                    </template>
+                </div>
+                <div class="playerrowsfooter">
+                    <div class="playercount">{{ team.countPlayersAvailableNextGame() }} players (+{{ team.countMissNextGamePlayers() }} players missing next game) <a href="#" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">Buy new player</a></div>
+                    <specialrules
+                        :fumbbl-api="fumbblApi"
+                        :team-id="team.getId()"
+                        :can-edit="accessControl.canCreate()"
+                        :raw-api-special-rules="rawApiSpecialRules"
+                        @rules-updated="handleSpecialRulesUpdated"
+                    ></specialrules>
+                </div>
+            </div>
+        </div>
+        <div class="teammanagement" :class="{editteam: accessControl.canEdit()}">
+            <div class="teammanagementrow">
+                <div class="title left">
+                    Coach:
+                </div>
+                <div class="info left">
+                    <a href="#">Bob</a>
+                </div>
+                <div class="title right">
+                    Re-Rolls ({{ rerollCostForMode/1000 }}k):
+                </div>
+                <div class="info right">
+                    <addremove
+                        :current-value="team.getRerolls().toString()"
+                        :can-edit="accessControl.canEdit()"
+                        :can-remove-immediately="accessControl.canCreate()"
+                        :can-add="addRemovePermissions.rerolls.add"
+                        :can-remove="addRemovePermissions.rerolls.remove"
+                        :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
+                        :label-remove="accessControl.canCreate() ? 'Remove' : 'Discard'"
+                        @add="addReroll"
+                        @remove-with-confirm="modals.removeReroll = true"
+                        @remove-immediately="removeReroll"
+                    ></addremove>
+                </div>
+            </div>
+            <div class="teammanagementrow">
+                <div class="title left">
+                    Roster:
+                </div>
+                <div class="info left">
+                    {{ teamManagementSettings.rosterName }}
+                </div>
+                <div class="title right">
+                    Dedicated Fans:
+                </div>
+                <div class="info right">
+                    <template v-if="accessControl.canCreate()">
+                        <select v-model.number="dedicatedFansChoice">
+                            <option v-for="dedicatedFansStartValue in teamManagementSettings.getDedicatedFansAllowedValues(team.getDedicatedFans(), team.getTreasury())" :key="dedicatedFansStartValue">{{ dedicatedFansStartValue }}</option>
+                        </select>&nbsp;
+                        <button v-if="dedicatedFansChoice != team.getDedicatedFans()" @click="updateDedicatedFans()" class="teambutton">Ok</button>
+                    </template>
+                    <template v-else>
+                        {{ team.getDedicatedFans() }}
+                    </template>
+                </div>
+            </div>
+            <div class="teammanagementrow">
+                <div class="title left">
+                    Current Team Value:
+                </div>
+                <div class="info left">
+                    {{ currentTeamValue/1000 }}k<span v-if="team.getTvLimitDisplay() !== 0"> (±{{ team.getTvLimitDisplay() }})</span>
+                </div>
+                <div class="title right">
+                    Assistant Coaches:
+                </div>
+                <div class="info right">
+                    <addremove
+                        :current-value="team.getAssistantCoaches().toString()"
+                        :can-edit="accessControl.canEdit()"
+                        :can-remove-immediately="accessControl.canCreate()"
+                        :can-add="addRemovePermissions.assistantCoaches.add"
+                        :can-remove="addRemovePermissions.assistantCoaches.remove"
+                        :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
+                        :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
+                        @add="addAssistantCoach"
+                        @remove-with-confirm="modals.removeAssistantCoach = true"
+                        @remove-immediately="removeAssistantCoach"
+                    ></addremove>
+                </div>
+            </div>
+            <div class="teammanagementrow">
+                <div class="title left">
+                    Treasury:
+                </div>
+                <div class="info left">
+                    {{ team.getTreasury()/1000 }}k
+                </div>
+                <div class="title right">
+                    Cheerleaders:
+                </div>
+                <div class="info right">
+                    <addremove
+                        :current-value="team.getCheerleaders().toString()"
+                        :can-edit="accessControl.canEdit()"
+                        :can-remove-immediately="accessControl.canCreate()"
+                        :can-add="addRemovePermissions.cheerleaders.add"
+                        :can-remove="addRemovePermissions.cheerleaders.remove"
+                        :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
+                        :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
+                        @add="addCheerleader"
+                        @remove-with-confirm="modals.removeCheerleader = true"
+                        @remove-immediately="removeCheerleader"
+                    ></addremove>
+                </div>
+            </div>
+            <div class="teammanagementrow">
+                <div class="title left">
+                    Team Value:
+                </div>
+                <div class="info left">
+                    {{ teamValue/1000 }}k
+                </div>
+                <div class="title right">
+                    Apothecary:
+                </div>
+                <div class="info right">
+                    <addremove
+                        :current-value="team.getApothecary() ? 'Yes' : 'No'"
+                        :can-edit="accessControl.canEdit() && teamManagementSettings.apothecaryAllowed"
+                        :can-remove-immediately="accessControl.canCreate()"
+                        :can-add="addRemovePermissions.apothecary.add"
+                        :can-remove="addRemovePermissions.apothecary.remove"
+                        :label-add="accessControl.canCreate() ? 'Add' : 'Hire'"
+                        :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
+                        @add="addApothecary"
+                        @remove-with-confirm="modals.removeApothecary = true"
+                        @remove-immediately="removeApothecary"
+                    ></addremove>
+                </div>
+            </div>
+            <div v-if="accessControl.canViewHistory()" class="teammanagementrow">
+                <div class="title left">
+                    Games this Season:
+                </div>
+                <div class="info left">
+                    {{ team.getGamesPlayedInSeason() }} / {{ teamManagementSettings.seasonLength }} <span v-if="team.getCurrentSeason() > 1"> (Season {{ team.getCurrentSeason() }})</span>
+                </div>
+                <div class="title right">
+                    Current Re-draft Budget:
+                </div>
+                <div class="info right">
+                    <div class=data>
+                        todo
+                    </div>
+                    <div v-if="accessControl.canEdit()" class="editteamcontrols">
+                        <!-- deliberately empty -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="accessControl.canViewHistory()" class="teamrecord">
+            <div class="teamstats">
+                <div class="gamesplayed">Games Played:	{{ gamesPlayedStatDisplay }}</div>
+                <div class="tddiff">TD Diff: {{ tdDiffStatDisplay }}</div>
+                <div class="casdiff">Cas Diff: {{ casDiffStatDisplay }}</div>
+            </div>
+            <div class="lastopponent">
+                Last Opponent: <a href="#" :data-id="lastPlayedTeamData.id">{{ lastPlayedTeamData.name }}</a>
+            </div>
+        </div>
+        <div v-if="accessControl.canCreate()" class="createteam">
+            <div class="activateteam">
+                <template v-if="editTeamNameInProgress">
+                    NOTE: The activate team button is hidden whilst you are editing the team name above.
+                </template>
+                <template v-else-if="teamManagementSettings.isValidForCreate(team)">
+                    <button @click="modals.activateTeam = true" class="teambutton">Activate</button>
+                </template>
+                <template v-else>
+                    <button @click="modals.errorsForCreate = true" class="teambutton">Activate</button>
+                </template>
+            </div>
+            <div class="deleteteam">
+                <button @click="modals.deleteTeam = true" class="teambutton">Delete Team</button>
+            </div>
+        </div>
+        <div v-if="accessControl.canRetireTeam()" class="retireteam">
+            <button @click="modals.retireTeam = true" class="teambutton">Retire Team</button>
+        </div>
+        <readytoplay
+            v-if="accessControl.canReadyTeam()"
+            :journeymanQuantityForNextGame="journeymanQuantityForNextGame"
+            :journeymanPositions="teamManagementSettings.journeymanPositions"
+            @ready-to-play="handleReadyToPlay"
+        ></readytoplay>
+        <modal
+            v-if="errorModalInfo !== null"
+            :button-settings="{cancel: {enabled: true, label: 'Close'}, confirm: {enabled: false, label: ''}}"
+            :modal-size="'small'"
+            @cancel="errorModalInfo = null"
+        >
+            <template v-slot:header>
+                Error
+            </template>
+
+            <template v-slot:body>
+                <p>{{ errorModalInfo.general }}</p>
+                <p>Technical details: {{ errorModalInfo.technical }}</p>
+            </template>
+        </modal>
+        <modal
+            v-show="modals.removeReroll === true"
+            :button-settings="{cancel: {enabled: true, label: 'Cancel'}, confirm: {enabled: true, label: 'Remove'}}"
+            :modal-size="'small'"
+            @cancel="modals.removeReroll = false"
+            @confirm="removeReroll"
+        >
+            <template v-slot:header>
+                Discard reroll
+            </template>
+
+            <template v-slot:body>
+                <p>Are you sure you wish to discard this reroll? This cannot be undone.</p>
+            </template>
+        </modal>
+        <modal
+            v-show="modals.removeAssistantCoach === true"
+            :button-settings="{cancel: {enabled: true, label: 'Cancel'}, confirm: {enabled: true, label: 'Remove'}}"
+            :modal-size="'small'"
+            @cancel="modals.removeAssistantCoach = false"
+            @confirm="removeAssistantCoach"
+        >
+            <template v-slot:header>
+                Discard assistant coach
+            </template>
+
+            <template v-slot:body>
+                <p>Are you sure you wish to discard this assistant coach? This cannot be undone.</p>
+            </template>
+        </modal>
+        <modal
+            v-show="modals.removeCheerleader === true"
+            :button-settings="{cancel: {enabled: true, label: 'Cancel'}, confirm: {enabled: true, label: 'Remove'}}"
+            :modal-size="'small'"
+            @cancel="modals.removeCheerleader = false"
+            @confirm="removeCheerleader"
+        >
+            <template v-slot:header>
+                Discard cheerleader
+            </template>
+
+            <template v-slot:body>
+                <p>Are you sure you wish to discard this cheerleader? This cannot be undone.</p>
+            </template>
+        </modal>
+        <modal
+            v-show="modals.removeApothecary === true"
+            :button-settings="{cancel: {enabled: true, label: 'Cancel'}, confirm: {enabled: true, label: 'Remove'}}"
+            :modal-size="'small'"
+            @cancel="modals.removeApothecary = false"
+            @confirm="removeApothecary"
+        >
+            <template v-slot:header>
+                Fire apothecary
+            </template>
+
+            <template v-slot:body>
+                <p>Are you sure you wish to fire this apothecary? This cannot be undone.</p>
+            </template>
+        </modal>
+        <modal
+            v-show="modals.activateTeam === true"
+            :button-settings="{cancel: {enabled: true, label: 'Oops, let me go back and check!'}, confirm: {enabled: true, label: 'Yes, my team complies'}}"
+            :modal-size="'small'"
+            @cancel="modals.activateTeam = false"
+            @confirm="handleActivateTeam"
+        >
+            <template v-slot:header>
+                * * * Important Notice * * *
+            </template>
+
+            <template v-slot:body>
+                <p>Before you activate your team, please make sure your team complies with our <a href="https://fumbbl.com/note/Christer/NamesAndImages" target="_blank">Team Naming Policy</a>.</p>
+                <p>Failure to follow these rules may result in your account being suspended for some time, depending on the severity of the transgression. The staff and the community are constantly monitoring teams and we do take this seriously. So, please make sure your team is in accordance with the rules before activating it.</p>
+            </template>
+        </modal>
+        <modal
+            v-show="modals.errorsForCreate === true"
+            :button-settings="{cancel: {enabled: true, label: 'Close'}, confirm: {enabled: false, label: ''}}"
+            :modal-size="'small'"
+            @cancel="modals.errorsForCreate = false"
+        >
+            <template v-slot:header>
+                Unable to create team.
+            </template>
+
+            <template v-slot:body>
+                <p>Sorry we are unable to create your team, please review the errors listed below.</p>
+                <ul>
+                    <li v-for="error in teamManagementSettings.getErrorsForCreate(team)" :key="error">
+                        <template v-if="error === 'teamNameBlank'">Team name is blank.</template>
+                        <template v-if="error === 'insufficientTreasury'">Insufficient treasury for chosen players and sideline staff.</template>
+                        <template v-if="error === 'insufficientPlayers'">Less than minimum required starting players selected.</template>
+                    </li>
+                </ul>
+            </template>
+        </modal>
+        <modal
+            v-show="modals.deleteTeam === true"
+            :button-settings="{cancel: {enabled: true, label: 'Cancel'}, confirm: {enabled: true, label: 'Delete Team'}}"
+            :modal-size="'small'"
+            @cancel="modals.deleteTeam = false"
+            @confirm="handleDeleteTeam"
+        >
+            <template v-slot:header>
+                Delete team?
+            </template>
+
+            <template v-slot:body>
+                <p>Are you sure you want to delete the following team?</p>
+                <p>Team: <strong>{{ team.getName() }}</strong> {{ team.getTeamValue() / 1000 }}k ({{ teamManagementSettings.rosterName }})</p>
+            </template>
+        </modal>
+        <modal
+            v-show="modals.retireTeam === true"
+            :button-settings="{cancel: {enabled: true, label: 'Cancel'}, confirm: {enabled: true, label: 'Retire Team'}}"
+            :modal-size="'small'"
+            @cancel="modals.retireTeam = false"
+            @confirm="handleRetireTeam"
+        >
+            <template v-slot:header>
+                Retire team?
+            </template>
+
+            <template v-slot:body>
+                <p>Are you sure you want to retire the following team?</p>
+                <p>Team: <strong>{{ team.getName() }}</strong> {{ team.getTeamValue() / 1000 }}k ({{ teamManagementSettings.rosterName }})</p>
+            </template>
+        </modal>
+        <retireplayer
+            v-if="playerToRetire"
+            :fumbblApi="fumbblApi"
+            :player="playerToRetire"
+            @nominate-retire-player-cancel="handleNominateRetirePlayerCancel"
+            @nominate-retire-player-confirm="handleNominateRetirePlayerConfirm"
+        ></retireplayer>
+    </div>
+</template>
+
+<script lang="ts">
+import { PropType } from "vue";
+import { Prop, Component, Vue, toNative, Emit } from 'vue-facing-decorator'
+import {
+    AddRemovePermissions,
+    JourneymanQuantityChoice,
+    PlayerGender,
+    PlayerRowFoldOutMode,
+    PositionDataForBuyingPlayer,
+    RawApiSpecialRules,
+    UserRole,
+} from "../include/Interfaces";
+import AccessControl from "../include/AccessControl";
+import Team from "../include/Team";
+import TeamSheet from "../include/TeamSheet";
+import PlayerComponent from "./Player.vue";
+import EditTeamNameComponent from "./EditTeamName.vue";
+import HireRookiesComponent from "./HireRookies.vue";
+import RosterIconManager from "../include/RosterIconManager";
+import TeamManagementSettings from "../include/TeamManagementSettings";
+import SpecialRulesComponent from "./SpecialRules.vue";
+import AddRemoveComponent from "./AddRemove.vue";
+import ModalComponent from "./Modal.vue";
+import RetirePlayerComponent from "./RetirePlayer.vue";
+import ReadyToPlayComponent from "./ReadyToPlay.vue";
+import FumbblApi from "../include/FumbblApi";
+import Player from "../include/Player";
+import { EventDataDrop, EventDataFoldOut, EventDataRemovePlayer } from "../include/EventDataInterfaces";
+
+@Component({
+    components: {
+        'editteamname': EditTeamNameComponent,
+        'player': PlayerComponent,
+        'hirerookies': HireRookiesComponent,
+        'specialrules': SpecialRulesComponent,
+        'addremove': AddRemoveComponent,
+        'modal': ModalComponent,
+        'retireplayer': RetirePlayerComponent,
+        'readytoplay': ReadyToPlayComponent,
+    },
+})
+class TeamComponent extends Vue {
+    @Prop({
+        type: Object as PropType<FumbblApi>,
+        required: true,
+    })
+    public fumbblApi!: FumbblApi;
+
+    @Prop({
+        type: Number,
+        required: true,
+    })
+    public teamId!: number;
+
+    @Emit('unexpected-error')
+    public triggerUnexpectedError(errorMessage: string): string {
+        return errorMessage;
+    }
+
+    @Emit('delete-team')
+    public triggerDeleteTeam() {}
+
+    private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
+
+    // the following properties (prefixed with data) must be initialized in order to become reactive data properties
+    // to avoid warnings we provide getters for each without the data prefix, which also ignore the possibility of them being undefined
+    public dataTeam?: Team = undefined;
+    public dataTeamSheet?: TeamSheet = undefined;
+    public dataTeamManagementSettings?: TeamManagementSettings = undefined;
+    public dataAccessControl?: AccessControl = undefined;
+    public dataRosterIconManager?: RosterIconManager = undefined;
+
+    private teamLastModifiedTimestamp: number = 0;
+    private userRoles: UserRole[] = ['OWNER']; // TODO: fix hardcoded values here
+    public editTeamNameInProgress: boolean = false;
+    public dedicatedFansChoice: number = 0;
+    public playerToRetire: Player | null = null;
+    public rawApiSpecialRules: RawApiSpecialRules = {fromRoster: null, fromTeam: null};
+    public mainMenuShow: string = 'none';
+    private showHireRookies: boolean = false;
+    public errorModalInfo: {general: string, technical: string} | null = null;
+
+    public modals: {
+        activateTeam: boolean,
+        errorsForCreate: boolean,
+        deleteTeam: boolean,
+        retireTeam: boolean,
+        removeReroll: boolean,
+        removeAssistantCoach: boolean,
+        removeCheerleader: boolean,
+        removeApothecary: boolean,
+    } = {
+        activateTeam: false,
+        errorsForCreate: false,
+        deleteTeam: false,
+        retireTeam: false,
+        removeReroll: false,
+        removeAssistantCoach: false,
+        removeCheerleader: false,
+        removeApothecary: false,
+    };
+
+    public menuShow(menu: string) {
+        this.mainMenuShow = menu;
+    }
+
+    public menuHide(menu: string) {
+        this.mainMenuShow = 'none';
+    }
+
+    async mounted() {
+        await this.reloadTeam();
+
+        this.dedicatedFansChoice = this.team.getDedicatedFans();
+
+        // Reload the team when someone returns to the tab
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'visible') {
+                this.reloadTeam();
+            }
+        });
+    }
+
+    private async reloadTeam() {
+        const apiResponse = await this.fumbblApi.getTeam(this.teamId);
+        if (apiResponse.isSuccessful()) {
+            const rawApiTeam = apiResponse.getData();
+            this.rawApiSpecialRules.fromTeam = rawApiTeam.specialRules;
+            await this.setupForRulesetAndRoster(rawApiTeam.ruleset, rawApiTeam.roster.id);
+
+            // Make sure that the same icon stays with the same player throughout the session
+            const playerRosterIconVersionPositions: any = {};
+            if (this.team) {
+                for (const player of this.team.getPlayers()) {
+                    playerRosterIconVersionPositions[player.getId()] = player.getIconRowVersionPosition();
+                }
+            }
+
+            this.dataTeam = Team.fromApi(
+                rawApiTeam,
+                this.teamManagementSettings.minStartFans,
+                this.teamManagementSettings,
+                playerRosterIconVersionPositions,
+                this.rosterIconManager,
+            );
+
+            this.dataAccessControl = new AccessControl(this.userRoles, this.team.getTeamStatus().getStatus());
+
+            this.refreshTeamSheet();
+        } else {
+            this.triggerUnexpectedError('Loading team information: ' + apiResponse.getErrorMessage());
+        }
+    }
+
+    private reloadTeamWithDelay() {
+        const currentTimestamp = Date.now();
+        this.teamLastModifiedTimestamp = currentTimestamp;
+        const reloadForRecentModification = () => {
+            if (this.teamLastModifiedTimestamp === currentTimestamp && ! this.teamSheet.isDragInProgress()) {
+                this.reloadTeam();
+            }
+        };
+        setTimeout(reloadForRecentModification, this.MODIFICATION_RELOAD_DELAY);
+    }
+
+    private created() {
+        window.addEventListener("keydown", this.handleKeyDown);
+    }
+
+    private destroyed() {
+        window.removeEventListener("keydown", this.handleKeyDown);
+    }
+
+    private handleKeyDown(event: KeyboardEvent) {
+        if (event.ctrlKey || event.metaKey) {
+            if (this.accessControl && this.accessControl.canEdit()) {
+                if (event.key === "$") {
+                    event.preventDefault();
+                    this.enableShowHireRookies();
+                }
+            }
+        }
+    }
+
+    private async recoverFromUnexpectedError(generalErrorMessage: string, technicalErrorMessage: string) {
+        this.errorModalInfo = {
+            general: generalErrorMessage,
+            technical: technicalErrorMessage,
+        }
+        await this.reloadTeam();
+    }
+
+    private async setupForRulesetAndRoster(rulesetId: number, rosterId: number) {
+        // Prevent this basic set up from running more than once
+        if (this.teamManagementSettings !== null && this.rawApiSpecialRules.fromRoster !== null && this.rosterIconManager !== null) {
+            return;
+        }
+
+        const apiResponseRuleset = await this.fumbblApi.getRuleset(rulesetId);
+        const apiResponseRoster = await this.fumbblApi.getRoster(rosterId);
+
+        if (apiResponseRuleset.isSuccessful() && apiResponseRoster.isSuccessful()) {
+            const rawApiRuleset = apiResponseRuleset.getData();
+            const rawApiRoster = apiResponseRoster.getData();
+
+            this.rawApiSpecialRules.fromRoster = rawApiRoster.specialRules;
+            let hasLowCostLinemen = false;
+            for (const specialRule of this.rawApiSpecialRules.fromRoster) {
+                if (specialRule.name === 'Low Cost Linemen') {
+                    hasLowCostLinemen = true;
+                }
+            }
+
+            await this.setupRosterIconManager(rawApiRoster.positions);
+            this.dataTeamManagementSettings = new TeamManagementSettings(rawApiRuleset, rawApiRoster, hasLowCostLinemen);
+        } else {
+            let currentAction = '';
+            let errorMessage = '';
+            if (! apiResponseRuleset.isSuccessful()) {
+                currentAction = 'Loading ruleset information';
+                errorMessage = apiResponseRuleset.getErrorMessage();
+            } else {
+                currentAction = 'Loading roster information';
+                errorMessage = apiResponseRoster.getErrorMessage();
+            }
+            this.triggerUnexpectedError(currentAction + ': ' + errorMessage);
+        }
+    }
+
+    public async setupRosterIconManager(rawApiPositions: any[]) {
+        const positionIconData = rawApiPositions.map((position: any) => {
+            return {
+                positionId: ~~position.id,
+                positionIcon: ~~position.icon,
+            };
+        });
+        const rosterIconManager = new RosterIconManager();
+        await rosterIconManager.prepareIconData(positionIconData);
+
+        this.dataRosterIconManager = rosterIconManager;
+    }
+
+    public get dataPropertiesInitialized(): boolean {
+        return this.dataTeam !== undefined &&
+            this.dataTeamSheet !== undefined &&
+            this.dataTeamManagementSettings !== undefined &&
+            this.dataAccessControl !== undefined &&
+            this.dataRosterIconManager !== undefined;
+    }
+
+    public get team(): Team {
+        return this.dataTeam!;
+    }
+
+    public get teamSheet(): TeamSheet {
+        return this.dataTeamSheet!;
+    }
+
+    public get teamManagementSettings(): TeamManagementSettings {
+        return this.dataTeamManagementSettings!;
+    }
+
+    public get accessControl(): AccessControl {
+        return this.dataAccessControl!;
+    }
+
+    public get rosterIconManager(): RosterIconManager {
+        return this.dataRosterIconManager!;
+    }
+
+    public get teamValue(): number {
+        return this.teamManagementSettings.calculateTeamValue(this.team);
+    }
+
+    public get currentTeamValue(): number {
+        return this.teamManagementSettings.calculateCurrentTeamValue(this.team);
+    }
+
+    public get teamCreationCost(): number {
+        return this.teamManagementSettings.calculateCreateTeamCost(this.team);
+    }
+
+    public get rosterPositionDataForBuyingPlayer(): PositionDataForBuyingPlayer[] {
+        const positionQuantities: {positionId: number, quantity: number}[] = [];
+
+        for (const position of this.teamManagementSettings.positions) {
+            const positionQuantity = {
+                positionId: position.id,
+                quantity: this.team.countPlayersOfPositionId(position.id),
+            };
+            positionQuantities.push(positionQuantity);
+        }
+
+        return this.teamManagementSettings.getRosterPositionDataForBuyingPlayer(
+            this.team.getTreasury(),
+            positionQuantities,
+        );
+    }
+
+    public get showHireRookiesWithPermissionsCheck(): boolean {
+        return this.showHireRookies && this.accessControl.canHireRookie();
+    }
+
+    public get gamesPlayedStatDisplay(): string {
+        return '0 (0/0/0)'; // todo
+    }
+
+    public get tdDiffStatDisplay(): string {
+        return '0 (0 - 0)'; // todo
+    }
+
+    public get casDiffStatDisplay(): string {
+        return '0 (0/0/0 - 0/0/0)'; // todo
+    }
+
+    public get lastPlayedTeamData(): {id: number, name: string} {
+        return {
+            id: 10000000000,
+            name: 'Todo United',
+        };
+    }
+
+    public get addRemovePermissions(): AddRemovePermissions {
+        return this.teamManagementSettings.getAddRemovePermissions(this.team);
+    }
+
+    public get divisionLogoImageUrl(): string {
+        if (this.team.isCompetitiveDivision()) {
+            return 'https://fumbbl.com/i/677766';
+        } else if (this.team.isLeagueDivision()) {
+            return 'https://fumbbl.com/FUMBBL/Images/Icons/league.png';
+        } else {
+            return 'https://fumbbl.com/FUMBBL/Images/Race/unknown_196.png';
+        }
+    }
+
+    public refreshTeamSheet(entryNumbersUpdating: number[] = []) {
+        this.dataTeamSheet = new TeamSheet(
+            this.teamManagementSettings.maxPlayers,
+            this.team.getPlayers(),
+            entryNumbersUpdating,
+        );
+    }
+
+    public get rerollCostForMode(): number {
+        if (this.team.getTeamStatus().isNew()) {
+            return this.teamManagementSettings.rerollCostOnCreate;
+        } else {
+            return this.teamManagementSettings.rerollCostFull;
+        }
+    }
+
+    public get journeymanQuantityForNextGame(): number {
+        const playerDeficit = this.teamManagementSettings.startPlayers - this.team.countPlayersAvailableNextGame();
+        return playerDeficit < 0 ? 0 : playerDeficit;
+    }
+
+    public handleMakePlayerDraggable(playerNumber: number) {
+        this.teamSheet.setDragSource(playerNumber);
+    }
+
+    public handlePlayerDragEnter(playerNumber: number) {
+        if (! this.teamSheet.isDragSource(playerNumber)) {
+            this.teamSheet.setDropTarget(playerNumber);
+        } else {
+            this.teamSheet.clearAllDropTargets();
+        }
+    }
+
+    public async handlePlayerDrop(eventDataDrop: EventDataDrop) {
+        const dragSourcePlayerNumber = this.teamSheet.getDragSourcePlayerNumber();
+        if (! dragSourcePlayerNumber) {
+            return;
+        }
+
+        const playerNumbers = this.team.movePlayer(
+            dragSourcePlayerNumber,
+            eventDataDrop.teamSheetEntryNumber,
+            ! eventDataDrop.hasPlayer,
+        );
+        this.reloadTeamWithDelay();
+
+        const apiResponse = await this.fumbblApi.renumberPlayers(this.team.getId(), playerNumbers);
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred whilst renumbering your players.',
+                apiResponse.getErrorMessage(),
+            );
+            return;
+        }
+
+        this.refreshTeamSheet();
+    }
+
+    public handlePlayerDragEnd() {
+        this.endDragDrop();
+    }
+
+    public handleEndPlayerDraggable() {
+        this.teamSheet.clearDragDrop();
+    }
+
+    public endDragDrop() {
+        this.teamSheet.clearDragDrop();
+    }
+
+    public async removeAllPlayers() {
+        const playerIdsToRemove = this.team.getPlayers().map(player => player.getId());
+        this.team.removeAllPlayers();
+        // call this to immediately show the players have gone (handleGeneralTeamUpdate needs to be called after all have been fully removed).
+        this.refreshTeamSheet();
+
+        for (const playerId of playerIdsToRemove) {
+            const apiResponse = await this.fumbblApi.removePlayer(this.team.getId(), playerId);
+            if (! apiResponse.isSuccessful()) {
+                await this.recoverFromUnexpectedError(
+                    'An error occurred removing a player whilst removing all players from team.',
+                    apiResponse.getErrorMessage(),
+                );
+                return;
+            }
+        }
+
+        // Important to call this after all players have finished being removed,
+        // otherwise some players will reappear during the removal process.
+        this.reloadTeamWithDelay();
+    }
+
+    public async updateDedicatedFans() {
+        this.team.updateDedicatedFans(this.dedicatedFansChoice, this.teamManagementSettings.dedicatedFansCost);
+        this.reloadTeamWithDelay();
+
+        const apiResponse = await this.fumbblApi.setDedicatedFans(this.team.getId(), this.dedicatedFansChoice);
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred setting dedicated fans.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    public async addReroll() {
+        this.team.addReroll(
+            this.team.getTeamStatus().isNew() ? this.teamManagementSettings.rerollCostOnCreate : this.teamManagementSettings.rerollCostFull
+        );
+        this.reloadTeamWithDelay();
+
+        const apiResponse = await this.fumbblApi.addReroll(this.team.getId());
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred adding a reroll.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    public async removeReroll() {
+        this.team.removeReroll(this.teamManagementSettings.rerollCostOnCreate);
+        this.modals.removeReroll = false;
+        this.reloadTeamWithDelay();
+
+        let apiResponse = null;
+        if (this.accessControl.canCreate()) {
+            apiResponse = await this.fumbblApi.removeReroll(this.team.getId());
+        } else {
+            apiResponse = await this.fumbblApi.discardReroll(this.team.getId());
+        }
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred removing a reroll.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    public async addAssistantCoach() {
+        this.team.addAssistantCoach(this.teamManagementSettings.assistantCoachCost);
+        this.reloadTeamWithDelay();
+
+        const apiResponse = await this.fumbblApi.addAssistantCoach(this.team.getId());
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred adding an assistant coach.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    public async removeAssistantCoach() {
+        this.team.removeAssistantCoach(this.teamManagementSettings.assistantCoachCost);
+        this.modals.removeAssistantCoach = false;
+        this.reloadTeamWithDelay();
+
+        let apiResponse = null;
+        if (this.accessControl.canCreate()) {
+            apiResponse = await this.fumbblApi.removeAssistantCoach(this.team.getId());
+        } else {
+            apiResponse = await this.fumbblApi.fireAssistantCoach(this.team.getId());
+        }
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred removing an assistant coach.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    public async addCheerleader() {
+        this.team.addCheerleader(this.teamManagementSettings.cheerleaderCost);
+        this.reloadTeamWithDelay();
+
+        const apiResponse = await this.fumbblApi.addCheerleader(this.team.getId());
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred adding a cheerleader.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    public async removeCheerleader() {
+        this.team.removeCheerleader(this.teamManagementSettings.cheerleaderCost);
+        this.modals.removeCheerleader = false;
+        this.reloadTeamWithDelay();
+
+        let apiResponse = null;
+        if (this.accessControl.canCreate()) {
+            apiResponse = await this.fumbblApi.removeCheerleader(this.team.getId());
+        } else {
+            apiResponse = await this.fumbblApi.fireCheerleader(this.team.getId());
+        }
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred removing a cheerleader.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    public async addApothecary() {
+        this.team.addApothecary(this.teamManagementSettings.apothecaryCost);
+        this.reloadTeamWithDelay();
+
+        const apiResponse = await this.fumbblApi.addApothecary(this.team.getId());
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred adding an apothecary.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    public async removeApothecary() {
+        this.team.removeApothecary(this.teamManagementSettings.apothecaryCost);
+        this.modals.removeApothecary = false;
+        this.reloadTeamWithDelay();
+
+        let apiResponse = null;
+        if (this.accessControl.canCreate()) {
+            apiResponse = await this.fumbblApi.removeApothecary(this.team.getId());
+        } else {
+            apiResponse = await this.fumbblApi.fireApothecary(this.team.getId());
+        }
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred removing an apothecary.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    public enableShowHireRookies(): void {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        this.showHireRookies = ! this.showHireRookies;
+    }
+
+    private getGender(defaultGender: string): PlayerGender {
+        const availableGenders: PlayerGender[] = ['FEMALE', 'MALE', 'NEUTRAL', 'NONBINARY'];
+        if (availableGenders.includes(defaultGender.toUpperCase() as PlayerGender)) {
+            return defaultGender.toUpperCase() as PlayerGender;
+        }
+        return availableGenders[Math.floor(Math.random()*availableGenders.length)];
+    }
+
+    public async handleRemovePlayer(eventDataRemovePlayer: EventDataRemovePlayer) {
+        const player = this.team.findPlayerByNumber(eventDataRemovePlayer.teamSheetEntryNumber);
+        if (player === null || player.getId() !== eventDataRemovePlayer.playerId) {
+            await this.recoverFromUnexpectedError(
+                'Unable to remove player, if this problem continues please reload the page.',
+                `Removing playerId ${eventDataRemovePlayer.playerId} from number ${eventDataRemovePlayer.teamSheetEntryNumber} but found playerId ${player ? player.getId() : 'empty'}`,
+            );
+            return;
+        }
+
+        this.team.removePlayer(player);
+        this.refreshTeamSheet();
+        this.reloadTeamWithDelay();
+
+        const apiResponse = await this.fumbblApi.removePlayer(this.team.getId(), player.getId());
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred removing a player.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    public handleNominateRetirePlayer(player: Player) {
+        this.playerToRetire = player;
+    }
+
+    public handleNominateRetirePlayerCancel() {
+        this.playerToRetire = null;
+    }
+
+    public async handleNominateRetirePlayerConfirm() {
+        if (! this.playerToRetire) {
+            return;
+        }
+
+        this.team.removePlayer(this.playerToRetire);
+        this.refreshTeamSheet();
+        this.reloadTeamWithDelay();
+
+        const playerToRetireId = this.playerToRetire.getId();
+        this.playerToRetire = null;
+
+        const apiResponse = await this.fumbblApi.retirePlayer(this.team.getId(), playerToRetireId);
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred retiring a player.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    public async handleHireJourneyman(player: Player) {
+        const firstEmptyTeamSheetEntry = this.teamSheet.findFirstEmptyTeamSheetEntry();
+        if (! firstEmptyTeamSheetEntry) {
+            return;
+        }
+
+        const teamSheetEntryId = firstEmptyTeamSheetEntry.getNumber();
+
+        player.permanentlyHireJourneyman(teamSheetEntryId);
+
+        this.refreshTeamSheet([teamSheetEntryId]);
+        setTimeout(() => this.teamSheet.clearAllIsUpdating(), 2000);
+        this.reloadTeamWithDelay();
+
+        const apiResponse = await this.fumbblApi.hireJourneyman(this.team.getId(), player.getId());
+        if (! apiResponse.isSuccessful()) {
+            await this.recoverFromUnexpectedError(
+                'An error occurred permanently hiring a journeyman.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    // public handleFoldOut(teamSheetEntryNumber: number, playerRowFoldOutMode: PlayerRowFoldOutMode, multipleOpenMode: boolean) {
+    public handleFoldOut(eventDataFoldOut: EventDataFoldOut) {
+        this.teamSheet.updateFoldOut(
+            eventDataFoldOut.teamSheetEntryNumber,
+            eventDataFoldOut.playerRowFoldOutMode,
+            eventDataFoldOut.multipleOpenMode,
+        );
+    }
+
+    public async handleHireRookie(positionId: number) {
+        const firstEmptyTeamSheetEntry = this.teamSheet.findFirstEmptyTeamSheetEntry();
+        if (! firstEmptyTeamSheetEntry) {
+            return;
+        }
+
+        const position = this.teamManagementSettings.getPosition(positionId);
+        const gender = this.getGender(position.defaultGender);
+        const iconRowVersionPosition = this.rosterIconManager.getNextAvailableIconRowVersionPosition(
+            positionId,
+            this.team.getTakenIconRowVersionPositionsOfPositionId(positionId),
+        );
+
+        // Add quick temporary player for user interface responsiveness
+        // This temporary player is removed when reload team is called later in this method
+        const temporaryPlayer = this.team.buyTemporaryPlayer(
+            firstEmptyTeamSheetEntry.getNumber(),
+            this.teamManagementSettings.getPosition(positionId),
+            iconRowVersionPosition,
+            gender,
+        );
+        this.refreshTeamSheet();
+
+        const apiResponsePlayerName = await this.fumbblApi.generatePlayerName(this.teamManagementSettings.nameGenerator, gender);
+
+        if (! apiResponsePlayerName.isSuccessful()) {
+            this.team.removeTemporaryPlayers();
+            await this.recoverFromUnexpectedError(
+                'An error occurred when generating a player name.',
+                apiResponsePlayerName.getErrorMessage(),
+            );
+            return;
+        }
+
+        const playerName = apiResponsePlayerName.getData();
+        temporaryPlayer.setPlayerName(playerName);
+        this.refreshTeamSheet();
+
+        const apiResponse = await this.fumbblApi.addPlayer(this.team.getId(), positionId, gender, playerName);
+        if (apiResponse.isSuccessful()) {
+            const newPlayerResponseData: {playerId: number, number: number} = apiResponse.getData();
+            temporaryPlayer.setIdForTemporaryPlayer(newPlayerResponseData.playerId);
+            this.refreshTeamSheet();
+            this.reloadTeamWithDelay();
+            if (temporaryPlayer.getPlayerNumber() !== newPlayerResponseData.number) {
+                await this.recoverFromUnexpectedError(
+                    'Your player has been purchased but your team page is out of synch with the latest version on the server. Please refresh the page if this problem continues.',
+                    `Expected player number ${temporaryPlayer.getPlayerNumber()}, got ${newPlayerResponseData.number}`,
+                );
+            }
+        } else {
+            this.team.removeTemporaryPlayers();
+            await this.recoverFromUnexpectedError(
+                'An error occurred buying a new player.',
+                apiResponse.getErrorMessage(),
+            );
+        }
+    }
+
+    public handleSpecialRulesUpdated() {
+        this.reloadTeam();
+    }
+
+    public handleBeginEditTeamName() {
+        this.editTeamNameInProgress = true;
+    }
+
+    public handleCancelEditTeamName() {
+        this.editTeamNameInProgress = false;
+    }
+
+    public async handleEditTeamName(newTeamName: string) {
+        const originalTeamName = this.team.getName();
+        this.team.setName(newTeamName);
+        const apiResponse = await this.fumbblApi.renameTeam(this.team.getId(), newTeamName);
+        if (! apiResponse.isSuccessful()) {
+            this.team.setName(originalTeamName);
+            await this.recoverFromUnexpectedError('Unable to rename team.', apiResponse.getErrorMessage());
+        }
+        this.reloadTeamWithDelay();
+        this.editTeamNameInProgress = false;
+    }
+
+    public async handleActivateTeam() {
+        const apiResponse = await this.fumbblApi.activateTeam(this.team.getId());
+        if (apiResponse.isSuccessful()) {
+            await this.reloadTeam();
+            this.modals.activateTeam = false;
+            setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 500);
+        } else {
+            this.modals.activateTeam = false;
+            await this.recoverFromUnexpectedError('An error occurred activating your team.', apiResponse.getErrorMessage());
+        }
+    }
+
+    public async handleDeleteTeam() {
+        const apiResponse = await this.fumbblApi.deleteTeam(this.team.getId());
+        if (apiResponse.isSuccessful()) {
+            this.modals.deleteTeam = false;
+            this.triggerDeleteTeam();
+        } else {
+            this.modals.deleteTeam = false;
+            await this.recoverFromUnexpectedError('An error occurred deleting your team.', apiResponse.getErrorMessage());
+        }
+    }
+
+    public async handleRetireTeam() {
+        const apiResponse = await this.fumbblApi.retireTeam(this.team.getId());
+        if (apiResponse.isSuccessful()) {
+            await this.reloadTeam();
+            this.modals.retireTeam = false;
+            setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 500);
+        } else {
+            this.modals.retireTeam = false;
+            await this.recoverFromUnexpectedError('An error occurred retiring your team.', apiResponse.getErrorMessage());
+        }
+    }
+
+    public async handleReadyToPlay(journeymanQuantityChoices: JourneymanQuantityChoice[]) {
+        console.log('TODO: ready the team now', journeymanQuantityChoices);
+    }
+}
+
+export default toNative(TeamComponent);
+</script>

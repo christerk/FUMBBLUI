@@ -1,0 +1,940 @@
+// official colours
+@Carmine: #A10005;
+@Forest: #1A401C;
+@Eggshell: #e7ddc7;
+@OldLace: #f8f5e7;
+@White: #fff;
+@Quicksilver: #999999;
+@Jet: #2f2f2f;
+@Black: #000;
+
+// unofficial colours
+@brightGreen: #090;
+@cancelRed: #900;
+@darkBlue: #009;
+@lightGrey: #ddd;
+@teamMenuGreyBrown: #bcb29d;
+
+.teammanagement {
+  margin-top: 20px;
+ 
+  .team {
+    .teamheader {
+      display: flex;
+      background: @OldLace;
+      margin-bottom: 10px;
+      border-bottom: solid 1px @teamMenuGreyBrown;
+      height: 128px;
+      .rosterlogo {
+      }
+      .teamheadermain {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+        .teamheadermaincontent {
+          display: flex;
+          flex-direction: column;
+          input {
+            width: 200px;
+          }
+          .teamname {
+            flex: 1 0 auto;
+            display: flex;
+            justify-content: center;
+            .teamnamecontent {
+              display: flex;
+              column-gap: 5px;
+              align-items: center;
+              .teamnametext {
+                font-size: 250%;
+              }
+              .editteamname {
+                margin: 10px 0 10px 0;
+              }
+              .editlink {
+              }
+            }
+          }
+          .rosterinfo {
+            flex: 1 0 auto;
+            text-align: center;
+          }
+          .teamnav {
+            flex: 0 0 auto;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            line-height: 16px;
+            left: 0;
+            font-size: 14px;
+            color: @Carmine;
+            width: 100%;
+            a {
+              display: block;
+              height: 100%;
+              width: 100%;
+              color: inherit;
+              text-decoration: none;
+              &:hover {
+                background-color: #a5a39a
+              }
+            }
+            li {
+              display: inline-block;
+              list-style: none;
+              width: 120px;
+              padding: 0;
+              margin: 0;
+              font-weight: 700;
+              text-align: center;
+              height: 41px;
+              line-height: 31px;
+              img {
+                vertical-align: middle;
+              }
+              div {
+                color: #333; // not sure what this does yet
+              }
+            }
+            .submenu {
+              margin: 0;
+              padding: 0;
+              background: #f8f5e7;
+              border-bottom: solid 1px @teamMenuGreyBrown;
+              position: absolute;
+              z-index: 100;
+              font-size: 12px;
+              width: 120px;
+              li {
+                border: solid @teamMenuGreyBrown 1px;
+                border-top: 0;
+                border-bottom: 0;
+                a {
+                  padding: 5px;
+                }
+              }
+              .separator {
+                display: block;
+                height: 4px;
+                width: 100%;
+                overflow: hidden;
+                border-right: solid 1px @teamMenuGreyBrown;
+                border-left: solid 1px @teamMenuGreyBrown;
+                .line {
+                  display: block;
+                  height: 2px;
+                  background: @lightGrey;
+                  width: 80%;
+                  margin-left: 10%;
+                  margin-top: 1px;
+                }
+              }
+            }
+          }
+        }
+      }
+      .divisionlogo {
+      }
+    }
+    .createteamstats {
+      position: sticky;
+      top: 0;
+
+      background-color: @OldLace;
+      border-bottom: solid 1px @lightGrey;
+      padding: 10px;
+      display: flex;
+      margin-bottom: 10px;
+      .playerinfo {
+        width: 50%;
+        .currentplayercount {
+          width: 30px;
+        }
+      }
+      .costinfo {
+        width: 50%;
+        text-align: right;
+        .currentteamcost {
+          width: 55px;
+        }
+      }
+
+      .currentplayercount, .currentplayercountlabel, .currentteamcost, .currentteamcostlabel {
+        display: inline-block;
+        padding: 2px;
+        border: solid transparent 1px;
+        text-align: center;
+      }
+
+      .currentplayercount, .currentteamcost {
+        background-color: @White;
+        border: solid @Forest 1px;
+        text-align: center;
+      }
+    }
+
+    .redraft {
+      position: sticky;
+      top: 0;
+
+      background-color: @OldLace;
+      border: solid 2px @Forest;
+      border-radius: 5px;
+      padding: 10px;
+      margin-bottom: 10px;
+
+      .redraftcalculation {
+        text-align: center;
+        display: grid;
+        grid-template-columns: 2fr 1fr 2fr 1fr 2fr 1fr 2fr;
+        grid-template-rows: 1fr 2fr 1fr;
+        gap: 10px 10px;
+        grid-template-areas:
+          "budgetlabel . playercostlabel . othercostlabel . remainingbudgetlabel"
+          "budget subtract1 playercost subtract2 othercost equals remainingbudget"
+          "errormessage errormessage errormessage errormessage errormessage errormessage errormessage";
+        .budgetlabel { grid-area: budgetlabel; }
+        .playercostlabel { grid-area: playercostlabel; }
+        .othercostlabel { grid-area: othercostlabel; }
+        .remainingbudgetlabel { grid-area: remainingbudgetlabel; }
+        .budget { grid-area: budget; }
+        .subtract1 { grid-area: subtract1; }
+        .playercost { grid-area: playercost; }
+        .subtract2 { grid-area: subtract2; }
+        .othercost { grid-area: othercost; }
+        .equals { grid-area: equals; }
+        .remainingbudget { grid-area: remainingbudget; }
+        .errormessage { grid-area: errormessage; }
+
+        .budget, .subtract1, .playercost, .subtract2, .othercost, .equals, .remainingbudget {
+          font-size: 130%;
+        }
+        .subtract1, .subtract2, .equals {
+          text-align: center;
+        }
+        .remainingbudget {
+          background-color: lighten(@Carmine, 50%);
+        }
+        .errormessage {
+          font-weight: bold;
+          color: @Carmine;
+        }
+      }
+
+      .redraftactions {
+        display: flex;
+        .restartredraft {
+
+        }
+        .finishredraft {
+          flex-grow: 1;
+          text-align: right;
+          font-weight: bold;
+        }
+      }
+    }
+
+    .showhirerookies {
+      display: flex;
+      .hirerookies {
+        width: 30%;
+        margin-right: 5px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        max-height: 730px;
+        .hirerookie {
+          margin-bottom: 10px;
+          .rookieheader {
+            font-size: 110%;
+            background-color: @Forest;
+            color: @White;
+            padding: 5px;
+            display: flex;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+            .positionname {
+              width: 70%;
+              .mixin_abbreviate();
+            }
+            .positionquantity {
+              width: 15%;
+              text-align: right;
+            }
+            .positioncost {
+              font-weight: bold;
+              width: 15%;
+              text-align: right;
+            }
+          }
+          .rookiebody {
+            padding: 5px;
+            background-color: @OldLace;
+            .iconwithstats {
+              display: flex;
+              margin-bottom: 5px;
+              .positioniconcontainer {
+                width: 55px;
+                .iconusingbackground {
+
+                }
+              }
+              .rookiestats {
+                border-collapse: collapse;
+                height: 30px;
+                width: 160px;
+                th, td {
+                  padding: 0;
+                  border-left: solid @Quicksilver 1px;
+                  width: 45px;
+                  text-align: center;
+                  font-size: 90%;
+                  &:first-child {
+                    border-left-style: none;
+                  }
+                }
+                th {
+                  padding-top: 0;
+                  border-bottom: solid @Quicksilver 1px;
+                }
+                td {
+                  font-weight: bold;
+                  padding-bottom: 0;
+                }
+              }
+              .buying {
+                flex-grow: 1;
+                width: 17%;
+                display: flex;
+                justify-content: right;
+                align-items: flex-start;
+                button {
+                  font-size: 110%;
+                  padding: 3px 7px;
+                  margin-bottom: 4px;
+
+                  &.disabled {
+                    opacity: 0.3;
+                  }
+                }
+              }
+            }
+            .skills {
+              font-size: 90%;
+            }
+            .quantityprogressouter {
+              display: flex;
+              justify-content: center;
+              margin-bottom: 5px;
+              .quantityprogress {
+                display: flex;
+                .yes, .no {
+                  height: 4px;
+                  width: 13px;
+                  margin-right: 3px;
+                }
+                .yes {
+                  background-color: green;
+                }
+                .no {
+                  background-color: grey;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .playerrowsouter {
+        width: 70%;
+        .playerrows {
+          .playerrowsheader, .playerrow {
+            .cell {
+              &.playerdetails {
+                width: 115px;
+                .playername {
+                  width: 105px;
+                }
+              }
+              &.skills {
+                width: 115px;
+                .positionskills {
+                  .mixin_abbreviate();
+                }
+                .playerskills {
+                  .mixin_abbreviate();
+                }
+              }
+              &.removenewplayer, &.retireplayer {
+                width: 110px;
+              }
+            }
+          }
+        }
+      }
+
+      .playerrowsfooter {
+        flex-direction: column;
+      }
+    }
+
+    .playerrows {
+      // shared widths (we are emulating a table feel to a large extent)
+      .playerrowsheader, .playerrow {
+        // common settings to keep header and body "cells" in sync
+        .cell {
+          padding: 3px;
+          margin: auto 0;
+          &.draghandle, &.draghandledisabled {
+            width: 15px;
+          }
+          &.playernumber {
+            width: 35px;
+          }
+          &.playericoncontainer {
+            width: 55px;
+          }
+          &.playerdetails {
+            margin-right: 20px;
+            width: 200px;
+            .playername {
+              .mixin_abbreviate();
+            }
+            .playerposition {
+              .mixin_abbreviate();
+            }
+          }
+          &.statma, &.statst, &.statag, &.statpa, &.statav {
+            width: 35px;
+            .statincrease {
+              border-bottom: solid @brightGreen 2px;
+            }
+            .statdecrease {
+              border-bottom: solid @cancelRed 2px;
+            }
+          }
+          &.skills {
+            margin-left: 20px;
+            width: 300px;
+          }
+          &.injuries {
+            width: 60px;
+          }
+          &.spp {
+            width: 75px;
+            position: relative;
+            .maxlimit {
+              font-size: 70%;
+              vertical-align: bottom;
+            }
+            .tierinfo {
+              position: absolute;
+              bottom: -9px;
+              left: 13px;
+            }
+          }
+          &.cost {
+            width: 65px;
+            text-align: right;
+            padding-right: 10px;
+            .costbasic {
+
+            }
+            .costbreakdown {
+              font-size: 80%;
+            }
+          }
+          &.removenewplayer, &.retireplayer {
+            text-align: right;
+            width: 130px;
+          }
+        }
+      }
+      .playerrowsheader {
+        display: flex;
+        background-color: @Forest;
+        color: @White;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+      }
+      .playerrow {
+        background-color: @OldLace;
+        &.playerinrow {
+          .draghandle {
+            cursor: move;
+          }
+        }
+        .seperator {
+          padding: 0 5px;
+          &.normal {
+            .line {
+              border-bottom: solid @Forest 1px;
+              height: 2px;
+            }
+          }
+          &.active {
+            background-color: @White;
+            .line {
+              background-color: @Carmine;
+              height: 2px;
+            }
+          }
+          &.spacer {
+            .line {
+              background-color: @OldLace;
+              height: 2px;
+            }
+          }
+        }
+        &.dragsource {
+          .main {
+            background-color: @Quicksilver;
+            .playernumber {
+              .normalplayernumber {
+                display: none;
+              }
+              .draggingnowindicator {
+                display: block;
+              }
+            }
+          }
+          .seperator {
+            &.normal, &.spacer, .line {
+              background-color: @Quicksilver;
+            }
+          }
+        }
+        &.droptarget {
+          background-color: @White;
+          .main {
+            .droptargetindicator {
+              display: block;
+              font-size: 20px;
+            }
+          }
+          .spacer {
+            .line {
+              background-color: @White;
+            }
+          }
+        }
+        .main {
+          min-height: 38px;
+          .emptyplayer, .isupdating {
+            margin: auto 0;
+          }
+          .isupdating {
+            font-size: 16px;
+            font-weight: bold;
+          }
+          .draggingnowindicator {
+            display: none;
+          }
+          .droptargetindicator {
+            display: none;
+          }
+          display: flex;
+          .playernumber {
+            font-size: 20px;
+            text-align: center;
+          }
+          .playericoncontainer {
+            display: flex;
+            justify-content: center;
+          }
+          .playerdetails {
+            .playername {
+              font-size: 15px;
+              white-space: nowrap;
+            }
+            .playerposition {
+              font-size: 10px;
+            }
+          }
+          .skills {
+            .positionskills {
+              font-size: 10px;
+              font-style: oblique;
+            }
+          }
+          &.missnextgame {
+            .playernumber, .playericoncontainer, .skills, .statma, .statst, .statag, .statpa, .statav {
+              opacity: 0.4;
+            }
+          }
+        }
+        .foldout {
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.3s ease-out;
+          padding-left: 55px;
+          &.active {
+            display: block;
+            transition: max-height 0.3s ease-in;
+          }
+          &.foldoutmore {
+            &.active {
+              // max height needed to make css transitions work
+              max-height: 300px;
+            }
+            .playerdetails {
+              margin: 5px 20px 20px 0;
+              display: flex;
+              column-gap: 20px;
+              .playerdetailssection {
+                padding: 10px;
+                background-color: @White;
+                border: solid @Quicksilver 1px;
+              }
+              .title {
+                font-weight: bold;
+              }
+              .playerdetailsedit {
+                width: 50%;
+                label {
+                  display: block;
+                  margin-bottom: 5px;
+                }
+                input[type="text"], select {
+                  display: block;
+                }
+                input[type="text"] {
+                  width: 90%;
+                }
+                .playername {
+                  margin-top: 5px;
+                  margin-bottom: 15px;
+                }
+                .playergender {
+                  margin-bottom: 15px;
+                }
+              }
+              .playerdetailsrecord {
+                width: 50%;
+                table.playerstats {
+                  margin-top: 10px;
+                  border-spacing: 0;
+                  td {
+                    padding: 0;
+                    &:first-child {
+                      padding-right: 10px;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        .iconusingbackground {
+          image-rendering: pixelated;
+        }
+      }
+      .playerrow:last-child {
+        .seperator.normal {
+          .line {
+            border-bottom-color: transparent;
+          }
+        }
+      }
+    }
+    .playerrowsfooter {
+      display: flex;
+      row-gap: 20px;
+      background-color: @OldLace;
+      border-top: solid @Forest 4px;
+      border-bottom: solid @Forest 1px;
+      padding: 5px 10px;
+      .playercount {
+        flex-grow: 1
+      }
+      .specialrules {
+        flex-grow: 0;
+        .oneofchosen {
+          font-weight: bold;
+        }
+        .oneofseparator {
+          display: inline-block;
+          padding: 0 10px;
+        }
+      }
+    }
+    .teammanagement {
+      padding: 5px;
+      background-color: @OldLace;
+      .teammanagementrow {
+        display: flex;
+        .title {
+          background-color: @Forest;
+          color: @White;
+          padding: 5px;
+          &.left {
+            width: 27%
+          }
+          &.right {
+            width: 32%
+          }
+        }
+        .info {
+          padding: 5px;
+          text-align: center;
+          &.left {
+            width: 28%;
+          }
+          &.right {
+            width: 12%;
+          }
+        }
+      }
+      &.editteam {
+        .teammanagementrow {
+          .title {
+            &.left {
+              width: 24%;
+            }
+            &.right {
+              width: 30%;
+            }
+          }
+          .info {
+            &.left {
+              width: 18%;
+            }
+            &.right {
+              width: 28%;
+              .adremovecontainer {
+                display: flex;
+                justify-content: center;
+                .addremove {
+                  display: flex;
+                  .add, .remove {
+                    width: 70px;
+                    &.disabled {
+                      opacity: 0.2;
+                    }
+                  }
+                  .currentvalue {
+                    width: 50px;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    .teamrecord {
+      margin: 20px auto 0 auto;
+      padding: 5px;
+      width: 600px;
+      border: solid @Forest 2px;
+      .teamstats {
+        display: flex;
+        margin-bottom: 10px;
+        .gamesplayed {
+          width: 33%;
+        }
+        .tddiff {
+          width: 33%;
+          text-align: center;
+        }
+        .casdiff {
+          width: 33%;
+          text-align: right;
+        }
+      }
+      .lastopponent {
+
+      }
+    }
+
+    .createteam {
+      margin-top: 30px;
+      text-align: center;
+      .activateteam {
+        margin-bottom: 15px;
+      }
+      .deleteteam {
+
+      }
+    }
+
+    .readytoplay {
+      .journeymenquantities {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+        .journeymenrequiredinfo {
+          text-align: center;
+          margin-bottom: 5px;
+        }
+        .journeymanoption {
+          display: flex;
+          align-items: center;
+          margin-bottom: 10px;
+          .journeymanquantity {
+            border: solid @Quicksilver 1px;
+            background-color: @OldLace;
+            margin: 0 5px 0 10px;
+            padding: 1px 3px 1px 3px;
+          }
+        }
+      }
+      .readytoplaybuttonarea {
+        display: flex;
+        justify-content: center;
+      }
+    }
+
+    .retireteam {
+      margin-top: 30px;
+      text-align: center;
+    }
+  }
+  .errormessages {
+    color: red;
+  }
+  .teambutton {
+    background-color: @OldLace;
+    border: solid @Quicksilver 2px;
+    color: @Carmine;
+    border-radius: 5px;
+
+    &:active {
+      background-color: @Eggshell;
+    }
+  }
+  .mixin_abbreviate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .modalbackdrop {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 50px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.7);
+
+    .modal {
+      position: relative;
+      background: @OldLace;
+      border-radius: 20px;
+      border: solid 2px @Forest;
+      padding: 20px;
+      margin: auto;
+      max-height: 90%;
+      overflow: auto;
+
+      &.modalsmall {
+        width: 450px;
+      }
+
+      &.modalmedium {
+        width: 750px;
+      }
+
+      &.modallarge {
+        width: 900px;
+      }
+
+      .modalheader {
+        font-size: 120%;
+        padding-bottom: 10px;
+        display: flex;
+        position: relative;
+        border-bottom: 1px solid @Forest;
+
+        .modalclose {
+          position: absolute;
+          top: 0;
+          right: 0;
+          border: none;
+          font-size: 20px;
+          padding-bottom: 10px;
+          cursor: pointer;
+          font-weight: bold;
+          background: transparent;
+        }
+      }
+
+      .modalbody {
+        padding: 10px 0;
+      }
+
+      .modalbuttons {
+        display: flex;
+        justify-content: center;
+        button {
+          margin-right: 20px;
+        }
+      }
+    }
+  }
+
+  .loadingellipsis:after {
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: bottom;
+    -webkit-animation: ellipsis steps(4,end) 900ms infinite;
+    animation: ellipsis steps(4,end) 900ms infinite;
+    content: "\2026"; /* ascii code for the ellipsis character */
+    width: 0px;
+  }
+
+  @keyframes ellipsis {
+    to {
+      width: 1.25em;
+    }
+  }
+
+  @-webkit-keyframes ellipsis {
+    to {
+      width: 1.25em;
+    }
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    width: 5rem;
+
+    &::-webkit-slider-runnable-track {
+      background: @brightGreen;
+      height: 0.5rem;
+      border-radius: 20px;
+    }
+
+    &::-moz-range-track {
+      background: @brightGreen;
+      height: 0.5rem;
+      border-radius: 20px;
+    }
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none; /* Override default look */
+      appearance: none;
+      margin-top: -4px; /* Centers thumb on the track */
+      background-color: @Forest;
+      height: 1rem;
+      width: 0.5rem;
+    }
+
+    &::-moz-range-thumb {
+      border: none; /*Removes extra border that FF applies*/
+      border-radius: 0; /*Removes default border-radius that FF applies*/
+      background-color: @Forest;
+      height: 1rem;
+      width: 0.5rem;
+    }
+  }
+
+}
