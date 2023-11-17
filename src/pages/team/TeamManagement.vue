@@ -2,6 +2,7 @@
     <div class="teammanagement">
         <team v-if="teamReady"
             :fumbbl-api="fumbblApi"
+            :coach-name="coachName"
             :team-id="teamId"
             @unexpected-error="handleUnexpectedError"
             @delete-team="handleDeleteTeam"
@@ -54,6 +55,7 @@ import ModalComponent from "./components/Modal.vue";
 })
 export default class TeamManagement extends Vue {
     public teamId: number = 0;
+    public coachName: string = '';
     public fumbblApi?: FumbblApi = undefined;
     public unexpectedErrorMessage?: string = undefined;
     public teamDeleted: boolean = false;
@@ -63,6 +65,9 @@ export default class TeamManagement extends Vue {
 
         const teamIdFromAttribute = document.getElementById("app")!.getAttribute("teamid");
         this.teamId = Number(teamIdFromAttribute);
+
+        const coachName = document.getElementById("app")!.getAttribute("coach")!;
+        this.coachName = coachName;
     }
 
     public get teamReady(): boolean {

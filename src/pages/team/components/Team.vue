@@ -528,6 +528,12 @@ class TeamComponent extends Vue {
     public fumbblApi!: FumbblApi;
 
     @Prop({
+        type: String,
+        required: true,
+    })
+    public coachName!: string;
+
+    @Prop({
         type: Number,
         required: true,
     })
@@ -552,7 +558,7 @@ class TeamComponent extends Vue {
     public dataRosterIconManager?: RosterIconManager = undefined;
 
     private teamLastModifiedTimestamp: number = 0;
-    private userRoles: UserRole[] = ['OWNER']; // TODO: fix hardcoded values here
+    private userRoles: UserRole[] = [];
     public editTeamNameInProgress: boolean = false;
     public dedicatedFansChoice: number = 0;
     public playerToRetire: Player | null = null;
@@ -591,6 +597,10 @@ class TeamComponent extends Vue {
 
     async mounted() {
         await this.reloadTeam();
+
+        if (this.team.getCoach().name === this.coachName) {
+            this.userRoles.push('OWNER');
+        }
 
         this.dedicatedFansChoice = this.team.getDedicatedFans();
 
