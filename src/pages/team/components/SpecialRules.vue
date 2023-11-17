@@ -107,7 +107,11 @@ class SpecialRulesComponent extends Vue {
     public rawApiSpecialRules!: RawApiSpecialRules;
 
     @Emit('rules-updated')
-    public triggerRulesUpdated() {}
+    public triggerRulesUpdated() {
+      return () => {
+        this.updateInProgress = false;
+      }
+    }
 
     private readonly ONE_OF_ID = '-3';
     public showOneOfOptions = false;
@@ -287,9 +291,6 @@ class SpecialRulesComponent extends Vue {
             this.updateInProgress = true;
             this.showOneOfOptions = false;
             this.showTeamOptions = false;
-            setTimeout(() => {
-                this.updateInProgress = false;
-            }, 2000);
         } else {
             this.errorModalInfo = {
                 general: 'An error occurred updating the teams special rule.',
