@@ -42,7 +42,8 @@ export default defineConfig({
       external: [/^\/i\//, /^\/FUMBBL\//],
       input: {
         tournamentsquads: resolve(__dirname, 'htdocs', 'tournamentsquads.html'),
-        winrater: resolve(__dirname, 'htdocs', 'winrater.html')
+        winrater: resolve(__dirname, 'htdocs', 'winrater.html'),
+        team: resolve(__dirname, 'htdocs', 'team.html')
       },
       output: {
         format: 'esm',
