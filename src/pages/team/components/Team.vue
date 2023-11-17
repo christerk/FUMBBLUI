@@ -1206,8 +1206,9 @@ class TeamComponent extends Vue {
         }
     }
 
-    public handleSpecialRulesUpdated() {
-        this.reloadTeam();
+    public async handleSpecialRulesUpdated(callback: any) {
+        await this.reloadTeam();
+        callback();
     }
 
     public handleBeginEditTeamName() {
