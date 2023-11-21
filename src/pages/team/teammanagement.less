@@ -386,6 +386,7 @@
           margin: auto 0;
           &.draghandle, &.draghandledisabled {
             width: 15px;
+            overflow: hidden;
           }
           &.playernumber {
             width: 35px;
@@ -797,9 +798,14 @@
     border: solid @Quicksilver 2px;
     color: @Carmine;
     border-radius: 5px;
+    cursor: pointer;
 
     &:active {
       background-color: @Eggshell;
+    }
+
+    &:hover {
+        background-color: lighten(@OldLace, 10%);
     }
   }
   .mixin_abbreviate {
