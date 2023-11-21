@@ -153,7 +153,7 @@
                     Coach:
                 </div>
                 <div class="info left">
-                    <a href="#">Bob</a>
+                    <a :href="'~'+team.coach.name">{{ team.coach.name }}</a>
                 </div>
                 <div class="title right">
                     Re-Rolls ({{ rerollCostForMode/1000 }}k):
