@@ -112,6 +112,32 @@
                             <div class="cell">...</div>
                         </template>
                     </div>
+
+                    <SortableTable v-if="team.players !== undefinded" :Items="team.players" :item="item">
+                      <template v-slot="prop">
+                        <template v-if="!prop.item.empty">
+                          <player :key="prop.item.getId()"
+                              :fumbbl-api="fumbblApi"
+                              :player="prop.item"
+                              :access-control="accessControl"
+                              :all-fold-outs-closed="true"
+                              :roster-icon-manager="rosterIconManager"
+                              :name-generator="teamManagementSettings.nameGenerator"
+                              :compact-view="showHireRookiesWithPermissionsCheck"
+                              @remove-player="handleRemovePlayer"
+                              @nominate-retire-player="handleNominateRetirePlayer"
+                              @hire-journeyman="handleHireJourneyman"
+                              @fold-out="handleFoldOut"
+                          ></player>
+                        </template>
+                        <template v-else>
+                          <div></div>
+                          <div>{{prop.item.number}}</div>
+                          <div>Empty</div>
+                        </template>
+                      </template>
+                    </SortableTable>
+<!--
                     <template v-if="teamSheet !== null">
                         <player v-for="teamSheetEntry in teamSheet.getEntries()" :key="teamSheetEntry.getNumber()"
                             :fumbbl-api="fumbblApi"
@@ -134,6 +160,7 @@
                             @fold-out="handleFoldOut"
                         ></player>
                     </template>
+-->
                 </div>
                 <div class="playerrowsfooter">
                     <div class="playercount">{{ team.countPlayersAvailableNextGame() }} players (+{{ team.countMissNextGamePlayers() }} players missing next game) <a href="#" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">Buy new player</a></div>
@@ -482,6 +509,7 @@
 <script lang="ts">
 import { PropType } from "vue";
 import { Prop, Component, Vue, toNative, Emit } from 'vue-facing-decorator'
+import { SortableTable } from '@components/fumbblcomponents'
 import {
     AddRemovePermissions,
     JourneymanQuantityChoice,
@@ -518,6 +546,7 @@ import { EventDataDrop, EventDataFoldOut, EventDataRemovePlayer } from "../inclu
         'modal': ModalComponent,
         'retireplayer': RetirePlayerComponent,
         'readytoplay': ReadyToPlayComponent,
+        SortableTable
     },
 })
 class TeamComponent extends Vue {
@@ -1150,11 +1179,22 @@ class TeamComponent extends Vue {
 
     // public handleFoldOut(teamSheetEntryNumber: number, playerRowFoldOutMode: PlayerRowFoldOutMode, multipleOpenMode: boolean) {
     public handleFoldOut(eventDataFoldOut: EventDataFoldOut) {
-        this.teamSheet.updateFoldOut(
-            eventDataFoldOut.teamSheetEntryNumber,
-            eventDataFoldOut.playerRowFoldOutMode,
-            eventDataFoldOut.multipleOpenMode,
-        );
+        let playerRowFoldOutMode = eventDataFoldOut.playerRowFoldOutMode;
+        let multipleOpenMode = eventDataFoldOut.multipleOpenMode;
+        let playerNumber = eventDataFoldOut.teamSheetEntryNumber;
+
+        if (playerRowFoldOutMode !== 'CLOSED' && ! multipleOpenMode) {
+            this.team.players.forEach(player => {
+                player.foldOut = 'CLOSED';
+            });
+        }
+
+        const player = this.findPlayer(playerNumber);
+        player.foldOut = playerRowFoldOutMode;
+    }
+
+    public findPlayer(number: number) {
+      return this.team.players.find(p => p.getPlayerNumber() === number);
     }
 
     public async handleHireRookie(positionId: number) {

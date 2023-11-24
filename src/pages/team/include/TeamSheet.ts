@@ -146,9 +146,11 @@ export default class TeamSheet {
             });
         }
 
-        const teamSheetEntry = this.findTeamSheetEntry(teamSheetEntryNumber);
-        teamSheetEntry.setFoldOut(playerRowFoldOutMode);
+        const p = this.findTeamSheetEntry(teamSheetEntryNumber);
+        p.setFoldOut(playerRowFoldOutMode);
     }
+
+
 
     public clearAllIsUpdating() {
         this.teamSheetEntries.forEach(teamSheetEntry => {

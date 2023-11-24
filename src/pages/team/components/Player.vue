@@ -1,26 +1,9 @@
 <template>
-    <div class="playerrow"
-        :draggable="teamSheetEntry.getIsDragSource() && ! teamSheetEntry.getIsJourneyman()"
-        :class="{
-            playerinrow: teamSheetEntry.hasPlayer(),
-            dragsource: teamSheetEntry.getIsDragSource(),
-            droptarget: teamSheetEntry.getIsDropTarget(),
-        }"
-        @dragenter="! teamSheetEntry.getIsJourneyman() ? triggerDragEnter() : undefined"
-        @dragover="! teamSheetEntry.getIsJourneyman() ? handleDragOver($event) : undefined"
-        @drop="! teamSheetEntry.getIsJourneyman() ? handleDrop($event) : undefined"
-        @dragend="! teamSheetEntry.getIsJourneyman() ? triggerDragEnd() : undefined"
-    >
-        <template v-if="teamSheetEntry.isFirst() && teamSheetEntry.hasPlayer() && !teamSheetEntry.getIsDragSource() && teamSheetEntry.getIsDropTarget()">
-            <div class="seperator active"><div class="line"></div></div>
-        </template>
-        <template v-else>
-            <div class="seperator spacer"><div class="line"></div></div>
-        </template>
-        <div class="main" :class="{missnextgame: teamSheetEntry.hasPlayer() && teamSheetEntry.getPlayer().isMissNextGame()}">
-            <template v-if="teamSheetEntry.hasRosteredPlayer()">
-                <div v-if="allFoldOutsClosed" class="cell draghandle" @mousedown="triggerMakePlayerDraggable()" @mouseup="triggerEndPlayerDraggable()">
-                    <template v-if="!isAnyPlayerDragInProgress || teamSheetEntry.getIsDragSource()">
+    <div :class="{playerrow: true, playerinrow: player != undefined}">
+        <div class="main" :class="{missnextgame: player != undefined && player.isMissNextGame()}">
+            <template v-if="player.hasRosteredPlayer()">
+                <div v-if="allFoldOutsClosed" class="cell draghandle handle" @mousedown="triggerMakePlayerDraggable()" @mouseup="triggerEndPlayerDraggable()">
+                    <template v-if="!isAnyPlayerDragInProgress || player.getIsDragSource()">
                         <svg fill="#000000" version="1.1" id="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                             width="15px" height="25px" viewBox="0 0 32 32" xml:space="preserve">
                             <title>draggable</title>
@@ -47,74 +30,74 @@
             </template>
             <div class="cell playernumber">
                 <span class="normalplayernumber">
-                    {{ teamSheetEntry.getNumber() }}
+                    {{ player.getPlayerNumber() }}
                 </span>
                 <div class="draggingnowindicator">&#8597;</div>
             </div>
-            <template v-if="teamSheetEntry.getIsUpdating()">
+            <template v-if="false">
                 <div class="isupdating">
                     <span class="loadingellipsis">Updating</span>
                 </div>
             </template>
-            <template v-else-if="teamSheetEntry.hasPlayer()">
+            <template v-else-if="player.hasPlayer()">
                 <div class="cell playericoncontainer">
-                    <div class="iconusingbackground" :style="rosterIconManager.getIconStyle(teamSheetEntry.getPlayer().getPositionId(), teamSheetEntry.getPlayer().getIconRowVersionPosition())"></div>
+                    <div class="iconusingbackground" :style="rosterIconManager.getIconStyle(player.getPositionId(), player.getIconRowVersionPosition())"></div>
                 </div>
                 <div class="cell playerdetails">
-                    <div class="playername" :title="teamSheetEntry.getPlayer().getPlayerName()">
-                        <span v-if="teamSheetEntry.getPlayer().isTemporaryPlayerWithoutName()">Loading...</span>
-                        <span v-else-if="teamSheetEntry.getPlayer().isTemporaryPlayer() || teamSheetEntry.getIsJourneyman()">{{ teamSheetEntry.getPlayer().getPlayerName() }}</span>
-                        <a v-else href="#" @click.exact.prevent="toggleFoldOutMore(false)" @click.ctrl.prevent="toggleFoldOutMore(true)" :title="`Player: ${teamSheetEntry.getPlayer().getPlayerName()}, ID: ${teamSheetEntry.getPlayer().getId()}`">{{ teamSheetEntry.getPlayer().getPlayerName() }}</a>
+                    <div class="playername" :title="player.getPlayerName()">
+                        <span v-if="player.isTemporaryPlayerWithoutName()">Loading...</span>
+                        <span v-else-if="player.isTemporaryPlayer() || player.getIsJourneyman()">{{ player.getPlayerName() }}</span>
+                        <a v-else href="#" @click.exact.prevent="toggleFoldOutMore(false)" @click.ctrl.prevent="toggleFoldOutMore(true)" :title="`Player: ${player.getPlayerName()}, ID: ${player.getId()}`">{{ player.getPlayerName() }}</a>
                     </div>
-                    <div class="playerposition" :title="teamSheetEntry.getPlayer().getDisplayPositionName()">{{ teamSheetEntry.getPlayer().getDisplayPositionName() }}</div>
+                    <div class="playerposition" :title="player.getDisplayPositionName()">{{ player.getDisplayPositionName() }}</div>
                 </div>
                 <template v-if="! compactView">
                     <div class="cell statma">
                         <span :class="{
-                            statincrease: teamSheetEntry.getPlayer().hasMovementIncrease,
-                            statdecrease: teamSheetEntry.getPlayer().hasMovementDecrease,
-                            }">{{ teamSheetEntry.getPlayer().movementStat }}</span>
+                            statincrease: player.hasMovementIncrease,
+                            statdecrease: player.hasMovementDecrease,
+                            }">{{ player.movementStat }}</span>
                     </div>
                     <div class="cell statst">
                         <span :class="{
-                            statincrease: teamSheetEntry.getPlayer().hasStrengthIncrease,
-                            statdecrease: teamSheetEntry.getPlayer().hasStrengthDecrease,
-                            }">{{ teamSheetEntry.getPlayer().strengthStat }}</span>
+                            statincrease: player.hasStrengthIncrease,
+                            statdecrease: player.hasStrengthDecrease,
+                            }">{{ player.strengthStat }}</span>
                     </div>
                     <div class="cell statag">
                         <span :class="{
-                            statincrease: teamSheetEntry.getPlayer().hasAgilityIncrease,
-                            statdecrease: teamSheetEntry.getPlayer().hasAgilityDecrease,
-                            }">{{ teamSheetEntry.getPlayer().agilityStat }}+</span>
+                            statincrease: player.hasAgilityIncrease,
+                            statdecrease: player.hasAgilityDecrease,
+                            }">{{ player.agilityStat }}+</span>
                     </div>
                     <div class="cell statpa">
-                        <span v-if="teamSheetEntry.getPlayer().getPositionStats().Passing" :class="{
-                            statincrease: teamSheetEntry.getPlayer().hasPassingIncrease,
-                            statdecrease: teamSheetEntry.getPlayer().hasPassingDecrease,
-                            }">{{ teamSheetEntry.getPlayer().passingStat }}+</span>
+                        <span v-if="player.getPositionStats().Passing" :class="{
+                            statincrease: player.hasPassingIncrease,
+                            statdecrease: player.hasPassingDecrease,
+                            }">{{ player.passingStat }}+</span>
                         <span v-else>-</span>
                     </div>
                     <div class="cell statav">
                         <span :class="{
-                            statincrease: teamSheetEntry.getPlayer().hasArmourIncrease,
-                            statdecrease: teamSheetEntry.getPlayer().hasArmourDecrease,
-                            }">{{ teamSheetEntry.getPlayer().armourStat }}+</span>
+                            statincrease: player.hasArmourIncrease,
+                            statdecrease: player.hasArmourDecrease,
+                            }">{{ player.armourStat }}+</span>
                     </div>
                 </template>
                 <div class="cell skills">
-                    <div class="positionskills" :title="teamSheetEntry.getPlayer().getPositionSkills().join(', ')">
-                        {{ teamSheetEntry.getPlayer().getPositionSkills().join(', ') }}
+                    <div class="positionskills" :title="player.getPositionSkills().join(', ')">
+                        {{ player.getPositionSkills().join(', ') }}
                     </div>
-                    <div class="playerskills" :title="teamSheetEntry.getPlayer().getSkills().join(', ')">
-                        {{ teamSheetEntry.getPlayer().getSkills().join(', ') }}
-                        <template v-if="teamSheetEntry.getIsJourneyman()">Loner</template>
+                    <div class="playerskills" :title="player.getSkills().join(', ')">
+                        {{ player.getSkills().join(', ') }}
+                        <template v-if="player.getIsJourneyman()">Loner</template>
                     </div>
                 </div>
-                <div class="cell injuries" :title="'Injuries in chronological order: ' + teamSheetEntry.getPlayer().getInjuries().join(',')">
-                    {{ displayInjuries(teamSheetEntry.getPlayer().getInjuries()) }}
+                <div class="cell injuries" :title="'Injuries in chronological order: ' + player.getInjuries().join(',')">
+                    {{ displayInjuries(player.getInjuries()) }}
                 </div>
                 <div class="cell spp" :title="sppSummaryText">
-                    <template v-if="teamSheetEntry.getPlayer().getPosition().isPeaked">
+                    <template v-if="player.getPosition().isPeaked">
                         <div>Peak-{{ sppDisplayInfo.spendable }}</div>
                     </template>
                     <template v-else>
@@ -123,17 +106,17 @@
                     </template>
                 </div>
                 <div class="cell cost">
-                    <div class="costbasic">{{ teamSheetEntry.getPlayer().getPlayerCost()/1000 }}k</div>
-                    <div class="costbreakdown">({{ teamSheetEntry.getPlayer().getPositionCost()/1000 }}+{{ teamSheetEntry.getPlayer().getSkillCost()/1000 }})k</div>
+                    <div class="costbasic">{{ player.getPlayerCost()/1000 }}k</div>
+                    <div class="costbreakdown">({{ player.getPositionCost()/1000 }}+{{ player.getSkillCost()/1000 }})k</div>
                 </div>
                 <div v-if="accessControl.canCreate()" class="cell removenewplayer">
-                    <template v-if="! teamSheetEntry.getIsJourneyman()">
+                    <template v-if="! player.getIsJourneyman()">
                         (<a href="#" @click.prevent="triggerRemovePlayer">Remove</a>)
                     </template>
                 </div>
                 <div v-else-if="accessControl.canEdit()" class="cell retireplayer">
-                    <template v-if="! teamSheetEntry.getIsJourneyman()">
-                        (<a href="#" @click.prevent="triggerNominateRetirePlayer">{{ teamSheetEntry.getPlayer().getIsRefundable() ? 'Refund' : 'Retire' }}</a>)
+                    <template v-if="! player.getIsJourneyman()">
+                        (<a href="#" @click.prevent="triggerNominateRetirePlayer">{{ player.getIsRefundable() ? 'Refund' : 'Retire' }}</a>)
                     </template>
                     <template v-else>
                         (<a href="#" @click.prevent="triggerHireJourneyman">Hire</a>)
@@ -147,9 +130,9 @@
             </template>
         </div>
         <div class="foldout foldoutmore" :class="{active: isFoldOutMore}">
-            <playerdetails v-if="teamSheetEntry.hasRosteredPlayer()"
+            <playerdetails v-if="player.hasRosteredPlayer()"
                 :fumbbl-api="fumbblApi"
-                :team-sheet-entry="teamSheetEntry"
+                :player="player"
                 :can-edit="accessControl.canEdit()"
                 :name-generator="nameGenerator"
                 @close="performFoldOut('CLOSED')"
@@ -184,10 +167,10 @@ class PlayerComponent extends Vue {
     public fumbblApi!: FumbblApi;
 
     @Prop({
-        type: Object as PropType<TeamSheetEntry>,
+        type: Object as PropType<Player>,
         required: true,
     })
-    public teamSheetEntry!: TeamSheetEntry;
+    public player!: Player;
 
     @Prop({
         type: Object as PropType<AccessControl>,
@@ -233,7 +216,7 @@ class PlayerComponent extends Vue {
 
     @Emit('make-player-draggable')
     public triggerMakePlayerDraggable(): number {
-        return this.teamSheetEntry.getNumber();
+        return this.player.getPlayerNumber();
     }
 
     @Emit('end-player-draggable')
@@ -241,14 +224,14 @@ class PlayerComponent extends Vue {
 
     @Emit('drag-enter')
     public triggerDragEnter(): number {
-        return this.teamSheetEntry.getNumber();
+        return this.player.getPlayerNumber();
     }
 
     @Emit('drop')
     public triggerDrop(): EventDataDrop {
         return {
-            teamSheetEntryNumber: this.teamSheetEntry.getNumber(),
-            hasPlayer: this.teamSheetEntry.hasPlayer(),
+            teamSheetEntryNumber: this.player.getPlayerNumber(),
+            hasPlayer: this.player.hasPlayer(),
         };
     }
 
@@ -257,21 +240,21 @@ class PlayerComponent extends Vue {
 
     @Emit('remove-player')
     public triggerRemovePlayer(): EventDataRemovePlayer {
-        const player = this.teamSheetEntry.getPlayer();
+        const player = this.player;
         return {
-            teamSheetEntryNumber: this.teamSheetEntry.getNumber(),
+            teamSheetEntryNumber: this.player.getPlayerNumber(),
             playerId: player ? player.getId() : 0,
         };
     }
 
     @Emit('nominate-retire-player')
     public triggerNominateRetirePlayer(): Player {
-        return this.teamSheetEntry.getPlayer()!;
+        return this.player!;
     }
 
     @Emit('hire-journeyman')
     public triggerHireJourneyman(): Player {
-        return this.teamSheetEntry.getPlayer()!;
+        return this.player!;
     }
 
     readonly delayForFoldoutAnimations = 600;
@@ -301,7 +284,7 @@ class PlayerComponent extends Vue {
     }
 
     public get isFoldOutMore(): boolean {
-        return this.teamSheetEntry.getFoldOut() === 'MORE';
+        return this.player.foldOut === 'MORE';
     }
 
     public getSeperatorClasses() {
@@ -316,13 +299,13 @@ class PlayerComponent extends Vue {
 
     public performFoldOut(playerRowFoldOutMode: PlayerRowFoldOutMode, multipleOpenMode = false) {
         this.triggerFoldOut({
-            teamSheetEntryNumber: this.teamSheetEntry.getNumber(),
+            teamSheetEntryNumber: this.player.getPlayerNumber(),
             playerRowFoldOutMode,
             multipleOpenMode
         });
         this.enableSmartScroll();
         if (playerRowFoldOutMode === 'CLOSED') {
-            this.teamSheetEntry.refreshUpdatePlayerDetails();
+            this.player.refreshUpdatePlayerDetails();
         }
     }
 
@@ -403,15 +386,15 @@ class PlayerComponent extends Vue {
     }
 
     public get sppDisplayInfo(): any {
-        if (! this.teamSheetEntry.hasPlayer()) {
+        if (! this.player.hasPlayer()) {
             return null;
         }
 
-        return this.teamSheetEntry.getPlayer().sppDisplayInfo;
+        return this.player.sppDisplayInfo;
     }
 
     public get sppSummaryText(): string {
-        if (! this.teamSheetEntry.hasPlayer()) {
+        if (! this.player.hasPlayer()) {
             return '';
         }
 

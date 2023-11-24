@@ -19,7 +19,8 @@ export default class Player {
     private skillCost: number = 0;
     private isJourneyman: boolean = false;
     private isRefundable: boolean = true;
-
+    public foldOut: PlayerRowFoldOutMode = 'CLOSED';
+    
     constructor(
         id: number,
         playerNumber: number,
@@ -105,6 +106,14 @@ export default class Player {
         if (this.isTemporaryPlayer()) {
             this.id = playerId;
         }
+    }
+
+    public get number(): number {
+      return this.playerNumber;
+    }
+
+    public set number(value) {
+      this.playerNumber = value;
     }
 
     public getPlayerNumber(): number {
@@ -328,5 +337,13 @@ export default class Player {
     public updatePlayerDetails(updatePlayerDetails: UpdatePlayerDetails) {
         this.playerName = updatePlayerDetails.getPlayerName();
         this.gender = updatePlayerDetails.getGender();
+    }
+
+    public hasRosteredPlayer() {
+      return true;
+    }
+
+    public hasPlayer() {
+      return true;
     }
 }

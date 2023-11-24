@@ -1,6 +1,6 @@
 <template>
   <div class="sortable">
-    <Sortable :list="Items" item-key="id" tag="div" :options="options" @change="onChange" @end="onEnd">
+    <Sortable class="sortwrap" :list="Items" item-key="id" :options="options" @change="onChange" @end="onEnd">
       <template #item="{element}">
         <div :class="{sortablerow: true, active: !element.empty}">
           <slot :item="element"></slot>
@@ -30,7 +30,7 @@ class SortableTable extends Vue {
   public options = {
     animation: 150,
     handle: ".handle",
-    draggable: ".sortablerow",
+    draggable: ".sortablerow"
   }
 
   public mounted() {

@@ -13,7 +13,7 @@ export default class Team {
     private name: string = '';
     private division: string = '';
     private coach: Coach = null;
-    private players: Player[] = [];
+    public players: Player[] = [];
     private teamValue: number = 0;
     private tvLimit: number = 0;
     private currentTeamValue: number = 0;

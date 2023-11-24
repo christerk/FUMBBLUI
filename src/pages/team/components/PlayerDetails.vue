@@ -4,13 +4,13 @@
             <div class="title">Edit player details</div>
             <template v-if="updatePlayerDetails">
                 <div class="playername">
-                    <label :for="'playerName_' + teamSheetEntry.getNumber()">Name</label>
-                    <input :id="'playerName_' + teamSheetEntry.getNumber()" v-model="updatePlayerDetails.playerName" type="text">
+                    <label :for="'playerName_' + player.getPlayerNumber()">Name</label>
+                    <input :id="'playerName_' + player.getPlayerNumber()" v-model="updatePlayerDetails.playerName" type="text">
                     <a href="#" @click.prevent="generatePlayerName">Generate random name</a>
                 </div>
                 <div class="playergender">
-                    <label :for="'gender_' + teamSheetEntry.getNumber()">Gender</label>
-                    <select :id="'gender_' + teamSheetEntry.getNumber()" v-model="updatePlayerDetails.gender">
+                    <label :for="'gender_' + player.getPlayerNumber()">Gender</label>
+                    <select :id="'gender_' + player.getPlayerNumber()" v-model="updatePlayerDetails.gender">
                         <option value="FEMALE">Female</option>
                         <option value="MALE">Male</option>
                         <option value="NEUTRAL">Neutral</option>
@@ -81,7 +81,6 @@ import { Prop, Component, Vue, toNative, Emit } from 'vue-facing-decorator'
 import UpdatePlayerDetails from "../include/UpdatePlayerDetails";
 import ModalComponent from "./Modal.vue";
 import FumbblApi from "../include/FumbblApi";
-import TeamSheetEntry from "../include/TeamSheetEntry";
 
 @Component({
     components: {
@@ -102,10 +101,10 @@ class PlayerDetailsComponent extends Vue {
     public canEdit!: boolean;
 
     @Prop({
-        type: Object as PropType<TeamSheetEntry>,
+        type: Object as PropType<Player>,
         required: true,
     })
-    public teamSheetEntry!: TeamSheetEntry;
+    public player!: Player;
 
     @Prop({
         type: String,
@@ -119,12 +118,11 @@ class PlayerDetailsComponent extends Vue {
     public updatePlayerDetailsErrors: string[] = [];
     public errorModalInfo: {general: string, technical: string} | null = null;
 
-    public get player() {
-        return this.teamSheetEntry.getPlayer();
-    }
-
     public get updatePlayerDetails(): UpdatePlayerDetails {
-        return this.teamSheetEntry.getUpdatePlayerDetails();
+        return new UpdatePlayerDetails(
+                this.player.getPlayerName(),
+                this.player.getGender(),
+            );
     }
 
     public async saveUpdatedPlayerDetails() {
@@ -143,7 +141,7 @@ class PlayerDetailsComponent extends Vue {
                 this.updatePlayerDetails.getGender()
             );
             if (apiResponse.isSuccessful()) {
-                this.teamSheetEntry.saveUpdatePlayerDetails();
+                this.player.saveUpdatePlayerDetails();
             } else {
                 this.errorModalInfo = {
                     general: 'An error occurred updating player details.',

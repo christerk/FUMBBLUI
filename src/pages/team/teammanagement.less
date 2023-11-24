@@ -520,6 +520,7 @@
         }
         .main {
           min-height: 38px;
+          width: 960px;
           .emptyplayer, .isupdating {
             margin: auto 0;
           }
@@ -633,6 +634,20 @@
         .seperator.normal {
           .line {
             border-bottom-color: transparent;
+          }
+        }
+      }
+      .sortable {
+        background: @OldLace;
+        .sortwrap {
+          display: grid;
+          width: 956px;
+          margin-left: 2px;
+          grid-template-columns: 1fr;
+          grid-row-gap: 1px;
+          background: @Forest;
+          .sortable-drag {
+            opacity: 0;
           }
         }
       }
