@@ -7,6 +7,14 @@
         </div>
       </template>
     </Sortable>
+    <Sortable class="sortwrap" :list="FootItems" item-key="id" :options="options" @change="onChange" @end="onEnd">
+      <template #item="{element}">
+        <div :class="{sortablerow: true, active: false}">
+          <slot :item="element"></slot>
+        </div>
+      </template>
+    </Sortable>
+
   </div>
 </template>
 
@@ -26,6 +34,9 @@ import { Sortable } from 'sortablejs-vue3'
 class SortableTable extends Vue {
   @Prop
   Items: {empty: boolean, number: number}[] = []
+
+  @Prop
+  FootItems:  {empty: boolean, number: number}[] = []
 
   public options = {
     animation: 150,
