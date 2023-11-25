@@ -77,10 +77,12 @@
 
 <script lang="ts">
 import { PropType } from "vue";
-import { Prop, Component, Vue, toNative, Emit } from 'vue-facing-decorator'
+import { Prop, Component, Vue, toNative, Emit, Watch } from 'vue-facing-decorator'
 import UpdatePlayerDetails from "../include/UpdatePlayerDetails";
 import ModalComponent from "./Modal.vue";
 import FumbblApi from "../include/FumbblApi";
+import Player from "../include/Player";
+import { PlayerRowFoldOutMode } from "../include/Interfaces";
 
 @Component({
     components: {
@@ -115,14 +117,30 @@ class PlayerDetailsComponent extends Vue {
     @Emit('close')
     public triggerClose() {}
 
+    @Watch("player.foldOut")
+    playerFoldOutWatcher(newValue: PlayerRowFoldOutMode, oldValue: PlayerRowFoldOutMode) {
+        if (newValue === 'CLOSED') {
+            this.refreshUpdatePlayerDetails();
+        }
+    }
+
+    public dataUpdatePlayerDetails?: UpdatePlayerDetails = undefined;
     public updatePlayerDetailsErrors: string[] = [];
     public errorModalInfo: {general: string, technical: string} | null = null;
 
     public get updatePlayerDetails(): UpdatePlayerDetails {
-        return new UpdatePlayerDetails(
-                this.player.getPlayerName(),
-                this.player.getGender(),
-            );
+        return this.dataUpdatePlayerDetails!;
+    }
+
+    mounted() {
+        this.refreshUpdatePlayerDetails();
+    }
+
+    private refreshUpdatePlayerDetails() {
+        this.dataUpdatePlayerDetails = new UpdatePlayerDetails(
+            this.player.getPlayerName(),
+            this.player.getGender(),
+        );
     }
 
     public async saveUpdatedPlayerDetails() {
@@ -141,7 +159,7 @@ class PlayerDetailsComponent extends Vue {
                 this.updatePlayerDetails.getGender()
             );
             if (apiResponse.isSuccessful()) {
-                this.player.saveUpdatePlayerDetails();
+                this.player.updatePlayerDetails(this.updatePlayerDetails);
             } else {
                 this.errorModalInfo = {
                     general: 'An error occurred updating player details.',

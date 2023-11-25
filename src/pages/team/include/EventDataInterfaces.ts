@@ -10,8 +10,3 @@ export interface EventDataRemovePlayer {
     teamSheetEntryNumber: number,
     playerId: number,
 }
-
-export interface EventDataDrop {
-    teamSheetEntryNumber: number,
-    hasPlayer: boolean,
-}
