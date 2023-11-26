@@ -31,7 +31,7 @@
                     <span v-else-if="player.isTemporaryPlayer || player.getIsJourneyman() || player.IsEmpty">{{ player.getPlayerName() }}</span>
                     <a v-else href="#" @click.exact.prevent="toggleFoldOutMore(false)" @click.ctrl.prevent="toggleFoldOutMore(true)" :title="`Player: ${player.getPlayerName()}, ID: ${player.id}`">{{ player.getPlayerName() }}</a>
                 </div>
-                <div class="playerposition" :title="player.getDisplayPositionName()">{{player.key}} {{ player.getDisplayPositionName() }}</div>
+                <div class="playerposition" :title="player.getDisplayPositionName()">{{ player.getDisplayPositionName() }}</div>
             </div>
             <template v-if="!compactView && !player.IsEmpty">
                 <div class="cell statma">
