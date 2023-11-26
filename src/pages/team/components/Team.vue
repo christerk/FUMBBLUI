@@ -84,7 +84,7 @@
                 v-if="showHireRookiesWithPermissionsCheck"
                 :roster-position-data-for-buying-player="rosterPositionDataForBuyingPlayer"
                 :roster-icon-manager="rosterIconManager"
-                :has-empty-team-sheet-entry="teamSheet.findFirstEmptyTeamSheetEntry() !== null"
+                :has-empty-team-sheet-entry="team.hasEmptyNumbers()"
                 :max-big-guys="teamManagementSettings.maxBigGuys"
                 @hire-rookie="handleHireRookie"
             ></hirerookies>
@@ -113,14 +113,13 @@
                         </template>
                     </div>
 
-                    <SortableTable v-if="team.players !== undefinded" :Items="team.players" :item="item">
+                    <SortableTable v-if="team.players !== undefined" :Items="team.players">
                       <template v-slot="prop">
                         <template v-if="!prop.item.empty">
                           <player :key="prop.item.getId()"
                               :fumbbl-api="fumbblApi"
                               :player="prop.item"
                               :access-control="accessControl"
-                              :all-fold-outs-closed="true"
                               :roster-icon-manager="rosterIconManager"
                               :name-generator="teamManagementSettings.nameGenerator"
                               :compact-view="showHireRookiesWithPermissionsCheck"
@@ -137,30 +136,6 @@
                         </template>
                       </template>
                     </SortableTable>
-<!--
-                    <template v-if="teamSheet !== null">
-                        <player v-for="teamSheetEntry in teamSheet.getEntries()" :key="teamSheetEntry.getNumber()"
-                            :fumbbl-api="fumbblApi"
-                            :team-sheet-entry="teamSheetEntry"
-                            :access-control="accessControl"
-                            :all-fold-outs-closed="teamSheet.allFoldOutsClosed()"
-                            :is-any-player-drag-in-progress="teamSheet.getDragSourcePlayerNumber() !== null"
-                            :use-active-seperator-for-drag-drop="teamSheet.useActiveSeperatorForDragDrop(teamSheetEntry)"
-                            :roster-icon-manager="rosterIconManager"
-                            :name-generator="teamManagementSettings.nameGenerator"
-                            :compact-view="showHireRookiesWithPermissionsCheck"
-                            @remove-player="handleRemovePlayer"
-                            @nominate-retire-player="handleNominateRetirePlayer"
-                            @hire-journeyman="handleHireJourneyman"
-                            @make-player-draggable="handleMakePlayerDraggable"
-                            @drag-enter="handlePlayerDragEnter"
-                            @drop="handlePlayerDrop"
-                            @drag-end="handlePlayerDragEnd"
-                            @end-player-draggable="handleEndPlayerDraggable"
-                            @fold-out="handleFoldOut"
-                        ></player>
-                    </template>
--->
                 </div>
                 <div class="playerrowsfooter">
                     <div class="playercount">{{ team.countPlayersAvailableNextGame() }} players (+{{ team.countMissNextGamePlayers() }} players missing next game) <a href="#" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">Buy new player</a></div>
@@ -514,14 +489,12 @@ import {
     AddRemovePermissions,
     JourneymanQuantityChoice,
     PlayerGender,
-    PlayerRowFoldOutMode,
     PositionDataForBuyingPlayer,
     RawApiSpecialRules,
     UserRole,
 } from "../include/Interfaces";
 import AccessControl from "../include/AccessControl";
 import Team from "../include/Team";
-import TeamSheet from "../include/TeamSheet";
 import PlayerComponent from "./Player.vue";
 import EditTeamNameComponent from "./EditTeamName.vue";
 import HireRookiesComponent from "./HireRookies.vue";
@@ -534,7 +507,7 @@ import RetirePlayerComponent from "./RetirePlayer.vue";
 import ReadyToPlayComponent from "./ReadyToPlay.vue";
 import FumbblApi from "../include/FumbblApi";
 import Player from "../include/Player";
-import { EventDataDrop, EventDataFoldOut, EventDataRemovePlayer } from "../include/EventDataInterfaces";
+import { EventDataFoldOut, EventDataRemovePlayer } from "../include/EventDataInterfaces";
 
 @Component({
     components: {
@@ -581,7 +554,6 @@ class TeamComponent extends Vue {
     // the following properties (prefixed with data) must be initialized in order to become reactive data properties
     // to avoid warnings we provide getters for each without the data prefix, which also ignore the possibility of them being undefined
     public dataTeam?: Team = undefined;
-    public dataTeamSheet?: TeamSheet = undefined;
     public dataTeamManagementSettings?: TeamManagementSettings = undefined;
     public dataAccessControl?: AccessControl = undefined;
     public dataRosterIconManager?: RosterIconManager = undefined;
@@ -676,7 +648,8 @@ class TeamComponent extends Vue {
         const currentTimestamp = Date.now();
         this.teamLastModifiedTimestamp = currentTimestamp;
         const reloadForRecentModification = () => {
-            if (this.teamLastModifiedTimestamp === currentTimestamp && ! this.teamSheet.isDragInProgress()) {
+            // TODO: do we need some protection here to avoid a reload during a drag?
+            if (this.teamLastModifiedTimestamp === currentTimestamp) {
                 this.reloadTeam();
             }
         };
@@ -762,7 +735,6 @@ class TeamComponent extends Vue {
 
     public get dataPropertiesInitialized(): boolean {
         return this.dataTeam !== undefined &&
-            this.dataTeamSheet !== undefined &&
             this.dataTeamManagementSettings !== undefined &&
             this.dataAccessControl !== undefined &&
             this.dataRosterIconManager !== undefined;
@@ -770,10 +742,6 @@ class TeamComponent extends Vue {
 
     public get team(): Team {
         return this.dataTeam!;
-    }
-
-    public get teamSheet(): TeamSheet {
-        return this.dataTeamSheet!;
     }
 
     public get teamManagementSettings(): TeamManagementSettings {
@@ -855,11 +823,11 @@ class TeamComponent extends Vue {
     }
 
     public refreshTeamSheet(entryNumbersUpdating: number[] = []) {
-        this.dataTeamSheet = new TeamSheet(
-            this.teamManagementSettings.maxPlayers,
-            this.team.getPlayers(),
-            entryNumbersUpdating,
-        );
+        // this.dataTeamSheet = new TeamSheet(
+        //     this.teamManagementSettings.maxPlayers,
+        //     this.team.getPlayers(),
+        //     entryNumbersUpdating,
+        // );
     }
 
     public get rerollCostForMode(): number {
@@ -875,54 +843,30 @@ class TeamComponent extends Vue {
         return playerDeficit < 0 ? 0 : playerDeficit;
     }
 
-    public handleMakePlayerDraggable(playerNumber: number) {
-        this.teamSheet.setDragSource(playerNumber);
-    }
+    // public async handlePlayerDrop(eventDataDrop: EventDataDrop) {
+    //     const dragSourcePlayerNumber = this.teamSheet.getDragSourcePlayerNumber();
+    //     if (! dragSourcePlayerNumber) {
+    //         return;
+    //     }
 
-    public handlePlayerDragEnter(playerNumber: number) {
-        if (! this.teamSheet.isDragSource(playerNumber)) {
-            this.teamSheet.setDropTarget(playerNumber);
-        } else {
-            this.teamSheet.clearAllDropTargets();
-        }
-    }
+    //     const playerNumbers = this.team.movePlayer(
+    //         dragSourcePlayerNumber,
+    //         eventDataDrop.teamSheetEntryNumber,
+    //         ! eventDataDrop.hasPlayer,
+    //     );
+    //     this.reloadTeamWithDelay();
 
-    public async handlePlayerDrop(eventDataDrop: EventDataDrop) {
-        const dragSourcePlayerNumber = this.teamSheet.getDragSourcePlayerNumber();
-        if (! dragSourcePlayerNumber) {
-            return;
-        }
+    //     const apiResponse = await this.fumbblApi.renumberPlayers(this.team.getId(), playerNumbers);
+    //     if (! apiResponse.isSuccessful()) {
+    //         await this.recoverFromUnexpectedError(
+    //             'An error occurred whilst renumbering your players.',
+    //             apiResponse.getErrorMessage(),
+    //         );
+    //         return;
+    //     }
 
-        const playerNumbers = this.team.movePlayer(
-            dragSourcePlayerNumber,
-            eventDataDrop.teamSheetEntryNumber,
-            ! eventDataDrop.hasPlayer,
-        );
-        this.reloadTeamWithDelay();
-
-        const apiResponse = await this.fumbblApi.renumberPlayers(this.team.getId(), playerNumbers);
-        if (! apiResponse.isSuccessful()) {
-            await this.recoverFromUnexpectedError(
-                'An error occurred whilst renumbering your players.',
-                apiResponse.getErrorMessage(),
-            );
-            return;
-        }
-
-        this.refreshTeamSheet();
-    }
-
-    public handlePlayerDragEnd() {
-        this.endDragDrop();
-    }
-
-    public handleEndPlayerDraggable() {
-        this.teamSheet.clearDragDrop();
-    }
-
-    public endDragDrop() {
-        this.teamSheet.clearDragDrop();
-    }
+    //     this.refreshTeamSheet();
+    // }
 
     public async removeAllPlayers() {
         const playerIdsToRemove = this.team.getPlayers().map(player => player.getId());
@@ -1155,17 +1099,14 @@ class TeamComponent extends Vue {
     }
 
     public async handleHireJourneyman(player: Player) {
-        const firstEmptyTeamSheetEntry = this.teamSheet.findFirstEmptyTeamSheetEntry();
-        if (! firstEmptyTeamSheetEntry) {
+        const firstEmptyNumber = this.team.findFirstEmptyNumber();
+        if (! firstEmptyNumber) {
             return;
         }
 
-        const teamSheetEntryId = firstEmptyTeamSheetEntry.getNumber();
+        player.permanentlyHireJourneyman(firstEmptyNumber);
 
-        player.permanentlyHireJourneyman(teamSheetEntryId);
-
-        this.refreshTeamSheet([teamSheetEntryId]);
-        setTimeout(() => this.teamSheet.clearAllIsUpdating(), 2000);
+        this.refreshTeamSheet([firstEmptyNumber]); // this will be deleted and the array passed in is irrelevant
         this.reloadTeamWithDelay();
 
         const apiResponse = await this.fumbblApi.hireJourneyman(this.team.getId(), player.getId());
@@ -1177,7 +1118,6 @@ class TeamComponent extends Vue {
         }
     }
 
-    // public handleFoldOut(teamSheetEntryNumber: number, playerRowFoldOutMode: PlayerRowFoldOutMode, multipleOpenMode: boolean) {
     public handleFoldOut(eventDataFoldOut: EventDataFoldOut) {
         let playerRowFoldOutMode = eventDataFoldOut.playerRowFoldOutMode;
         let multipleOpenMode = eventDataFoldOut.multipleOpenMode;
@@ -1198,8 +1138,8 @@ class TeamComponent extends Vue {
     }
 
     public async handleHireRookie(positionId: number) {
-        const firstEmptyTeamSheetEntry = this.teamSheet.findFirstEmptyTeamSheetEntry();
-        if (! firstEmptyTeamSheetEntry) {
+        const firstEmptyNumber = this.team.findFirstEmptyNumber();
+        if (! firstEmptyNumber) {
             return;
         }
 
@@ -1213,7 +1153,7 @@ class TeamComponent extends Vue {
         // Add quick temporary player for user interface responsiveness
         // This temporary player is removed when reload team is called later in this method
         const temporaryPlayer = this.team.buyTemporaryPlayer(
-            firstEmptyTeamSheetEntry.getNumber(),
+            firstEmptyNumber,
             this.teamManagementSettings.getPosition(positionId),
             iconRowVersionPosition,
             gender,

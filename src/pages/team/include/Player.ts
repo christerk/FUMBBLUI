@@ -20,7 +20,7 @@ export default class Player {
     private isJourneyman: boolean = false;
     private isRefundable: boolean = true;
     public foldOut: PlayerRowFoldOutMode = 'CLOSED';
-    
+
     constructor(
         id: number,
         playerNumber: number,
@@ -56,7 +56,12 @@ export default class Player {
         };
     }
 
-    static fromApi(rawApiPlayer: any, position: Position, iconRowVersionPosition: number): Player {
+    static fromApi(
+        rawApiPlayer: any,
+        position: Position,
+        iconRowVersionPosition: number,
+        isJourneyman: boolean,
+    ): Player {
         const player = new Player(
             rawApiPlayer.id,
             rawApiPlayer.number,
@@ -65,6 +70,7 @@ export default class Player {
             iconRowVersionPosition,
             rawApiPlayer.gender ? rawApiPlayer.gender.toUpperCase() : 'NONBINARY', // older journeymen have null gender
         );
+        player.isJourneyman = isJourneyman;
         player.injuries = rawApiPlayer.injuries.split(',').filter(injury => injury !== '');
         player.skills = rawApiPlayer.skills;
 
@@ -337,13 +343,5 @@ export default class Player {
     public updatePlayerDetails(updatePlayerDetails: UpdatePlayerDetails) {
         this.playerName = updatePlayerDetails.getPlayerName();
         this.gender = updatePlayerDetails.getGender();
-    }
-
-    public hasRosteredPlayer() {
-      return true;
-    }
-
-    public hasPlayer() {
-      return true;
     }
 }

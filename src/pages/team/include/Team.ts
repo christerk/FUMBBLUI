@@ -25,8 +25,9 @@ export default class Team {
     private cheerleaders: number = 0;
     private apothecary: boolean = false;
     private seasonInfo: {gamesPlayedInCurrentSeason: number, currentSeason: number} = {gamesPlayedInCurrentSeason: 0, currentSeason: 1};
+    private maxPlayers: 0;
 
-    constructor(division: string, minStartFans: number, treasury: number) {
+    constructor(division: string, minStartFans: number, treasury: number, maxPlayers: number) {
         this.division = division;
         this.name = 'New demo team name';
         this.coach = {
@@ -36,6 +37,7 @@ export default class Team {
         this.minStartDedicatedFans = minStartFans;
         this.dedicatedFans = minStartFans;
         this.treasury = treasury;
+        this.maxPlayers = maxPlayers;
     }
 
     static fromApi(
@@ -45,7 +47,7 @@ export default class Team {
         playerIconRowVersionPositions: any,
         rosterIconManager: RosterIconManager,
     ): Team {
-        const team = new Team(rawApiTeam.division, minStartDedicatedFans, rawApiTeam.treasury);
+        const team = new Team(rawApiTeam.division, minStartDedicatedFans, rawApiTeam.treasury, teamManagementSettings.maxPlayers);
         team.id = rawApiTeam.id;
         team.teamStatus = new TeamStatus(rawApiTeam.status);
         team.name = rawApiTeam.name;
@@ -72,11 +74,13 @@ export default class Team {
             if (playerIconRowVersionPositions[rawApiPlayer.id] !== undefined) {
                 iconRowVersionPosition = playerIconRowVersionPositions[rawApiPlayer.id];
             }
+            const isJourneyman = rawApiPlayer.number > teamManagementSettings.maxPlayers;
             team.addPlayer(
                 Player.fromApi(
                     rawApiPlayer,
                     teamManagementSettings.getPosition(rawApiPlayer.positionId),
                     iconRowVersionPosition,
+                    isJourneyman,
                 )
             );
         }
@@ -149,6 +153,18 @@ export default class Team {
 
     public addPlayer(player: Player): void {
         this.players.push(player);
+        this.sortPlayers();
+    }
+
+    public sortPlayers(): void {
+        this.players.sort((a, b) => {
+            if (a.getPlayerNumber() < b.getPlayerNumber()) {
+                return -1;
+            } else if (a.getPlayerNumber() > b.getPlayerNumber()) {
+                return 1;
+            }
+            return 0;
+        })
     }
 
     public buyPlayer(player: Player): void {
@@ -324,49 +340,31 @@ export default class Team {
         }
     }
 
-    public movePlayer(sourcePlayerNumber: number, targetPlayerNumber: number, emptyTarget: boolean): any {
-        const newPlayerNumbers = {};
-
-        if (sourcePlayerNumber === targetPlayerNumber) {
-            return;
-        }
-
-        const movingUp = sourcePlayerNumber > targetPlayerNumber;
-
-        let sourcePlayer = null;
-        for (const player of this.getPlayers()) {
-            let playerNumberChanged = false;
-
-            if (player.getPlayerNumber() === sourcePlayerNumber) {
-                sourcePlayer = player;
-            }
-
-            if (! emptyTarget) {
-                if (movingUp) {
-                    if (player.getPlayerNumber() >= targetPlayerNumber && player.getPlayerNumber() < sourcePlayerNumber) {
-                        player.increasePlayerNumber();
-                        playerNumberChanged = true;
-                    }
-                } else {
-                    if (player.getPlayerNumber() <= targetPlayerNumber && player.getPlayerNumber() > sourcePlayerNumber) {
-                        player.decreasePlayerNumber();
-                        playerNumberChanged = true;
-                    }
-                }
-            }
-
-            if (playerNumberChanged) {
-                newPlayerNumbers[player.getId()] = player.getPlayerNumber();
-            }
-        }
-
-        sourcePlayer.setPlayerNumber(targetPlayerNumber);
-        newPlayerNumbers[sourcePlayer.getId()] = sourcePlayer.getPlayerNumber();
-
-        return newPlayerNumbers;
-    }
-
     public canAfford(treasuryCost: number): boolean {
         return this.getTreasury() >= treasuryCost;
+    }
+
+    public findFirstEmptyNumber(): number | null {
+        if (this.players.length === 0) {
+            return 1;
+        }
+
+        let lastNumber = 0;
+        for (const player of this.players) {
+            if (player.getPlayerNumber() !== lastNumber + 1) {
+                return lastNumber + 1;
+            }
+            lastNumber = player.getPlayerNumber();
+        }
+
+        if (lastNumber < this.maxPlayers) {
+            return lastNumber + 1;
+        }
+
+        return null;
+    }
+
+    public hasEmptyNumbers(): boolean {
+        return this.findFirstEmptyNumber() !== null;
     }
 }
