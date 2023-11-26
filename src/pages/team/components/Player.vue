@@ -1,5 +1,5 @@
 <template>
-    <div :class="{playerrow: true, playerinrow: player != undefined}">
+    <div :class="{playerrow: true, playerinrow: player != undefined}" :key="player.key">
         <div class="main" :class="{missnextgame: player != undefined && player.isMissNextGame()}">
             <div v-if="!player.getIsJourneyman()" class="cell draghandle handle">
                 <svg fill="#000000" version="1.1" id="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -27,6 +27,7 @@
             </div>
             <div class="cell playerdetails">
                 <div class="playername" :title="player.getPlayerName()">
+                    {{ player.key }}
                     <span v-if="player.isTemporaryPlayerWithoutName()">Loading...</span>
                     <span v-else-if="player.isTemporaryPlayer() || player.getIsJourneyman()">{{ player.getPlayerName() }}</span>
                     <a v-else href="#" @click.exact.prevent="toggleFoldOutMore(false)" @click.ctrl.prevent="toggleFoldOutMore(true)" :title="`Player: ${player.getPlayerName()}, ID: ${player.getId()}`">{{ player.getPlayerName() }}</a>

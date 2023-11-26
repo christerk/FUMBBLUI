@@ -116,7 +116,7 @@
                     <SortableTable v-if="team.players !== undefined" :Items="team.players" :FootItems="team.extraPlayers" @onEnd="onPlayerRenumbered">
                       <template v-slot="prop">
                         <template v-if="!prop.item.empty">
-                          <player :key="prop.item.getId()"
+                          <player :key="prop.item.key"
                               :fumbbl-api="fumbblApi"
                               :player="prop.item"
                               :access-control="accessControl"
@@ -638,7 +638,7 @@ class TeamComponent extends Vue {
 
             this.dataAccessControl = new AccessControl(this.userRoles, this.team.getTeamStatus().getStatus());
 
-            this.refreshTeamSheet();
+            
         } else {
             this.triggerUnexpectedError('Loading team information: ' + apiResponse.getErrorMessage());
         }
@@ -860,7 +860,7 @@ class TeamComponent extends Vue {
         const playerIdsToRemove = this.team.getPlayers().map(player => player.getId());
         this.team.removeAllPlayers();
         // call this to immediately show the players have gone (handleGeneralTeamUpdate needs to be called after all have been fully removed).
-        this.refreshTeamSheet();
+        
 
         for (const playerId of playerIdsToRemove) {
             const apiResponse = await this.fumbblApi.removePlayer(this.team.getId(), playerId);
@@ -1045,7 +1045,7 @@ class TeamComponent extends Vue {
         }
 
         this.team.removePlayer(player);
-        this.refreshTeamSheet();
+        
         this.reloadTeamWithDelay();
 
         const apiResponse = await this.fumbblApi.removePlayer(this.team.getId(), player.getId());
@@ -1071,7 +1071,7 @@ class TeamComponent extends Vue {
         }
 
         this.team.removePlayer(this.playerToRetire);
-        this.refreshTeamSheet();
+        
         this.reloadTeamWithDelay();
 
         const playerToRetireId = this.playerToRetire.getId();
@@ -1146,7 +1146,7 @@ class TeamComponent extends Vue {
             iconRowVersionPosition,
             gender,
         );
-        this.refreshTeamSheet();
+        
 
         const apiResponsePlayerName = await this.fumbblApi.generatePlayerName(this.teamManagementSettings.nameGenerator, gender);
 
@@ -1161,13 +1161,13 @@ class TeamComponent extends Vue {
 
         const playerName = apiResponsePlayerName.getData();
         temporaryPlayer.setPlayerName(playerName);
-        this.refreshTeamSheet();
+        
 
         const apiResponse = await this.fumbblApi.addPlayer(this.team.getId(), positionId, gender, playerName);
         if (apiResponse.isSuccessful()) {
             const newPlayerResponseData: {playerId: number, number: number} = apiResponse.getData();
             temporaryPlayer.setIdForTemporaryPlayer(newPlayerResponseData.playerId);
-            this.refreshTeamSheet();
+            
             this.reloadTeamWithDelay();
             if (temporaryPlayer.getPlayerNumber() !== newPlayerResponseData.number) {
                 await this.recoverFromUnexpectedError(

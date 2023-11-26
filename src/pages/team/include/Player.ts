@@ -1,5 +1,6 @@
 import {PlayerGender, PlayerRecord, PlayerSkillStatus, Position} from "./Interfaces";
 import UpdatePlayerDetails from "./UpdatePlayerDetails";
+import { ref } from 'vue'
 
 export default class Player {
     private static readonly temporaryPlayerId = 0;
@@ -20,6 +21,7 @@ export default class Player {
     private isJourneyman: boolean = false;
     private isRefundable: boolean = true;
     public foldOut: PlayerRowFoldOutMode = 'CLOSED';
+    private _key = ref(0);
 
     constructor(
         id: number,
@@ -30,6 +32,7 @@ export default class Player {
         gender: PlayerGender,
     ) {
         this.id = id;
+        this._key.value = id;
         this.playerNumber = playerNumber;
         this.playerName = playerName;
         this.position = position;
@@ -108,6 +111,8 @@ export default class Player {
         return this.id;
     }
 
+    public get key(): number { return this._key.value; }
+
     public setIdForTemporaryPlayer(playerId: number) {
         if (this.isTemporaryPlayer()) {
             this.id = playerId;
@@ -140,6 +145,7 @@ export default class Player {
 
     public setPlayerName(playerName: string) {
         this.playerName = playerName;
+        this._key.value++;
     }
 
     public getPosition(): Position {
