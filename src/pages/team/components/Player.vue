@@ -1,6 +1,6 @@
 <template>
     <div :class="{playerrow: true, playerinrow: player != undefined, empty: player.IsEmpty}" :key="player.key">
-        <div class="main" :class="{missnextgame: player != undefined && player.isMissNextGame()}">
+        <div class="main" :class="{missnextgame: player != undefined && player.isMissNextGame(), compact: compactView}">
             <div v-if="!player.getIsJourneyman()" class="cell draghandle handle">
                 <svg fill="#000000" version="1.1" id="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                     width="15px" height="25px" viewBox="0 0 32 32" xml:space="preserve">
