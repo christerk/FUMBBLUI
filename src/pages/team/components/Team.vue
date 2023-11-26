@@ -113,7 +113,7 @@
                         </template>
                     </div>
 
-                    <SortableTable v-if="team.players !== undefined" :Items="team.players">
+                    <SortableTable v-if="team.players !== undefined" :Items="team.players" :FootItems="team.extraPlayers">
                       <template v-slot="prop">
                         <template v-if="!prop.item.empty">
                           <player :key="prop.item.getId()"

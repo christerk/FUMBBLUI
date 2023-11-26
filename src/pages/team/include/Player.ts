@@ -118,6 +118,10 @@ export default class Player {
       return this.playerNumber;
     }
 
+    public get IsExtraPlayer(): bool {
+      return this.isJourneyman || this.number > 16;
+    }
+
     public set number(value) {
       this.playerNumber = value;
     }

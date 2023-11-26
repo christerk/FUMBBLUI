@@ -14,6 +14,7 @@ export default class Team {
     private division: string = '';
     private coach: Coach = null;
     public players: Player[] = [];
+    public extraPlayers: Player[] = [];
     private teamValue: number = 0;
     private tvLimit: number = 0;
     private currentTeamValue: number = 0;
@@ -75,6 +76,7 @@ export default class Team {
                 iconRowVersionPosition = playerIconRowVersionPositions[rawApiPlayer.id];
             }
             const isJourneyman = rawApiPlayer.number > teamManagementSettings.maxPlayers;
+
             team.addPlayer(
                 Player.fromApi(
                     rawApiPlayer,
@@ -152,19 +154,17 @@ export default class Team {
     }
 
     public addPlayer(player: Player): void {
+      if (player.IsExtraPlayer) {
+        this.extraPlayers.push(player);
+      } else {
         this.players.push(player);
-        this.sortPlayers();
+      }
+      this.sortPlayers();
     }
 
     public sortPlayers(): void {
-        this.players.sort((a, b) => {
-            if (a.getPlayerNumber() < b.getPlayerNumber()) {
-                return -1;
-            } else if (a.getPlayerNumber() > b.getPlayerNumber()) {
-                return 1;
-            }
-            return 0;
-        })
+        this.players.sort((a, b) => a.getPlayerNumber() - b.getPlayerNumber());
+        this.extraPlayers.sort((a, b) => a.getPlayerNumber() - b.getPlayerNumber());
     }
 
     public buyPlayer(player: Player): void {
