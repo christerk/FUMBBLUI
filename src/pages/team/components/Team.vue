@@ -113,7 +113,7 @@
                         </template>
                     </div>
 
-                    <SortableTable v-if="team.players !== undefined" :Items="team.players" :FootItems="team.extraPlayers">
+                    <SortableTable v-if="team.players !== undefined" :Items="team.players" :FootItems="team.extraPlayers" @onEnd="onPlayerRenumbered">
                       <template v-slot="prop">
                         <template v-if="!prop.item.empty">
                           <player :key="prop.item.getId()"
@@ -843,30 +843,18 @@ class TeamComponent extends Vue {
         return playerDeficit < 0 ? 0 : playerDeficit;
     }
 
-    // public async handlePlayerDrop(eventDataDrop: EventDataDrop) {
-    //     const dragSourcePlayerNumber = this.teamSheet.getDragSourcePlayerNumber();
-    //     if (! dragSourcePlayerNumber) {
-    //         return;
-    //     }
-
-    //     const playerNumbers = this.team.movePlayer(
-    //         dragSourcePlayerNumber,
-    //         eventDataDrop.teamSheetEntryNumber,
-    //         ! eventDataDrop.hasPlayer,
-    //     );
-    //     this.reloadTeamWithDelay();
-
-    //     const apiResponse = await this.fumbblApi.renumberPlayers(this.team.getId(), playerNumbers);
-    //     if (! apiResponse.isSuccessful()) {
-    //         await this.recoverFromUnexpectedError(
-    //             'An error occurred whilst renumbering your players.',
-    //             apiResponse.getErrorMessage(),
-    //         );
-    //         return;
-    //     }
-
-    //     this.refreshTeamSheet();
-    // }
+    public async onPlayerRenumbered(evt) {
+      var newNumbers = {};
+      this.team.players.forEach(p => newNumbers[p.getId()] = p.number);
+      const apiResponse = await this.fumbblApi.renumberPlayers(this.team.getId(), newNumbers);
+      if (!apiResponse.isSuccessful()) {
+         await this.recoverFromUnexpectedError(
+             'An error occurred whilst renumbering your players.',
+             apiResponse.getErrorMessage(),
+         );
+         return;
+      }      
+    }
 
     public async removeAllPlayers() {
         const playerIdsToRemove = this.team.getPlayers().map(player => player.getId());
