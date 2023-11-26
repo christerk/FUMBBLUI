@@ -12,7 +12,7 @@
         <template v-slot:body>
             <template v-if="errors.length === 0">
                 <p>Are you sure you want to retire the following player?</p>
-                <p>#{{ player.getPlayerNumber() }} <strong>{{ player.getPositionName() }}:</strong> {{ player.getPlayerName() }}</p>
+                <p>#{{ player.playerNumber }} <strong>{{ player.getPositionName() }}:</strong> {{ player.getPlayerName() }}</p>
                 <template v-if="player.getSkills().length === 0">
                     <p>No earned skills.</p>
                 </template>
@@ -82,7 +82,7 @@ class RetirePlayerComponent extends Vue {
             this.errors.push('This player is not active.');
         }
 
-        if (this.player.getPlayerNumber() !== rawApiPlayer.number) {
+        if (this.player.playerNumber !== rawApiPlayer.number) {
             this.errors.push('Local player number is out of sync with saved player number.');
         }
 

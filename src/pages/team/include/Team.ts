@@ -8,7 +8,7 @@ export default class Team {
     private readonly COMPETITIVE_DIVISION_NAME: string = 'Competitive';
     private readonly LEAGUE_DIVISION_NAME: string = 'League';
     private readonly QUANTITY_ALLOWED_DENOTING_LINEMEN: number = 12;
-    private id: number = 0;
+    public id: number = 0;
     private teamStatus: TeamStatus = new TeamStatus();
     private name: string = '';
     private division: string = '';
@@ -67,6 +67,8 @@ export default class Team {
         team.seasonInfo.gamesPlayedInCurrentSeason = rawApiTeam.seasonInfo.gamesPlayedInCurrentSeason;
         team.seasonInfo.currentSeason = rawApiTeam.seasonInfo.currentSeason;
 
+        team.initializePlayers();
+
         for (const rawApiPlayer of rawApiTeam.players) {
             let iconRowVersionPosition = rosterIconManager.getNextAvailableIconRowVersionPosition(
                 rawApiPlayer.positionId,
@@ -86,7 +88,6 @@ export default class Team {
                 )
             );
         }
-
         return team;
     }
 
@@ -153,18 +154,26 @@ export default class Team {
         return this.players.filter(player => ! player.getIsJourneyman());
     }
 
+    public initializePlayers() {
+      for (let i=0; i<this.maxPlayers; i++) {
+        this.players.push(
+          Player.emptyPlayer(i+1)
+        );
+      }
+    }
+
     public addPlayer(player: Player): void {
       if (player.IsExtraPlayer) {
         this.extraPlayers.push(player);
       } else {
-        this.players.push(player);
+        this.players[player.number-1] = player;
       }
       this.sortPlayers();
     }
 
     public sortPlayers(): void {
-        this.players.sort((a, b) => a.getPlayerNumber() - b.getPlayerNumber());
-        this.extraPlayers.sort((a, b) => a.getPlayerNumber() - b.getPlayerNumber());
+        this.players.sort((a, b) => a.playerNumber - b.playerNumber);
+        this.extraPlayers.sort((a, b) => a.playerNumber - b.playerNumber);
     }
 
     public buyPlayer(player: Player): void {
@@ -184,17 +193,16 @@ export default class Team {
     }
 
     public findPlayerByNumber(playerNumber: number): Player | null {
-        const player = this.players.find(player => player.getPlayerNumber() === playerNumber);
-        return player ? player : null;
+        return this.players[playerNumber-1];
     }
 
     public removePlayer(player: Player): void {
         if (this.teamStatus.isNew()) {
             this.treasury += player.getPositionCost();
         }
-        const index = this.players.findIndex(playerToMatch => playerToMatch.getId() === player.getId());
+        const index = this.players.findIndex(playerToMatch => playerToMatch.id === player.id);
         if (index !== -1) {
-            this.players.splice(index, 1);
+            this.players[index] = Player.emptyPlayer(player.playerNumber);
         }
     }
 
@@ -349,16 +357,10 @@ export default class Team {
             return 1;
         }
 
-        let lastNumber = 0;
-        for (const player of this.players) {
-            if (player.getPlayerNumber() !== lastNumber + 1) {
-                return lastNumber + 1;
-            }
-            lastNumber = player.getPlayerNumber();
-        }
-
-        if (lastNumber < this.maxPlayers) {
-            return lastNumber + 1;
+        for (let i=0; i<this.players.length; i++) {
+          if (this.players[i].IsEmpty) {
+            return i+1;
+          }
         }
 
         return null;

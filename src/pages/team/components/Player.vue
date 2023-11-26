@@ -1,5 +1,5 @@
 <template>
-    <div :class="{playerrow: true, playerinrow: player != undefined}" :key="player.key">
+    <div :class="{playerrow: true, playerinrow: player != undefined, empty: player.IsEmpty}" :key="player.key">
         <div class="main" :class="{missnextgame: player != undefined && player.isMissNextGame()}">
             <div v-if="!player.getIsJourneyman()" class="cell draghandle handle">
                 <svg fill="#000000" version="1.1" id="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -18,23 +18,22 @@
             </div>
             <div class="cell playernumber">
                 <span class="normalplayernumber">
-                    {{ player.getPlayerNumber() }}
+                    {{ player.playerNumber }}
                 </span>
                 <div class="draggingnowindicator">&#8597;</div>
             </div>
             <div class="cell playericoncontainer">
-                <div class="iconusingbackground" :style="rosterIconManager.getIconStyle(player.getPositionId(), player.getIconRowVersionPosition())"></div>
+                <div v-if="!player.IsEmpty" class="iconusingbackground" :style="rosterIconManager.getIconStyle(player.getPositionId(), player.getIconRowVersionPosition())"></div>
             </div>
             <div class="cell playerdetails">
                 <div class="playername" :title="player.getPlayerName()">
-                    {{ player.key }}
                     <span v-if="player.isTemporaryPlayerWithoutName()">Loading...</span>
-                    <span v-else-if="player.isTemporaryPlayer() || player.getIsJourneyman()">{{ player.getPlayerName() }}</span>
-                    <a v-else href="#" @click.exact.prevent="toggleFoldOutMore(false)" @click.ctrl.prevent="toggleFoldOutMore(true)" :title="`Player: ${player.getPlayerName()}, ID: ${player.getId()}`">{{ player.getPlayerName() }}</a>
+                    <span v-else-if="player.isTemporaryPlayer() || player.getIsJourneyman() || player.IsEmpty">{{ player.getPlayerName() }}</span>
+                    <a v-else href="#" @click.exact.prevent="toggleFoldOutMore(false)" @click.ctrl.prevent="toggleFoldOutMore(true)" :title="`Player: ${player.getPlayerName()}, ID: ${player.id}`">{{ player.getPlayerName() }}</a>
                 </div>
-                <div class="playerposition" :title="player.getDisplayPositionName()">{{ player.getDisplayPositionName() }}</div>
+                <div class="playerposition" :title="player.getDisplayPositionName()">{{player.key}} {{ player.getDisplayPositionName() }}</div>
             </div>
-            <template v-if="! compactView">
+            <template v-if="!compactView && !player.IsEmpty">
                 <div class="cell statma">
                     <span :class="{
                         statincrease: player.hasMovementIncrease,
@@ -67,7 +66,7 @@
                         }">{{ player.armourStat }}+</span>
                 </div>
             </template>
-            <div class="cell skills">
+            <div v-if="!player.IsEmpty" class="cell skills">
                 <div class="positionskills" :title="player.getPositionSkills().join(', ')">
                     {{ player.getPositionSkills().join(', ') }}
                 </div>
@@ -76,10 +75,10 @@
                     <template v-if="player.getIsJourneyman()">Loner</template>
                 </div>
             </div>
-            <div class="cell injuries" :title="'Injuries in chronological order: ' + player.getInjuries().join(',')">
+            <div v-if="!player.IsEmpty" class="cell injuries" :title="'Injuries in chronological order: ' + player.getInjuries().join(',')">
                 {{ displayInjuries(player.getInjuries()) }}
             </div>
-            <div class="cell spp" :title="sppSummaryText">
+            <div v-if="!player.IsEmpty" class="cell spp" :title="sppSummaryText">
                 <template v-if="player.getPosition().isPeaked">
                     <div>Peak-{{ sppDisplayInfo.spendable }}</div>
                 </template>
@@ -88,16 +87,16 @@
                     <div class="tierinfo"><span v-for="n in sppDisplayInfo.tier" :key="n">•</span></div>
                 </template>
             </div>
-            <div class="cell cost">
+            <div v-if="!player.IsEmpty" class="cell cost">
                 <div class="costbasic">{{ player.getPlayerCost()/1000 }}k</div>
                 <div class="costbreakdown">({{ player.getPositionCost()/1000 }}+{{ player.getSkillCost()/1000 }})k</div>
             </div>
-            <div v-if="accessControl.canCreate()" class="cell removenewplayer">
+            <div v-if="!player.IsEmpty && accessControl.canCreate()" class="cell removenewplayer">
                 <template v-if="! player.getIsJourneyman()">
                     (<a href="#" @click.prevent="triggerRemovePlayer">Remove</a>)
                 </template>
             </div>
-            <div v-else-if="accessControl.canEdit()" class="cell retireplayer">
+            <div v-else-if="!player.IsEmpty && accessControl.canEdit()" class="cell retireplayer">
                 <template v-if="! player.getIsJourneyman()">
                     (<a href="#" @click.prevent="triggerNominateRetirePlayer">{{ player.getIsRefundable() ? 'Refund' : 'Retire' }}</a>)
                 </template>
@@ -175,8 +174,8 @@ class PlayerComponent extends Vue {
     public triggerRemovePlayer(): EventDataRemovePlayer {
         const player = this.player;
         return {
-            teamSheetEntryNumber: this.player.getPlayerNumber(),
-            playerId: player ? player.getId() : 0,
+            teamSheetEntryNumber: this.player.playerNumber,
+            playerId: player ? player.id : 0,
         };
     }
 
@@ -227,7 +226,7 @@ class PlayerComponent extends Vue {
 
     public performFoldOut(playerRowFoldOutMode: PlayerRowFoldOutMode, multipleOpenMode = false) {
         this.triggerFoldOut({
-            teamSheetEntryNumber: this.player.getPlayerNumber(),
+            teamSheetEntryNumber: this.player.playerNumber,
             playerRowFoldOutMode,
             multipleOpenMode
         });

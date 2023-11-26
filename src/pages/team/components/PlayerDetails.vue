@@ -4,13 +4,13 @@
             <div class="title">Edit player details</div>
             <template v-if="updatePlayerDetails">
                 <div class="playername">
-                    <label :for="'playerName_' + player.getPlayerNumber()">Name</label>
-                    <input :id="'playerName_' + player.getPlayerNumber()" v-model="updatePlayerDetails.playerName" type="text">
+                    <label :for="'playerName_' + player.playerNumber">Name</label>
+                    <input :id="'playerName_' + player.playerNumber" v-model="updatePlayerDetails.playerName" type="text">
                     <a href="#" @click.prevent="generatePlayerName">Generate random name</a>
                 </div>
                 <div class="playergender">
-                    <label :for="'gender_' + player.getPlayerNumber()">Gender</label>
-                    <select :id="'gender_' + player.getPlayerNumber()" v-model="updatePlayerDetails.gender">
+                    <label :for="'gender_' + player.playerNumber">Gender</label>
+                    <select :id="'gender_' + player.playerNumber" v-model="updatePlayerDetails.gender">
                         <option value="FEMALE">Female</option>
                         <option value="MALE">Male</option>
                         <option value="NEUTRAL">Neutral</option>

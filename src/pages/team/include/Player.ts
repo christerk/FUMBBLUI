@@ -1,14 +1,14 @@
 import {PlayerGender, PlayerRecord, PlayerSkillStatus, Position} from "./Interfaces";
 import UpdatePlayerDetails from "./UpdatePlayerDetails";
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import type { Ref } from 'vue'
 
 export default class Player {
     private static readonly temporaryPlayerId = 0;
     private static readonly temporaryPlayerName = 'Temporary Player';
     static missNextGameInjury = 'm';
 
-    private id: number;
-    private playerNumber: number;
+    public playerNumber: Ref<number> = ref(0);
     private playerName: string;
     private gender: PlayerGender = 'NEUTRAL';
     private iconRowVersionPosition: number; // allows selection of icon for display when position has multiple versions in the icon image
@@ -21,9 +21,20 @@ export default class Player {
     private isJourneyman: boolean = false;
     private isRefundable: boolean = true;
     public foldOut: PlayerRowFoldOutMode = 'CLOSED';
-    private _key = ref(0);
+
+    private type: Ref<{'EMPTY', 'TEMP', 'NORMAL'}> = ref('NORMAL');
+    public id: Ref<number> = ref(0);
+    private version: Ref<number> = ref(0);
+
+    public _key = computed(() => {
+      if (this.type.value == 'EMPTY') {
+        return this.type.value + ":" + -this.playerNumber.value + ":" + this.version.value;
+      }
+      return this.type.value + ":" + this.id.value + ":" + this.version.value;
+    });
 
     constructor(
+        type: {'EMPTY', 'TEMP', 'NORMAL'},
         id: number,
         playerNumber: number,
         playerName: string,
@@ -31,9 +42,11 @@ export default class Player {
         iconRowVersionPosition: number,
         gender: PlayerGender,
     ) {
-        this.id = id;
-        this._key.value = id;
-        this.playerNumber = playerNumber;
+        this.type.value = type;
+        this.id.value = id;
+        this.version.value = 0;
+
+        this.playerNumber.value = playerNumber;
         this.playerName = playerName;
         this.position = position;
         this.iconRowVersionPosition = iconRowVersionPosition;
@@ -66,6 +79,7 @@ export default class Player {
         isJourneyman: boolean,
     ): Player {
         const player = new Player(
+            'NORMAL',
             rawApiPlayer.id,
             rawApiPlayer.number,
             rawApiPlayer.name,
@@ -103,24 +117,35 @@ export default class Player {
         return player;
     }
 
+    static emptyPlayer(number: number) {
+      let player = new Player('EMPTY', -number, number, "Empty", 0, null, 'NEUTRAL');
+      return player;
+    }
+
     static temporaryPlayer(teamSheetEntryNumber: number, position: Position, iconRowVersionPosition: number, playerGender: PlayerGender): Player {
-        return new Player(Player.temporaryPlayerId, teamSheetEntryNumber, Player.temporaryPlayerName, position, iconRowVersionPosition, playerGender);
+        return new Player('TEMP', -teamSheetEntryNumber, teamSheetEntryNumber, Player.temporaryPlayerName, position, iconRowVersionPosition, playerGender);
     }
 
     public getId(): number {
-        return this.id;
+        return this.id.value;
     }
 
-    public get key(): number { return this._key.value; }
+    public get key(): number {
+      return this._key;
+    }
 
     public setIdForTemporaryPlayer(playerId: number) {
         if (this.isTemporaryPlayer()) {
-            this.id = playerId;
+            this.id.value = playerId;
         }
     }
 
     public get number(): number {
-      return this.playerNumber;
+      return this.playerNumber.value;
+    }
+
+    public get IsEmpty(): bool {
+      return this.type == 'EMPTY';
     }
 
     public get IsExtraPlayer(): bool {
@@ -136,7 +161,7 @@ export default class Player {
     }
 
     public setPlayerNumber(playerNumber: number): void {
-        this.playerNumber = playerNumber;
+        this.playerNumber.value = playerNumber;
     }
 
     public getPlayerName(): string {
@@ -145,7 +170,7 @@ export default class Player {
 
     public setPlayerName(playerName: string) {
         this.playerName = playerName;
-        this._key.value++;
+        this.version.value++;
     }
 
     public getPosition(): Position {
@@ -335,7 +360,7 @@ export default class Player {
     }
 
     public isTemporaryPlayer(): boolean {
-        return this.getId() === Player.temporaryPlayerId;
+        return this.type == 'TEMP';
     }
 
     public isTemporaryPlayerWithoutName(): boolean {
@@ -343,11 +368,11 @@ export default class Player {
     }
 
     public increasePlayerNumber() {
-        this.playerNumber += 1;
+        this.playerNumber.value += 1;
     }
 
     public decreasePlayerNumber() {
-        this.playerNumber -= 1;
+        this.playerNumber.value -= 1;
     }
 
     public updatePlayerDetails(updatePlayerDetails: UpdatePlayerDetails) {

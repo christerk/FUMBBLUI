@@ -845,7 +845,7 @@ class TeamComponent extends Vue {
 
     public async onPlayerRenumbered(evt) {
       var newNumbers = {};
-      this.team.players.forEach(p => newNumbers[p.getId()] = p.number);
+      this.team.players.filter(p => !p.IsEmpty).forEach(p => newNumbers[p.id] = p.playerNumber);
       const apiResponse = await this.fumbblApi.renumberPlayers(this.team.getId(), newNumbers);
       if (!apiResponse.isSuccessful()) {
          await this.recoverFromUnexpectedError(
@@ -1036,10 +1036,10 @@ class TeamComponent extends Vue {
 
     public async handleRemovePlayer(eventDataRemovePlayer: EventDataRemovePlayer) {
         const player = this.team.findPlayerByNumber(eventDataRemovePlayer.teamSheetEntryNumber);
-        if (player === null || player.getId() !== eventDataRemovePlayer.playerId) {
+        if (player === null || player.id !== eventDataRemovePlayer.playerId) {
             await this.recoverFromUnexpectedError(
                 'Unable to remove player, if this problem continues please reload the page.',
-                `Removing playerId ${eventDataRemovePlayer.playerId} from number ${eventDataRemovePlayer.teamSheetEntryNumber} but found playerId ${player ? player.getId() : 'empty'}`,
+                `Removing playerId ${eventDataRemovePlayer.playerId} from number ${eventDataRemovePlayer.teamSheetEntryNumber} but found playerId ${player ? player.id : 'empty'}`,
             );
             return;
         }
@@ -1048,7 +1048,7 @@ class TeamComponent extends Vue {
         
         this.reloadTeamWithDelay();
 
-        const apiResponse = await this.fumbblApi.removePlayer(this.team.getId(), player.getId());
+        const apiResponse = await this.fumbblApi.removePlayer(this.team.id, player.id);
         if (! apiResponse.isSuccessful()) {
             await this.recoverFromUnexpectedError(
                 'An error occurred removing a player.',
@@ -1122,7 +1122,7 @@ class TeamComponent extends Vue {
     }
 
     public findPlayer(number: number) {
-      return this.team.players.find(p => p.getPlayerNumber() === number);
+      return this.team.players.find(p => p.playerNumber === number);
     }
 
     public async handleHireRookie(positionId: number) {
@@ -1169,10 +1169,10 @@ class TeamComponent extends Vue {
             temporaryPlayer.setIdForTemporaryPlayer(newPlayerResponseData.playerId);
             
             this.reloadTeamWithDelay();
-            if (temporaryPlayer.getPlayerNumber() !== newPlayerResponseData.number) {
+            if (temporaryPlayer.playerNumber.value !== newPlayerResponseData.number) {
                 await this.recoverFromUnexpectedError(
                     'Your player has been purchased but your team page is out of synch with the latest version on the server. Please refresh the page if this problem continues.',
-                    `Expected player number ${temporaryPlayer.getPlayerNumber()}, got ${newPlayerResponseData.number}`,
+                    `Expected player number ${temporaryPlayer.playerNumber.value}, got ${newPlayerResponseData.number}`,
                 );
             }
         } else {

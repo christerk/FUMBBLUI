@@ -459,6 +459,10 @@
       }
       .playerrow {
         background-color: @OldLace;
+        &.empty { 
+            background: lighten(@Quicksilver, 10%);
+        }
+
         &.playerinrow {
           .draghandle {
             cursor: move;
