@@ -9,7 +9,7 @@
     </Sortable>
     <Sortable class="sortwrap" :list="FootItems" item-key="id" :options="options" @change="onChange" @end="onEnd">
       <template #item="{element}">
-        <div :class="{sortablerow: true, active: false}">
+        <div :class="{sortablerow: true, active: !element.empty}">
           <slot :item="element"></slot>
         </div>
       </template>
