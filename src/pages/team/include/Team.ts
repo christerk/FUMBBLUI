@@ -207,7 +207,7 @@ export default class Team {
     }
 
     public removeTemporaryPlayers(): void {
-        const temporaryPlayers = this.players.filter((player) => player.isTemporaryPlayer());
+        const temporaryPlayers = this.players.filter((player) => player.isTemporaryPlayer);
         if (this.teamStatus.isNew()) {
             const temporaryPlayersCost = temporaryPlayers.reduce((cost: number, player: Player) => cost + player.getPositionCost(), 0);
             if (temporaryPlayersCost > 0) {

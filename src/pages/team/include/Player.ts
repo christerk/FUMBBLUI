@@ -33,6 +33,8 @@ export default class Player {
       return this.type.value + ":" + this.id.value + ":" + this.version.value;
     });
 
+    public isTemporaryPlayer = computed(() => this.type.value == 'TEMP');
+
     constructor(
         type: {'EMPTY', 'TEMP', 'NORMAL'},
         id: number,
@@ -135,8 +137,9 @@ export default class Player {
     }
 
     public setIdForTemporaryPlayer(playerId: number) {
-        if (this.isTemporaryPlayer()) {
+        if (this.isTemporaryPlayer) {
             this.id.value = playerId;
+            this.type.value = 'NORMAL';
         }
     }
 
@@ -359,12 +362,8 @@ export default class Player {
         return this.injuries.includes(Player.missNextGameInjury);
     }
 
-    public isTemporaryPlayer(): boolean {
-        return this.type == 'TEMP';
-    }
-
     public isTemporaryPlayerWithoutName(): boolean {
-        return this.isTemporaryPlayer() && this.getPlayerName() === Player.temporaryPlayerName;
+        return this.isTemporaryPlayer && this.getPlayerName() === Player.temporaryPlayerName;
     }
 
     public increasePlayerNumber() {
