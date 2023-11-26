@@ -197,7 +197,7 @@ export default class TeamManagementSettings {
     }
 
     public calculateTeamValue(team: Team): number {
-        let playerCost = team.getPlayers().reduce((playerCost, player) => playerCost += player.getPlayerCost(), 0);
+        let playerCost = team.getPlayers().filter(p => !p.IsEmpty).reduce((playerCost, player) => playerCost += player.getPlayerCost(), 0);
 
         return playerCost +
             (team.getRerolls() * this.settings.rerolls.cost) +
