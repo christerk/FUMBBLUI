@@ -27,6 +27,7 @@ export default class Team {
     private apothecary: boolean = false;
     private seasonInfo: {gamesPlayedInCurrentSeason: number, currentSeason: number} = {gamesPlayedInCurrentSeason: 0, currentSeason: 1};
     private maxPlayers: 0;
+    public record: any = {};
 
     constructor(division: string, minStartFans: number, treasury: number, maxPlayers: number) {
         this.division = division;
@@ -66,6 +67,7 @@ export default class Team {
         team.apothecary = rawApiTeam.apothecary === 'Yes';
         team.seasonInfo.gamesPlayedInCurrentSeason = rawApiTeam.seasonInfo.gamesPlayedInCurrentSeason;
         team.seasonInfo.currentSeason = rawApiTeam.seasonInfo.currentSeason;
+        team.record = rawApiTeam.record;
 
         team.initializePlayers();
 

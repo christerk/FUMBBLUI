@@ -47,7 +47,25 @@
                     </ul>
                 </div>
             </div>
-            <img class="divisionlogo" :src="divisionLogoImageUrl" :alt="`Division logo for ${team.getDivision()}.`" :title="`Division logo for ${team.getDivision()}.`">
+            <div class="quickstats">
+              <div class="division">{{ team.getDivision() }}</div>
+              <div class="infobox">
+                <div class="title">Games</div>
+                <div class="info">{{ team.record.games }} ({{team.record.wins}}/{{team.record.ties}}/{{team.record.losses}})</div>
+              </div>
+              <div class="infobox">
+                <div class="title">Form</div>
+                <div class="info">{{team.record.form}}</div>
+              </div>
+              <div class="infobox">
+                <div class="title">TD / g</div>
+                <div class="info">{{ (team.record.td.for / (team.record.games==0?1:team.record.games)).toFixed(2) }}</div>
+              </div>
+              <div class="infobox">
+                <div class="title">Cas / g</div>
+                <div class="info">{{ (team.record.cas.for / (team.record.games==0?1:team.record.games)).toFixed(2) }}</div>
+              </div>
+            </div>
         </div>
         <div v-if="accessControl.canCreate()" class="createteamstats">
             <div class="playerinfo">
@@ -288,16 +306,6 @@
                         <!-- deliberately empty -->
                     </div>
                 </div>
-            </div>
-        </div>
-        <div v-if="accessControl.canViewHistory()" class="teamrecord">
-            <div class="teamstats">
-                <div class="gamesplayed">Games Played:	{{ gamesPlayedStatDisplay }}</div>
-                <div class="tddiff">TD Diff: {{ tdDiffStatDisplay }}</div>
-                <div class="casdiff">Cas Diff: {{ casDiffStatDisplay }}</div>
-            </div>
-            <div class="lastopponent">
-                Last Opponent: <a href="#" :data-id="lastPlayedTeamData.id">{{ lastPlayedTeamData.name }}</a>
             </div>
         </div>
         <div v-if="accessControl.canCreate()" class="createteam">
