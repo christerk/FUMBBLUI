@@ -51,7 +51,15 @@
               <div class="division">{{ team.getDivision() }}</div>
               <div class="infobox">
                 <div class="title">Games</div>
-                <div class="info">{{ team.record.games }} ({{team.record.wins}}/{{team.record.ties}}/{{team.record.losses}})</div>
+                <div class="info">{{ team.record.games }}</div>
+              </div>
+              <div class="infobox">
+                <div class="title">Season</div>
+                <div class="info">S{{ team.seasonInfo.currentSeason }} G{{ team.seasonInfo.gamesPlayedInCurrentSeason }}</div>
+              </div>
+              <div class="infobox">
+                <div class="title">Record</div>
+                <div class="info">{{team.record.wins}}/{{team.record.ties}}/{{team.record.losses}}</div>
               </div>
               <div class="infobox">
                 <div class="title">Form</div>
