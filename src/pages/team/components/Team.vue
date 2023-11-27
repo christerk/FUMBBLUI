@@ -822,14 +822,6 @@ class TeamComponent extends Vue {
         }
     }
 
-    public refreshTeamSheet(entryNumbersUpdating: number[] = []) {
-        // this.dataTeamSheet = new TeamSheet(
-        //     this.teamManagementSettings.maxPlayers,
-        //     this.team.getPlayers(),
-        //     entryNumbersUpdating,
-        // );
-    }
-
     public get rerollCostForMode(): number {
         if (this.team.getTeamStatus().isNew()) {
             return this.teamManagementSettings.rerollCostOnCreate;
@@ -946,7 +938,7 @@ class TeamComponent extends Vue {
         let apiResponse = null;
         if (this.accessControl.canCreate()) {
             apiResponse = await this.fumbblApi.removeAssistantCoach(this.team.getId());
-        } else {
+        } else { 
             apiResponse = await this.fumbblApi.fireAssistantCoach(this.team.getId());
         }
         if (! apiResponse.isSuccessful()) {
@@ -1094,7 +1086,6 @@ class TeamComponent extends Vue {
 
         player.permanentlyHireJourneyman(firstEmptyNumber);
 
-        this.refreshTeamSheet([firstEmptyNumber]); // this will be deleted and the array passed in is irrelevant
         this.reloadTeamWithDelay();
 
         const apiResponse = await this.fumbblApi.hireJourneyman(this.team.getId(), player.getId());
@@ -1245,7 +1236,17 @@ class TeamComponent extends Vue {
     }
 
     public async handleReadyToPlay(journeymanQuantityChoices: JourneymanQuantityChoice[]) {
-        console.log('TODO: ready the team now', journeymanQuantityChoices);
+        let postData = {
+          journeymen: journeymanQuantityChoices
+        };
+        const apiResponse = await this.fumbblApi.readyTeam(this.team.id, postData);
+
+        if (apiResponse.isSuccessful()) {
+            await this.reloadTeam();
+            setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 500);
+        } else {
+            await this.recoverFromUnexpectedError('An error occurred readying your team.', apiResponse.getErrorMessage());
+        }
     }
 }
 

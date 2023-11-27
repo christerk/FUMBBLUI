@@ -151,7 +151,7 @@ export default class Team {
     }
 
     public getRosteredPlayers(): Player[] {
-        return this.players.filter(player => ! player.getIsJourneyman());
+        return this.players.filter(player => !player.IsEmpty && !player.getIsJourneyman());
     }
 
     public initializePlayers() {

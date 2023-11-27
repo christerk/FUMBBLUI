@@ -290,6 +290,12 @@ export default class FumbblApi {
         return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/activate'));
     }
 
+    public async readyTeam(teamId: number, postData: any): Promise<ApiResponse> {
+        const url = this.getUrlRestricted('/api/team/ready');
+        postData['teamId'] = teamId;
+        return await this.enqueuePost(url, postData);
+      }
+
     public async renumberPlayers(teamId: number, playerNumbers: any): Promise<ApiResponse> {
         const url = this.getUrlRestricted('/api/team/renumber');
         const data = {teamId, playerNumbers};

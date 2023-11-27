@@ -11,6 +11,7 @@
                         :max="journeymanQuantityForNextGame"
                         v-model.number="journeymanQuantityInput.quantity"
                         @change="handleQuantityChange(journeymanQuantityInput.positionId)"
+                        @input="handleQuantityChange(journeymanQuantityInput.positionId)"
                     >
                     <label :for="'journeymanQuantity_' + journeymanQuantityInput.positionId" title="Use range slider to adjust number of journeymen for this position.">
                         <span class="journeymanquantity">{{ journeymanQuantityInput.quantity }}</span> {{ journeymanQuantityInput.positionName }}
@@ -26,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { PropType } from "vue";
+import { PropType, ref } from "vue";
 import { Prop, Component, Vue, toNative, Emit } from 'vue-facing-decorator'
 import { JourneymanQuantityChoice, JourneymanQuantityInput, Position } from "../include/Interfaces";
 
@@ -57,9 +58,10 @@ class ReadyToPlayComponent extends Vue {
                 return {
                     positionId: position.id,
                     positionName: position.name,
-                    quantity: this.journeymanQuantityInputs.length === 0 ? this.journeymanQuantityForNextGame : 0,
+                    quantity: ref(0),
                 }
             });
+            this.journeymanQuantityInputs[0].quantity = this.journeymanQuantityForNextGame
         }
     }
 
@@ -87,13 +89,39 @@ class ReadyToPlayComponent extends Vue {
     }
 
     public handleQuantityChange(positionId: number) {
-        if (this.journeymanQuantityInputs.length === 2) {
-            const oppositeInput = this.journeymanQuantityInputs.find(journeymanQuantityInput => journeymanQuantityInput.positionId !== positionId);
-            const changedInput = this.journeymanQuantityInputs.find(journeymanQuantityInput => journeymanQuantityInput.positionId === positionId);
-            if (oppositeInput && changedInput) {
-                oppositeInput.quantity = this.journeymanQuantityForNextGame - changedInput.quantity;
-            }
+
+      let updatingIndex = this.journeymanQuantityInputs.findIndex(i => i.positionId === positionId);
+      let delta = this.journeymanQuantityForNextGame - this.journeymanQuantityInputs.reduce((total, i) => total += i.quantity, 0);
+
+      if (delta < 0) {
+        let currentIndex = updatingIndex + 1;
+        // Try lower rows
+        while (delta < 0 && currentIndex < this.journeymanQuantityInputs.length) {
+          if (this.journeymanQuantityInputs[currentIndex].quantity > 0) {
+            delta++;
+            this.journeymanQuantityInputs[currentIndex].quantity--;
+          } else {
+            currentIndex++;
+          }
         }
+
+        currentIndex = updatingIndex - 1;
+        // Try higher rows
+        while (delta < 0 && currentIndex >= 0) {
+          if (this.journeymanQuantityInputs[currentIndex].quantity > 0) {
+            delta++;
+            this.journeymanQuantityInputs[currentIndex].quantity--;
+          } else {
+            currentIndex--;
+          }          
+        }
+      } else if (delta > 0) {
+        if (updatingIndex < this.journeymanQuantityInputs.length-1) {
+          this.journeymanQuantityInputs[updatingIndex + 1].quantity += delta;
+        } else if (updatingIndex > 0) {
+          this.journeymanQuantityInputs[updatingIndex - 1].quantity += delta;
+        }
+      }
     }
 }
 
