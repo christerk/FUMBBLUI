@@ -92,10 +92,8 @@
                 <div class="playerrows">
                     <div class="playerrowsheader">
                         <template v-if="! showHireRookiesWithPermissionsCheck">
-                            <div class="cell draghandle"></div>
-                            <div class="cell playernumber"></div>
-                            <div class="cell playericoncontainer"></div>
-                            <div class="cell playerdetails"></div>
+                            <div class="cell"><button v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">Hire Players</button></div>
+                            <div class="cell"></div>
                             <div class="cell statma">Ma</div>
                             <div class="cell statst">St</div>
                             <div class="cell statag">Ag</div>
@@ -109,7 +107,7 @@
                             <div v-else-if="accessControl.canEdit()" class="cell removenewplayer">Retire</div>
                         </template>
                         <template v-else>
-                            <div class="cell">...</div>
+                            <div class="cell"><button v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">&lt;&lt; Close</button></div>
                         </template>
                     </div>
 
@@ -138,7 +136,7 @@
                     </SortableTable>
                 </div>
                 <div class="playerrowsfooter">
-                    <div class="playercount">{{ team.countPlayersAvailableNextGame() }} players (+{{ team.countMissNextGamePlayers() }} players missing next game) <a href="#" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">Buy new player</a></div>
+                    <div class="playercount">{{ team.countPlayersAvailableNextGame() }} players (+{{ team.countMissNextGamePlayers() }} players missing next game)</div>
                     <specialrules
                         :fumbbl-api="fumbblApi"
                         :team-id="team.getId()"
