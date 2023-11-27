@@ -8,10 +8,14 @@ export default class FumbblApi {
     private queue: PromiseQueue;
     private readonly simulateDelay: boolean = false;
     private isDevMode: boolean = false;
+    private enableOauth: boolean = false;
+    private accessToken: string = '';
+    private tokenExpiry: number = 0;
 
     constructor() {
         this.queue = new PromiseQueue();
         this.isDevMode = import.meta.env.VITE_API_URL !== import.meta.env.VITE_API_URL_RESTRICTED;
+        this.enableOauth = import.meta.env.VITE_ENABLE_OAUTH == 'true';
     }
 
     protected getUrl(apiUrl: string): string {
@@ -22,6 +26,38 @@ export default class FumbblApi {
         return import.meta.env.VITE_API_URL_RESTRICTED + apiUrl;
     }
 
+    protected async getAccessToken(): string {
+      if (Date.now() > this.tokenExpiry) {
+        let data = {
+          grant_type: "client_credentials",
+          client_id: import.meta.env.VITE_CLIENT_ID,
+          client_secret: import.meta.env.VITE_CLIENT_SECRET,
+        };
+        this.enableOauth = false;
+        let result = await this.post(this.getUrl('/api/oauth/token'), data);
+        this.enableOauth = true;
+        let tokenData = result.data;
+
+        this.tokenExpiry = Date.now() + tokenData.expires_in/1000 - 10;
+        this.accessToken = tokenData.access_token;
+      }
+
+      return this.accessToken;
+    }
+
+    protected async getAuthHeaders() {
+      let headers = {};
+      if (this.enableOauth) {
+        let token = await this.getAccessToken();
+        headers = {
+          'headers': {
+            'Authorization': 'Bearer '+token
+          }
+        };
+      }
+      return headers;
+    }
+
     protected async post(url: string, data: any = null, transform: (d: any) => any = null): Promise<ApiResponse> {
         if (this.simulateDelay) {
             await this.delay(1000);
@@ -29,7 +65,7 @@ export default class FumbblApi {
 
         let result;
         try {
-            result = await Axios.post(url, data);
+            result = await Axios.post(url, data, await this.getAuthHeaders());
         } catch(error) {
             return ApiResponse.error(error);
         }
@@ -54,7 +90,7 @@ export default class FumbblApi {
 
             let result = null;
             try {
-                result = await Axios.post(url, data);
+                result = await Axios.post(url, data, await this.getAuthHeaders());
             } catch (error) {
                 return ApiResponse.error(error);
             }
