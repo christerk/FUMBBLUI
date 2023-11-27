@@ -1,10 +1,11 @@
 <template>
     <div class="readytoplay">
         <div v-if="journeymanQuantityInputs.length > 1" class="journeymenquantities">
-            <div>
-                <div class="journeymenrequiredinfo">{{ journeymanQuantityForNextGame }} journeymen required.</div>
+            <div class="journeymenrequiredinfo">{{ journeymanQuantityForNextGame }} journeymen required.</div>
+            <div :class="{jmtable: true, l2: journeymanQuantityInputs.length == 2}">
                 <div v-for="journeymanQuantityInput of journeymanQuantityInputs" :key="journeymanQuantityInput.positionId" class="journeymanoption">
                     <input
+                        v-if="journeymanQuantityInputs.length > 2 || journeymanQuantityInput.positionId != journeymanQuantityInputs[0].positionId" 
                         :id="'journeymanQuantity_' + journeymanQuantityInput.positionId"
                         type="range"
                         min="0"
@@ -13,8 +14,12 @@
                         @change="handleQuantityChange(journeymanQuantityInput.positionId)"
                         @input="handleQuantityChange(journeymanQuantityInput.positionId)"
                     >
-                    <label :for="'journeymanQuantity_' + journeymanQuantityInput.positionId" title="Use range slider to adjust number of journeymen for this position.">
+                    <label v-if="journeymanQuantityInputs.length > 2 || journeymanQuantityInput.positionId != journeymanQuantityInputs[0].positionId" :for="'journeymanQuantity_' + journeymanQuantityInput.positionId" title="Use range slider to adjust number of journeymen for this position.">
                         <span class="journeymanquantity">{{ journeymanQuantityInput.quantity }}</span> {{ journeymanQuantityInput.positionName }}
+                    </label>
+                    <label v-else :for="'journeymanQuantity_' + journeymanQuantityInput.positionId" title="Use range slider to adjust number of journeymen for this position.">
+                      {{ journeymanQuantityInput.positionName }}
+                        <span class="journeymanquantity">{{ journeymanQuantityInput.quantity }}</span> 
                     </label>
                 </div>
             </div>

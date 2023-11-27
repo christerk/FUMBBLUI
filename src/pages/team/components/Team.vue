@@ -92,7 +92,7 @@
                 <div class="playerrows">
                     <div class="playerrowsheader">
                         <template v-if="! showHireRookiesWithPermissionsCheck">
-                            <div class="cell"><button v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">Hire Players</button></div>
+                            <div class="cell"><button class="light" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">Hire Players</button></div>
                             <div class="cell"></div>
                             <div class="cell statma">Ma</div>
                             <div class="cell statst">St</div>
@@ -107,7 +107,7 @@
                             <div v-else-if="accessControl.canEdit()" class="cell removenewplayer">Retire</div>
                         </template>
                         <template v-else>
-                            <div class="cell"><button v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">&lt;&lt; Close</button></div>
+                            <div class="cell"><button class="light" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">&lt;&lt; Close</button></div>
                         </template>
                     </div>
 

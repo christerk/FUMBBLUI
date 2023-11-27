@@ -718,7 +718,7 @@
                 .addremove {
                   display: flex;
                   .add, .remove {
-                    width: 70px;
+                    width: 80px;
                     &.disabled {
                       opacity: 0.2;
                     }
@@ -770,8 +770,26 @@
     }
 
     .readytoplay {
+        display: grid;
+        place-items: center;
+        .jmtable {
+            display: grid;
+            grid-template-columns: 1fr;
+
+            &.l2 {
+                grid-template-columns: 1fr 1fr;
+                place-items: start;
+
+                .journeymanoption {
+                    place-self: start;
+                    line-height: 25px;
+                    &:first-child {
+                        place-self: end;
+                    }
+                }
+            }
+        }
       .journeymenquantities {
-        display: flex;
         justify-content: center;
         margin: 20px 0;
         .journeymenrequiredinfo {
@@ -785,8 +803,12 @@
           .journeymanquantity {
             border: solid @Quicksilver 1px;
             background-color: @OldLace;
-            margin: 0 5px 0 10px;
-            padding: 1px 3px 1px 3px;
+            margin: 0 0.5rem;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: inline-block;
+            text-align: center;
           }
         }
       }
@@ -805,19 +827,6 @@
     color: red;
   }
   .teambutton {
-    background-color: @OldLace;
-    border: solid @Quicksilver 2px;
-    color: @Carmine;
-    border-radius: 5px;
-    cursor: pointer;
-
-    &:active {
-      background-color: @Eggshell;
-    }
-
-    &:hover {
-        background-color: lighten(@OldLace, 10%);
-    }
   }
   .mixin_abbreviate {
     white-space: nowrap;
