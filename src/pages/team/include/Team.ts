@@ -230,7 +230,11 @@ export default class Team {
             if (playerCost > 0) {
                 this.treasury += playerCost;
             }
-            this.players = [];
+            let emptyPlayers = [];
+            for (let i=0; i<this.maxPlayers; i++) {
+              emptyPlayers.push(Player.emptyPlayer(i+1));
+            }
+            this.players = emptyPlayers;
         }
     }
 
