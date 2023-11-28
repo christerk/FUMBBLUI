@@ -29,9 +29,9 @@
                       <div class="status">{{team.getTeamStatus().displayName}}</div>
                     </div>
                     <ul class="teamnav">
-                        <button v-if="accessControl.canReadyTeam()" class="menu" @click="triggerReadyToPlay">Complete</button>
-                        <button v-else-if="teamManagementSettings.isValidForCreate(team)" class="menu" @click="modals.activateTeam = true">Activate</button>
-                        <button v-else @click="modals.errorsForCreate = true" class="menu">Activate</button>
+                        <button v-if="team.getTeamStatus().isPostMatch() && accessControl.canReadyTeam()" class="menu" @click="triggerReadyToPlay">Complete</button>
+                        <button v-else-if="team.getTeamStatus().isNew() && teamManagementSettings.isValidForCreate(team)" class="menu" @click="modals.activateTeam = true">Activate</button>
+                        <button v-else-if="team.getTeamStatus().isNew()" @click="modals.errorsForCreate = true" class="menu">Activate-error</button>
                         <li class="menu">
                           <a href="#" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">Hire Players</a>
                         </li>
