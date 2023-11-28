@@ -28,7 +28,7 @@
             </template>
         </div>
         <div class="playerdetailssection playerdetailsrecord">
-            <a v-if="player" :href="`https://fumbbl.com/p/player?player_id=${player.getId()}`" style="float: right;">Manage player</a>
+            <a v-if="player" :href="`https://fumbbl.com/p/player?player_id=${player.id}`" style="float: right;">Manage player</a>
             <div class="title">Details</div>
             <table class="playerstats">
                 <tr>
