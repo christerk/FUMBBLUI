@@ -97,6 +97,9 @@
                 </template>
             </div>
             <div v-else-if="!player.IsEmpty && accessControl.canEdit()" class="cell retireplayer">
+                <template v-if="player.canSkill">
+                    <a href="#" @click.prevent="triggerSkillPlayer">Skill</a>
+                </template>
                 <template v-if="! player.getIsJourneyman()">
                     (<a href="#" @click.prevent="triggerNominateRetirePlayer">{{ player.getIsRefundable() ? 'Refund' : 'Retire' }}</a>)
                 </template>
@@ -187,6 +190,11 @@ class PlayerComponent extends Vue {
     @Emit('hire-journeyman')
     public triggerHireJourneyman(): Player {
         return this.player!;
+    }
+
+    @Emit('skill-player')
+    public triggerSkillPlayer(): Player {
+      return this.player!;
     }
 
     @Emit('fold-out')

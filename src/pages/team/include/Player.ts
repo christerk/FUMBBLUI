@@ -98,6 +98,7 @@ export default class Player {
         player.record.games = rawApiPlayer.record.games;
         player.record.completions = rawApiPlayer.record.completions;
         player.record.touchdowns = rawApiPlayer.record.touchdowns;
+        player.record.deflections = rawApiPlayer.record.deflections;
         player.record.interceptions = rawApiPlayer.record.interceptions;
         player.record.casualties = rawApiPlayer.record.casualties;
         player.record.mvps = rawApiPlayer.record.mvps;
@@ -356,6 +357,15 @@ export default class Player {
                 characteristic: characteristicThresholds[numberOfSkills] ?? 0,
             }
         }
+    }
+
+    public addSkill(skill: string) {
+      this.skills.push(skill);
+    }
+
+    public get canSkill(): boolean {
+      let info = this.sppDisplayInfo;
+      return info.tier > 0;
     }
 
     public isMissNextGame(): boolean {

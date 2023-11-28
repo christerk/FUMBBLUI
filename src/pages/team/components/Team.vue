@@ -129,8 +129,8 @@
                             <div class="cell injuries">Inj</div>
                             <div class="cell spp">SPP</div>
                             <div class="cell cost">Cost</div>
-                            <div v-if="accessControl.canCreate()" class="cell removenewplayer">Remove</div>
-                            <div v-else-if="accessControl.canEdit()" class="cell removenewplayer">Retire</div>
+                            <div v-if="accessControl.canCreate()" class="cell removenewplayer"></div>
+                            <div v-else-if="accessControl.canEdit()" class="cell removenewplayer"></div>
                         </template>
                         <template v-else>
                             <div class="cell"><button class="light" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">&lt;&lt; Close</button></div>
@@ -150,6 +150,7 @@
                               @remove-player="handleRemovePlayer"
                               @nominate-retire-player="handleNominateRetirePlayer"
                               @hire-journeyman="handleHireJourneyman"
+                              @skill-player="showSkillPlayer"
                               @fold-out="handleFoldOut"
                           ></player>
                         </template>
@@ -485,6 +486,21 @@
                 <p>Team: <strong>{{ team.getName() }}</strong> {{ team.getTeamValue() / 1000 }}k ({{ teamManagementSettings.rosterName }})</p>
             </template>
         </modal>
+        <modal
+            v-show="modals.skillPlayer === true"
+            :button-settings="{cancel: {enabled: false}, confirm: {enabled: true, label: 'Close' }}"
+            :modal-size="'skill'"
+            @confirm="handleSkillPlayer"
+        >
+            <template v-slot:header>
+                Skill Player
+            </template>
+
+            <template v-slot:body>
+                <iframe v-if="modals.skillPlayer" style="border-radius: 5px; width:800px; height:496px" :src="'/p/selectskill?teamId='+team.id+'&playerId='+skillingPlayer.id" title="Select Skill"></iframe>
+            </template>
+        </modal>
+
         <retireplayer
             v-if="playerToRetire"
             :fumbblApi="fumbblApi"
@@ -581,6 +597,7 @@ class TeamComponent extends Vue {
     public mainMenuShow: string = 'none';
     private showHireRookies: boolean = false;
     public errorModalInfo: {general: string, technical: string} | null = null;
+    private skillingPlayer: Player | null = null;
 
     public modals: {
         activateTeam: boolean,
@@ -591,6 +608,7 @@ class TeamComponent extends Vue {
         removeAssistantCoach: boolean,
         removeCheerleader: boolean,
         removeApothecary: boolean,
+        skillPlayer: boolean,
     } = {
         activateTeam: false,
         errorsForCreate: false,
@@ -600,6 +618,7 @@ class TeamComponent extends Vue {
         removeAssistantCoach: false,
         removeCheerleader: false,
         removeApothecary: false,
+        skillPlayer: false,
     };
 
     public menuShow(menu: string) {
@@ -1110,6 +1129,16 @@ class TeamComponent extends Vue {
             );
         }
     }
+
+    public async showSkillPlayer(player: Player) {
+      this.skillingPlayer = player;
+      this.modals.skillPlayer = true;
+    }
+
+    public async handleSkillPlayer() {
+      await this.reloadTeam();
+      this.modals.skillPlayer = false;
+    }    
 
     public handleFoldOut(eventDataFoldOut: EventDataFoldOut) {
         let playerRowFoldOutMode = eventDataFoldOut.playerRowFoldOutMode;

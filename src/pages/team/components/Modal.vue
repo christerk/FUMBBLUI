@@ -72,6 +72,7 @@ class ModalComponent extends Vue {
             modalsmall: this.modalSize === 'small',
             modalmedium: this.modalSize === 'medium',
             modallarge: this.modalSize === 'large',
+            modalskill: this.modalSize === 'skill',
         }
     }
 }

@@ -44,6 +44,10 @@
                     <td>Touchdowns</td>
                 </tr>
                 <tr>
+                    <td>{{ player ? player.getRecord().deflections : '0' }}</td>
+                    <td>Deflections</td>
+                </tr>
+                <tr>
                     <td>{{ player ? player.getRecord().interceptions : '0' }}</td>
                     <td>Interceptions</td>
                 </tr>

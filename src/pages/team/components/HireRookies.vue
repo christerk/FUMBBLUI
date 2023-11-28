@@ -33,7 +33,7 @@
                             class="teambutton"
                             :class="{disabled: ! canBuyPosition(positionDataForBuyingPlayer)}"
                             :title="reasonsCannotBuy(positionDataForBuyingPlayer).join('\r\n')"
-                        >Buy</button>
+                        >Hire</button>
                     </div>
                 </div>
                 <div class="skills">{{ positionDataForBuyingPlayer.position.skills.join(', ') }}</div>
