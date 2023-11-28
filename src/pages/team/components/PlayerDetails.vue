@@ -158,7 +158,7 @@ class PlayerDetailsComponent extends Vue {
 
         if (this.updatePlayerDetailsErrors.length === 0) {
             const apiResponse = await this.fumbblApi.updatePlayer(
-                this.player.getId(),
+                this.player.id,
                 this.updatePlayerDetails.getPlayerName(),
                 this.updatePlayerDetails.getGender()
             );

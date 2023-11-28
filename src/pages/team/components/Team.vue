@@ -898,7 +898,7 @@ class TeamComponent extends Vue {
     }
 
     public async removeAllPlayers() {
-        const playerIdsToRemove = this.team.getPlayers().map(player => player.getId());
+        const playerIdsToRemove = this.team.getPlayers().filter(p => !p.IsEmpty).map(player => player.id);
         this.team.removeAllPlayers();
         // call this to immediately show the players have gone (handleGeneralTeamUpdate needs to be called after all have been fully removed).
         
