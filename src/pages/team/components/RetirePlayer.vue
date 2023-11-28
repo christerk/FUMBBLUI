@@ -66,7 +66,7 @@ class RetirePlayerComponent extends Vue {
     public errors: string[] = [];
 
     async mounted() {
-        const apiResponse = await this.fumbblApi.getPlayer(this.player.getId());
+        const apiResponse = await this.fumbblApi.getPlayer(this.player.id);
         if (apiResponse.isSuccessful()) {
             const rawApiPlayer = apiResponse.getData();
             this.validatePlayer(rawApiPlayer);

@@ -29,7 +29,7 @@
                       <div class="status">{{team.getTeamStatus().displayName}}</div>
                     </div>
                     <ul class="teamnav">
-                        <button v-if="team.getTeamStatus().isPostMatch() && accessControl.canReadyTeam()" class="menu" @click="triggerReadyToPlay">Complete</button>
+                        <button v-if="team.getTeamStatus().isPostMatch() && accessControl.canReadyTeam()" class="menu" @click="interceptReadyToPlay">Complete</button>
                         <button v-else-if="team.getTeamStatus().isNew() && teamManagementSettings.isValidForCreate(team)" class="menu" @click="modals.activateTeam = true">Activate</button>
                         <button v-else-if="team.getTeamStatus().isNew()" @click="modals.errorsForCreate = true" class="menu">Activate-error</button>
                         <li class="menu">
@@ -131,7 +131,7 @@
                 @hide-panel="enableShowHireRookies"
             ></hirerookies>
             <div class="playerrowsouter">
-                <div class="playerrows">
+                <div :class="{playerrows: true, showplayercontrols:team.getTeamStatus().showPlayerControls()}" >
                     <div class="playerrowsheader">
                         <template v-if="! showHireRookiesWithPermissionsCheck">
                             <div class="cell"></div>
@@ -229,7 +229,7 @@
                 <div class="info right">
                     <template v-if="accessControl.canCreate()">
                         <select v-model.number="dedicatedFansChoice">
-                            <option v-for="dedicatedFansStartValue in teamManagementSettings.getDedicatedFansAllowedValues(team.getDedicatedFans(), team.getTreasury())" :key="dedicatedFansStartValue">{{ dedicatedFansStartValue }}</option>
+                            <option v-for="dedicatedFansStartValue in teamManagementSettings.getDedicatedFansAllowedValues(team.getDedicatedFans(), team.getTreasuryRef())" :key="dedicatedFansStartValue">{{ dedicatedFansStartValue }}</option>
                         </select>&nbsp;
                         <button v-if="dedicatedFansChoice != team.getDedicatedFans()" @click="updateDedicatedFans()" class="teambutton">Ok</button>
                     </template>
@@ -268,7 +268,7 @@
                     Treasury:
                 </div>
                 <div class="info left">
-                    {{ team.getTreasury()/1000 }}k
+                    {{ team.getTreasuryRef()/1000 }}k
                 </div>
                 <div class="title right">
                     Cheerleaders:
@@ -352,12 +352,7 @@
         <div v-if="accessControl.canRetireTeam()" class="retireteam">
             <button @click="modals.retireTeam = true" class="teambutton">Retire Team</button>
         </div>
-        <readytoplay
-            v-if="accessControl.canReadyTeam()"
-            :journeymanQuantityForNextGame="journeymanQuantityForNextGame"
-            :journeymanPositions="teamManagementSettings.journeymanPositions"
-            @ready-to-play="handleReadyToPlay"
-        ></readytoplay>
+
         <modal
             v-if="errorModalInfo !== null"
             :button-settings="{cancel: {enabled: true, label: 'Close'}, confirm: {enabled: false, label: ''}}"
@@ -517,6 +512,46 @@
             </template>
         </modal>
 
+        <modal
+            ref="postMatchModal"
+            class="postmatch"
+            v-show="modals.readyTeam === true"
+            :button-settings="{cancel: {enabled: true, label: 'Close'}, confirm: {enabled: !readyToPlayTriggered, label: 'Ready to Play' }}"
+            :modal-size="'medium'"
+            @cancel="modals.readyTeam = false"
+            @confirm="triggerReadyToPlay"
+        >
+            <template v-slot:header>
+                Complete Post-Match
+            </template>
+
+            <template v-slot:body>
+              <div class="expensivemistakes">
+                <div v-if="willTriggerExpensiveMistakes && !readyToPlayTriggered" class="warning">
+                  <div class="paragraph">Treasury {{ team.treasury/1000 }}k is greater than {{ this.teamManagementSettings.expensiveMistakesStart/1000 }}k</div>
+                  <div class="paragraph">Expensive mistakes will be triggered</div>
+                </div>
+
+                <div v-if="readyToPlayTriggered" class="warning emresult">
+                  <div class="title">Expensive Mistakes</div>
+                  <div class="emRoll">
+                    <die type="d6" ref="emDie" @complete="completeExpensiveMistakes"></die>
+                  </div>
+                  <div v-if="showEmResult">{{ emResult }}</div>
+                  <div v-if="showEmResult">Lost {{ emTreasuryLoss }}</div>
+                </div>
+
+              </div>
+              <readytoplay
+                  ref="readyToPlayComponent"
+                  :class="{invisible: !accessControl.canReadyTeam() || readyToPlayTriggered}"
+                  :journeymanQuantityForNextGame="journeymanQuantityForNextGame"
+                  :journeymanPositions="teamManagementSettings.journeymanPositions"
+                  @ready-to-play="handleReadyToPlay"
+              ></readytoplay>
+            </template>
+        </modal>
+        
         <retireplayer
             v-if="playerToRetire"
             :fumbblApi="fumbblApi"
@@ -529,8 +564,8 @@
 
 <script lang="ts">
 import { PropType } from "vue";
-import { Prop, Component, Vue, toNative, Emit } from 'vue-facing-decorator'
-import { SortableTable } from '@components/fumbblcomponents'
+import { Prop, Component, Vue, toNative, Emit, Ref } from 'vue-facing-decorator'
+import { SortableTable, Die } from '@components/fumbblcomponents'
 import {
     AddRemovePermissions,
     JourneymanQuantityChoice,
@@ -565,7 +600,8 @@ import { EventDataFoldOut, EventDataRemovePlayer } from "../include/EventDataInt
         'modal': ModalComponent,
         'retireplayer': RetirePlayerComponent,
         'readytoplay': ReadyToPlayComponent,
-        SortableTable
+        SortableTable,
+        Die
     },
 })
 class TeamComponent extends Vue {
@@ -595,11 +631,20 @@ class TeamComponent extends Vue {
     @Emit('delete-team')
     public triggerDeleteTeam() {}
 
+    @Ref
+    private emDie: Die;
+
+    @Ref
+    private readyToPlayComponent: ReadyToPlayComponent;
+
+    @Ref
+    private postMatchModal: ModalComponent;
+
     private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
 
     // the following properties (prefixed with data) must be initialized in order to become reactive data properties
     // to avoid warnings we provide getters for each without the data prefix, which also ignore the possibility of them being undefined
-    public dataTeam?: Team = undefined;
+    public team: Team = undefined;
     public dataTeamManagementSettings?: TeamManagementSettings = undefined;
     public dataAccessControl?: AccessControl = undefined;
     public dataRosterIconManager?: RosterIconManager = undefined;
@@ -614,6 +659,10 @@ class TeamComponent extends Vue {
     private showHireRookies: boolean = false;
     public errorModalInfo: {general: string, technical: string} | null = null;
     private skillingPlayer: Player | null = null;
+    private showEmResult: boolean = false;
+    private emResult: string = '';
+    private emTreasuryLoss: string = '';
+    private readyToPlayTriggered: boolean = false;
 
     public modals: {
         activateTeam: boolean,
@@ -625,6 +674,7 @@ class TeamComponent extends Vue {
         removeCheerleader: boolean,
         removeApothecary: boolean,
         skillPlayer: boolean,
+        readyTeam: boolean,
     } = {
         activateTeam: false,
         errorsForCreate: false,
@@ -635,6 +685,7 @@ class TeamComponent extends Vue {
         removeCheerleader: false,
         removeApothecary: false,
         skillPlayer: false,
+        readyTeam: false,
     };
 
     public menuShow(menu: string) {
@@ -677,13 +728,22 @@ class TeamComponent extends Vue {
                 }
             }
 
-            this.dataTeam = Team.fromApi(
+            let newTeam = Team.fromApi(
                 rawApiTeam,
                 this.teamManagementSettings.minStartFans,
                 this.teamManagementSettings,
                 playerRosterIconVersionPositions,
                 this.rosterIconManager,
             );
+
+            console.log('reloadTeam PRE', newTeam);
+
+            this.team = newTeam;
+
+            console.log('reloadTeam POST', this.team);
+
+            console.log('reloadTeam X', this.team.treasury);
+            console.log('reloadTeam Y', this.team.willTriggerExpensiveMistakes);
 
             this.dataAccessControl = new AccessControl(this.userRoles, this.team.getTeamStatus().getStatus());
 
@@ -783,13 +843,13 @@ class TeamComponent extends Vue {
     }
 
     public get dataPropertiesInitialized(): boolean {
-        return this.dataTeam !== undefined &&
+        return this.team !== undefined &&
             this.dataTeamManagementSettings !== undefined &&
             this.dataAccessControl !== undefined &&
             this.dataRosterIconManager !== undefined;
     }
 
-    public get team(): Team {
+    public get team2(): Team {
         return this.dataTeam!;
     }
 
@@ -829,7 +889,7 @@ class TeamComponent extends Vue {
         }
 
         return this.teamManagementSettings.getRosterPositionDataForBuyingPlayer(
-            this.team.getTreasury(),
+            this.team.getTreasuryRef(),
             positionQuantities,
         );
     }
@@ -887,7 +947,7 @@ class TeamComponent extends Vue {
     public async onPlayerRenumbered(evt) {
       var newNumbers = {};
       this.team.players.filter(p => !p.IsEmpty).forEach(p => newNumbers[p.id] = p.playerNumber);
-      const apiResponse = await this.fumbblApi.renumberPlayers(this.team.getId(), newNumbers);
+      const apiResponse = await this.fumbblApi.renumberPlayers(this.team.id, newNumbers);
       if (!apiResponse.isSuccessful()) {
          await this.recoverFromUnexpectedError(
              'An error occurred whilst renumbering your players.',
@@ -1115,10 +1175,10 @@ class TeamComponent extends Vue {
         
         this.reloadTeamWithDelay();
 
-        const playerToRetireId = this.playerToRetire.getId();
+        const playerToRetireId = this.playerToRetire.id;
         this.playerToRetire = null;
 
-        const apiResponse = await this.fumbblApi.retirePlayer(this.team.getId(), playerToRetireId);
+        const apiResponse = await this.fumbblApi.retirePlayer(this.team.id, playerToRetireId);
         if (! apiResponse.isSuccessful()) {
             await this.recoverFromUnexpectedError(
                 'An error occurred retiring a player.',
@@ -1144,6 +1204,17 @@ class TeamComponent extends Vue {
                 apiResponse.getErrorMessage(),
             );
         }
+    }
+
+    public async interceptReadyToPlay() {
+      if (this.willTriggerExpensiveMistakes || (this.journeymanQuantityForNextGame > 0 && this.teamManagementSettings.journeymanPositions.length > 1)) {
+        this.showEmResult = false;
+        this.readyToPlayTriggered = false;
+        this.modals.readyTeam = true;
+      } else {
+        this.team.setTeamStatus('Active');
+        this.triggerReadyToPlay();
+      }
     }
 
     public async showSkillPlayer(player: Player) {
@@ -1260,7 +1331,7 @@ class TeamComponent extends Vue {
     }
 
     public async handleActivateTeam() {
-        const apiResponse = await this.fumbblApi.activateTeam(this.team.getId());
+        const apiResponse = await this.fumbblApi.activateTeam(this.team.id);
         if (apiResponse.isSuccessful()) {
             await this.reloadTeam();
             this.modals.activateTeam = false;
@@ -1301,11 +1372,41 @@ class TeamComponent extends Vue {
         const apiResponse = await this.fumbblApi.readyTeam(this.team.id, postData);
 
         if (apiResponse.isSuccessful()) {
+          const emResult: any = apiResponse.getData();
+          if (emResult != undefined && emResult.expensiveMistakes != undefined) {
+            let roll = emResult.expensiveMistakes.roll;
+            this.emResult = emResult.expensiveMistakes.effect;
+            this.emTreasuryLoss = emResult.expensiveMistakes.treasuryLoss;
+
+            this.emDie.roll(roll);
+          } else {
+            this.modals.readyTeam = false;
             await this.reloadTeam();
-            setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 500);
+          }
+
         } else {
             await this.recoverFromUnexpectedError('An error occurred readying your team.', apiResponse.getErrorMessage());
         }
+    }
+
+    public triggerReadyToPlay() {
+      if (this.willTriggerExpensiveMistakes) {
+        this.readyToPlayTriggered = true;
+      }
+
+      if (this.readyToPlayComponent != undefined) {
+        this.readyToPlayComponent.triggerReadyToPlay();
+      }
+    }
+
+    public async completeExpensiveMistakes() {
+      this.showEmResult = true;
+      await this.reloadTeam();
+      setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 500);
+    }
+
+    public get willTriggerExpensiveMistakes() { 
+      return this.team.treasury >= this.teamManagementSettings.expensiveMistakesStart;
     }
 }
 

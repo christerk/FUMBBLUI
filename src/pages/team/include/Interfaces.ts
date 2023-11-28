@@ -131,6 +131,9 @@ export interface SetupTeamManagementSettings {
     seasons: {
         seasonLength: number,
     },
+    ruleset: {
+      expensiveMistakesStart: number,
+    }
 };
 
 export interface AddRemovePermissions {

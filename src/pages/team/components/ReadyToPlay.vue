@@ -1,7 +1,7 @@
 <template>
     <div class="readytoplay">
-        <div v-if="journeymanQuantityInputs.length > 1" class="journeymenquantities">
-            <div class="journeymenrequiredinfo">{{ journeymanQuantityForNextGame }} journeymen required.</div>
+        <div v-if="journeymanQuantityForNextGame > 0 && journeymanQuantityInputs.length > 1" class="journeymenquantities">
+            <div class="journeymenrequiredinfo">Choose {{ journeymanQuantityForNextGame }} {{ journeymanQuantityForNextGame==1?'journeyman position':'journeymen positions' }}.</div>
             <div :class="{jmtable: true, l2: journeymanQuantityInputs.length == 2}">
                 <div v-for="journeymanQuantityInput of journeymanQuantityInputs" :key="journeymanQuantityInput.positionId" class="journeymanoption">
                     <input
@@ -23,10 +23,6 @@
                     </label>
                 </div>
             </div>
-        </div>
-        <div class="readytoplaybuttonarea">
-            <button v-if="isValidJourneymanQuantityChoices" class="teambutton" @click="triggerReadyToPlay">Ready to play</button>
-            <div v-else>Incorrect number of journeymen chosen, {{ journeymanQuantityForNextGame }} needed, {{ totalJourneymenChosen }} selected.</div>
         </div>
     </div>
 </template>

@@ -57,4 +57,11 @@ export default class TeamStatus {
     public isPostMatch(): boolean {
         return this.status === 'POST_MATCH_SEQUENCE';
     }
+
+    public showPlayerControls(): boolean {
+      return this.status === 'NEW'
+      || this.status === 'POST_MATCH_SEQUENCE'
+      || this.status === 'SKILL_ROLLS_PENDING'
+      || this.status == 'REDRAFTING';
+    }
 }

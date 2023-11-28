@@ -81,6 +81,9 @@ export default class TeamManagementSettings {
             seasons: {
                 seasonLength: rawApiRuleset.options.rulesetOptions.seasonLength,
             },
+            ruleset: {
+              expensiveMistakesStart: rawApiRuleset.options.rulesetOptions.expensiveMistakesStart,
+            }
         };
 
         // https://fumbbl.com/api/ruleset/get/4
@@ -128,6 +131,10 @@ export default class TeamManagementSettings {
 
     public get seasonLength(): number {
         return this.settings.seasons.seasonLength;
+    }
+
+    public get expensiveMistakesStart(): number {
+      return this.settings.ruleset.expensiveMistakesStart * 1000;
     }
 
     public get startPlayers() {

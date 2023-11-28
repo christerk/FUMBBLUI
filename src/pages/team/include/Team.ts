@@ -3,6 +3,8 @@ import Player from "./Player";
 import RosterIconManager from "./RosterIconManager";
 import TeamManagementSettings from "./TeamManagementSettings";
 import TeamStatus from "./TeamStatus";
+import { ref, computed } from 'vue';
+import type { Ref } from 'vue'
 
 export default class Team {
     private readonly COMPETITIVE_DIVISION_NAME: string = 'Competitive';
@@ -18,7 +20,7 @@ export default class Team {
     private teamValue: number = 0;
     private tvLimit: number = 0;
     private currentTeamValue: number = 0;
-    private treasury: number = 0;
+    public treasury: number = 0;
     private rerolls: number = 0;
     private minStartDedicatedFans: number = 0;
     public dedicatedFans: number = 0; // Needs to be public, bound to v-model
@@ -90,6 +92,9 @@ export default class Team {
                 )
             );
         }
+        console.log('fromApi', team.treasury);
+        let x = team.willTriggerExpensiveMistakes;
+        console.log('fromApi PostWillTrigger', x, team.treasury);
         return team;
     }
 
@@ -115,6 +120,10 @@ export default class Team {
 
     public getTeamStatus(): TeamStatus {
         return this.teamStatus;
+    }
+
+    public setTeamStatus(newStatus: string) {
+      this.teamStatus = new TeamStatus(newStatus);
     }
 
     public getName(): string {
@@ -144,16 +153,16 @@ export default class Team {
         return this.currentTeamValue;
     }
 
-    public getTreasury(): number {
-        return this.treasury;
-    }
-
     public getPlayers(): Player[] {
         return this.players;
     }
 
     public getRosteredPlayers(): Player[] {
         return this.players.filter(player => !player.IsEmpty && !player.getIsJourneyman());
+    }
+
+    public getTreasuryRef(): Ref<number> {
+      return this.treasury;
     }
 
     public initializePlayers() {
@@ -355,7 +364,7 @@ export default class Team {
     }
 
     public canAfford(treasuryCost: number): boolean {
-        return this.getTreasury() >= treasuryCost;
+        return this.treasury >= treasuryCost;
     }
 
     public findFirstEmptyNumber(): number | null {

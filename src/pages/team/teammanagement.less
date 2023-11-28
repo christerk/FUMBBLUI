@@ -523,13 +523,33 @@
       }
       .playerrowsheader {
         display: grid;
-        grid-template-columns: 88px 1fr repeat(5, 35px) 1fr 60px 40px 60px 65px;
 
         background-color: @Forest;
         color: @White;
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
       }
+
+      &.showplayercontrols {
+        .playerrowsheader {
+            grid-template-columns: 88px 1fr repeat(5, 35px) 1fr 60px 40px 60px 65px;
+        }
+        .main {
+            grid-template-columns: 15px 25px 48px 1fr repeat(5, 35px) 1fr 60px 40px 60px 65px;
+            &.compact {
+              grid-template-columns: 15px 25px 48px 1fr 1fr 60px 40px 60px 65px;
+            }
+        }
+      }
+
+      .playerrowsheader {
+        grid-template-columns: 88px 1fr repeat(5, 35px) 1fr 60px 40px 60px;
+      }
+      .main {
+        grid-template-columns: 15px 25px 48px 1fr repeat(5, 35px) 1fr 60px 40px 60px;
+
+      }
+
       .playerrow {
         background-color: @OldLace;
         &.empty { 
@@ -599,11 +619,6 @@
 
           min-height: 38px;
           display: grid;
-          grid-template-columns: 15px 25px 48px 1fr repeat(5, 35px) 1fr 60px 40px 60px 65px;
-
-          &.compact {
-            grid-template-columns: 15px 25px 48px 1fr 1fr 60px 40px 60px 65px;
-          }
 
           .emptyplayer, .isupdating {
             margin: auto 0;
@@ -902,6 +917,11 @@
         display: flex;
         justify-content: center;
       }
+      &.invisible {
+        opacity: 0;
+        z-index: -5;
+        position: relative;
+      }
     }
 
     .retireteam {
@@ -987,6 +1007,54 @@
           margin-right: 20px;
         }
       }
+    }
+  }
+
+  .postmatch {
+    text-align: center;
+
+    div.warning {
+        border: solid 2px red;
+        display: grid;
+        padding: 1rem;
+        border-radius: 9px;
+        font-weight: bold;
+        margin: 1rem;
+        height: 8rem;
+        grid-template-columns: 1fr;
+        place-items: center;
+        transition: all ease 0.3s;
+
+        &.emresult {
+            background: white;
+            display: inline-grid;
+            grid-template-rows: auto 1fr 1fr 1fr;
+
+            border: transparent;
+
+        }
+        .paragraph {
+            margin: 0.5rem;
+        }
+    }
+
+    div.emresult {
+        display: grid;
+        padding: 1rem;
+        border-radius: 9px;
+        font-weight: bold;
+        margin: 1rem;
+        height: 8rem;
+        grid-template-columns: 1fr;
+        place-items: center;
+
+        .paragraph {
+            margin: 0.5rem;
+        }
+    }
+
+    .emRoll {
+        text-align: center;
     }
   }
 
