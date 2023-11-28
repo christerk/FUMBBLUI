@@ -49,6 +49,8 @@ export default class TeamManagementSettings {
                         isBigGuy: position.type === 'BIGGUY',
                         defaultGender: position.gender,
                         isPeaked: position.type === 'PEAKED',
+                        primarySkills: position.normalSkills,
+                        secondarySkills: position.doubleSkills,
                     } as Position;
                 }),
             },

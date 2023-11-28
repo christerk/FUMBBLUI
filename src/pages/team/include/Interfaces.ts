@@ -44,6 +44,8 @@ export interface Position {
     isBigGuy: boolean,
     defaultGender: string,
     isPeaked: boolean,
+    primarySkills: string[],
+    secondarySkills: string[],
 };
 
 export interface PositionDataForBuyingPlayer {

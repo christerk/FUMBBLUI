@@ -39,7 +39,10 @@
                         >Hire</button>
                     </div>
                 </div>
-                <div class="skills">{{ positionDataForBuyingPlayer.position.skills.join(', ') }}</div>
+                <div class="skillrow">
+                  <div class="skills">{{ positionDataForBuyingPlayer.position.skills.join(', ') }}</div>
+                  <div class="categories"><span class="primary">{{ positionDataForBuyingPlayer.position.primarySkills.join('') }}</span> <span class="secondary">{{ positionDataForBuyingPlayer.position.secondarySkills.join('') }}</span></div>
+                </div>
                 <div class="quantityprogressouter" v-if="positionDataForBuyingPlayer.position.quantityAllowed > 100">
                     <div class="quantityprogress">
                         <div v-for="item in positionDataForBuyingPlayer.position.quantityAllowed" :key="item" :class="{yes: item <= positionDataForBuyingPlayer.quantityHired, no: item > positionDataForBuyingPlayer.quantityHired}"></div>

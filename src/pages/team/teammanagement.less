@@ -393,8 +393,18 @@
                 }
               }
             }
-            .skills {
-              font-size: 90%;
+            .skillrow {
+              display: flex;
+              .skills {
+                flex-grow: 1;
+                font-size: 90%;
+              }
+              .categories {
+                text-align: right;
+              }
+              .primary {
+                font-weight: bold;
+              }
             }
             .quantityprogressouter {
               display: flex;
