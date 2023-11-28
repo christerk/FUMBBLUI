@@ -1,5 +1,8 @@
 <template>
     <div class="hirerookies">
+        <div class="controls">
+          <button @click.prevent="hidePanel">&lt;&lt; Close</button>
+        </div>
         <div class="hirerookie" v-for="positionDataForBuyingPlayer in rosterPositionDataForBuyingPlayer" :key="positionDataForBuyingPlayer.positionId">
             <div class="rookieheader">
                 <div class="positionname" :title="positionDataForBuyingPlayer.position.name">{{ positionDataForBuyingPlayer.position.name }}</div>
@@ -82,6 +85,10 @@ class HireRookiesComponent extends Vue {
     @Emit('hire-rookie')
     public triggerHireRookie(positionId: number) {
         return positionId;
+    }
+
+    @Emit('hide-panel')
+    public hidePanel() {
     }
 
     private get bigGuyCount(): number {

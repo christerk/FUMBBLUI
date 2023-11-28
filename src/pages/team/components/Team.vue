@@ -1,7 +1,20 @@
 <template>
     <div class="team" v-if="dataPropertiesInitialized">
         <div class="teamheader">
-            <img class="rosterlogo" :src="`https://fumbbl.com/i/${teamManagementSettings.logoIdLarge}`" :alt="`Roster logo for ${teamManagementSettings.rosterName}`" :title="`Roster logo for ${teamManagementSettings.rosterName}`">
+            <div class="rosterlogo quickstats">
+              <div class="division">{{ teamManagementSettings.rosterName }}</div>
+              <div class="infobox logo">
+                <img class="logoimage" :src="`https://fumbbl.com/i/${teamManagementSettings.logoIdLarge}`" :alt="`Roster logo for ${teamManagementSettings.rosterName}`" :title="`Roster logo for ${teamManagementSettings.rosterName}`">
+              </div>
+              <div class="infobox">
+                <div class="title">TV</div>
+                <div class="info">{{ teamValue/1000 }}k</div>
+              </div>
+              <div class="infobox">
+                <div class="title">CTV</div>
+                <div class="info">{{ currentTeamValue/1000 }}k</div>
+              </div>
+            </div>
             <div class="teamheadermain">
                 <div class="teamheadermaincontent">
                     <editteamname
@@ -13,14 +26,14 @@
                         @cancel="handleCancelEditTeamName"
                     ></editteamname>
                     <div class="rosterinfo" style="margin-top: 0.5em;">
-                        <img v-if="team.getTeamStatus().isNew()" src="https://fumbbl.com/FUMBBL/Images/New_small.gif" alt="Roster" title="New team">
-                        <img v-else-if="team.getTeamStatus().isActive()" src="https://fumbbl.com/FUMBBL/Images/Roster_small.gif" alt="Roster" title="Ready / View Roster">
-                        <img v-else-if="team.getTeamStatus().isPostMatch()" src="https://fumbbl.com/FUMBBL/Images/p_small.png" alt="Roster" title="Post match sequence">
-                        <img v-else-if="team.getTeamStatus().isRetired()" src="https://fumbbl.com/FUMBBL/Images/Retired_small.gif" alt="Roster" title="Retired">
-                        <span :title="team.getDivision()"> [{{ team.getDivisionAbbreviated() }}]</span> {{ teamManagementSettings.rosterName }}
+                      <div class="status">{{team.getTeamStatus().displayName}}</div>
                     </div>
                     <ul class="teamnav">
-                        <li v-if="false"><a href="/p/team?team_id=1085077">Refresh</a></li>
+                        <button class="menu" @click="triggerReadyToPlay">Complete</button>
+                        <li class="menu">
+                          <a href="#" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">Hire Players</a>
+                        </li>
+                        <div class="spacer"></div>
                         <li v-if="accessControl.canViewHistory()" class="menu" @mouseenter="menuShow('show')" @mouseleave="menuHide('show')">
                             <a href="#">Show<img src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"></a>
                             <ul class="submenu" v-show="mainMenuShow === 'show'">
@@ -113,12 +126,13 @@
                 :has-empty-team-sheet-entry="team.hasEmptyNumbers()"
                 :max-big-guys="teamManagementSettings.maxBigGuys"
                 @hire-rookie="handleHireRookie"
+                @hide-panel="enableShowHireRookies"
             ></hirerookies>
             <div class="playerrowsouter">
                 <div class="playerrows">
                     <div class="playerrowsheader">
                         <template v-if="! showHireRookiesWithPermissionsCheck">
-                            <div class="cell"><button class="light" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">Hire Players</button></div>
+                            <div class="cell"></div>
                             <div class="cell"></div>
                             <div class="cell statma">Ma</div>
                             <div class="cell statst">St</div>
@@ -133,7 +147,7 @@
                             <div v-else-if="accessControl.canEdit()" class="cell removenewplayer"></div>
                         </template>
                         <template v-else>
-                            <div class="cell"><button class="light" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">&lt;&lt; Close</button></div>
+                            <div class="cell">&nbsp;</div>
                         </template>
                     </div>
 

@@ -2,6 +2,7 @@ import { TeamStatusValue } from "./Interfaces";
 
 export default class TeamStatus {
     private status: TeamStatusValue = 'NEW';
+    private displayNames: Map<TeamStatusValue, string>;
 
     constructor(rawApiStatus?: string) {
         rawApiStatus = rawApiStatus !== undefined ? rawApiStatus : 'New';
@@ -17,11 +18,28 @@ export default class TeamStatus {
             'Blocked': 'BLOCKED', // I don't remember fully what this does 
         };
 
+        this.displayNames = new Map<TeamStatusValue, string>([
+          ["NEW", "New"],
+          ["ACTIVE", "Active"],
+          ["WAITING_FOR_OPPONENT", "Waiting for Opponent"],
+          ["SKILL_ROLLS_PENDING", "Skill Rolls Pending"],
+          ["POST_MATCH_SEQUENCE", "Post-Match"],
+          ["REDRAFTING", "Redrafting"],
+          ["RETIRED", "Retired"],
+          ["PENDING_APPROVAL", "Reported"],
+          ["BLOCKED", "Blocked"],
+        ]);
+
+        this.statusName = rawApiStatus;
         this.status = statusLookup[rawApiStatus];
     }
 
     public getStatus() {
         return this.status;
+    }
+
+    public get displayName() {
+      return this.displayNames.get(this.status);
     }
 
     public isNew(): boolean {
