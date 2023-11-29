@@ -19,6 +19,41 @@
   margin-top: 20px;
  
   .team {
+    position: relative;
+    overflow: hidden;
+
+    .container {
+        display: grid;
+        grid-template-columns: 100% 100%;
+        grid-template-rows: 1fr;
+        margin-left: 0;
+        width: 100%;
+
+        .panel {
+            margin-left: 0;
+            width: 100%;
+            transition: all ease-in-out 0.5s;
+        }
+
+        .teamsheet {
+            opacity: 1;
+        }
+        .teamstats {
+            opacity: 0;
+        }
+
+        &.hidden {
+            .panel {
+                margin-left: -100%;
+            }
+            .teamsheet {
+                opacity: 0;
+            }
+            .teamstats {
+                opacity: 1;
+            }
+        }
+    }
     .teamheader {
       display: flex;
       background: @OldLace;
@@ -206,6 +241,9 @@
       }
       .divisionlogo {
       }
+    }
+    .teamsheet, .teamstats {
+        width: 100%;
     }
     .createteamstats {
       position: sticky;

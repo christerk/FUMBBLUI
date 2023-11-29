@@ -40,12 +40,12 @@
                             <a href="#">Show<img src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"></a>
                             <ul class="submenu" v-show="mainMenuShow === 'show'">
                                 <li><a :href="`https://fumbbl.com/p/team?op=log&team_id=${team.getId()}`">Log</a></li>
-                                <li><a :href="`https://fumbbl.com/p/team?op=view&showmatches=1&team_id=${team.getId()}`">Matches</a></li>
-                                <li><a :href="`https://fumbbl.com/p/team?op=view&showstats=1&team_id=${team.getId()}`">Stats</a></li>
-                                <li><a :href="`https://fumbbl.com/p/team?op=development&team_id=${team.getId()}`">Development</a></li>
-                                <li><a :href="`https://fumbbl.com/p/team?op=pastplayers&team_id=${team.getId()}`">Past Players</a></li>
+                                <li><a :href="`https://fumbbl.com/p/team?op=view&showmatches=1&team_id=${team.id}`">Matches</a></li>
+                                <li><a href="#" @click="teamSheetHidden = !teamSheetHidden; mainMenuShow=''">Stats</a></li>
+                                <li><a :href="`https://fumbbl.com/p/team?op=development&team_id=${team.id}`">Development</a></li>
+                                <li><a :href="`https://fumbbl.com/p/team?op=pastplayers&team_id=${team.id}`">Past Players</a></li>
                                 <li><a :href="`https://fumbbl.com/~${team.getCoach().name}/${team.getName()}`">View Roster</a></li>
-                                <li><a :href="`https://fumbbl.com/p/yearbook?team_id=${team.getId()}`">Yearbook</a></li>
+                                <li><a :href="`https://fumbbl.com/p/yearbook?team_id=${team.id}`">Yearbook</a></li>
                             </ul>
                         </li>
                         <li v-if="team.isLeagueDivision()" class="menu">
@@ -90,265 +90,272 @@
               </div>
             </div>
         </div>
-        <div v-if="accessControl.canCreate()" class="createteamstats">
-            <div class="playerinfo">
-                <span class="currentplayercount">{{ team.getRosteredPlayers().length }}</span>
-                <span class="text">Players ({{ teamManagementSettings.startPlayers }} required)</span>
-                <span class="text">&bull;</span>
-                <span class="text">Treasury</span>
-                <span class="treasury">{{ team.treasury/1000 }}k</span>
-                <span class="text">&bull;</span>
-                <a href="#" @click.prevent="removeAllPlayers">Remove all players</a>
+
+        <div class="container" :class="{hidden: teamSheetHidden}">
+          <div class="panel teamsheet">
+            <div v-if="accessControl.canCreate()" class="createteamstats">
+                <div class="playerinfo">
+                    <span class="currentplayercount">{{ team.getRosteredPlayers().length }}</span>
+                    <span class="text">Players ({{ teamManagementSettings.startPlayers }} required)</span>
+                    <span class="text">&bull;</span>
+                    <span class="text">Treasury</span>
+                    <span class="treasury">{{ team.treasury/1000 }}k</span>
+                    <span class="text">&bull;</span>
+                    <a href="#" @click.prevent="removeAllPlayers">Remove all players</a>
+                </div>
+                <div class="costinfo">
+                    <div class="currentteamcostlabel">Treasury spent (Max {{ teamManagementSettings.startTreasury/1000 }}k)</div> <div class="currentteamcost">{{ teamCreationCost/1000 }}k</div>
+                </div>
             </div>
-            <div class="costinfo">
-                <div class="currentteamcostlabel">Treasury spent (Max {{ teamManagementSettings.startTreasury/1000 }}k)</div> <div class="currentteamcost">{{ teamCreationCost/1000 }}k</div>
-            </div>
-        </div>
-        <div v-if="false" class="redraft">
-             <div class="redraftcalculation">
-                <div class="budgetlabel">Re-drafting Budget</div>
-                <div class="playercostlabel">Player (re-)hiring cost</div>
-                <div class="othercostlabel">Team staff cost</div>
-                <div class="remainingbudgetlabel">Remaining budget</div>
-                <div class="budget">1145k</div>
-                <div class="subtract1">-</div>
-                <div class="playercost">1470k</div>
-                <div class="subtract2">-</div>
-                <div class="othercost">210k</div>
-                <div class="equals">=</div>
-                <div class="remainingbudget">-535k</div>
-                <div class="errormessage"><template v-if="true">⚠ Not enough money to cover team cost.</template></div>
+            <div v-if="false" class="redraft">
+                 <div class="redraftcalculation">
+                    <div class="budgetlabel">Re-drafting Budget</div>
+                    <div class="playercostlabel">Player (re-)hiring cost</div>
+                    <div class="othercostlabel">Team staff cost</div>
+                    <div class="remainingbudgetlabel">Remaining budget</div>
+                    <div class="budget">1145k</div>
+                    <div class="subtract1">-</div>
+                    <div class="playercost">1470k</div>
+                    <div class="subtract2">-</div>
+                    <div class="othercost">210k</div>
+                    <div class="equals">=</div>
+                    <div class="remainingbudget">-535k</div>
+                    <div class="errormessage"><template v-if="true">⚠ Not enough money to cover team cost.</template></div>
+                </div>
+
+                <div class="redraftactions">
+                    <div class="restartredraft"><a href="#">Restart redraft</a> (clears all changes)</div>
+                    <div class="finishredraft" v-if="true"><a href="#">Finish redraft</a> (saves your changes)</div>
+                </div>
             </div>
 
-            <div class="redraftactions">
-                <div class="restartredraft"><a href="#">Restart redraft</a> (clears all changes)</div>
-                <div class="finishredraft" v-if="true"><a href="#">Finish redraft</a> (saves your changes)</div>
-            </div>
-        </div>
+            <div :class="{showhirerookies: showHireRookiesWithPermissionsCheck}">
+                <hirerookies
+                    v-if="showHireRookiesWithPermissionsCheck"
+                    :roster-position-data-for-buying-player="rosterPositionDataForBuyingPlayer"
+                    :roster-icon-manager="rosterIconManager"
+                    :has-empty-team-sheet-entry="team.hasEmptyNumbers()"
+                    :max-big-guys="teamManagementSettings.maxBigGuys"
+                    @hire-rookie="handleHireRookie"
+                    @hide-panel="enableShowHireRookies"
+                ></hirerookies>
+                <div class="playerrowsouter">
+                    <div :class="{playerrows: true, showplayercontrols:team.getTeamStatus().showPlayerControls()}" >
+                        <div class="playerrowsheader">
+                            <template v-if="! showHireRookiesWithPermissionsCheck">
+                                <div class="cell"></div>
+                                <div class="cell"></div>
+                                <div class="cell statma">Ma</div>
+                                <div class="cell statst">St</div>
+                                <div class="cell statag">Ag</div>
+                                <div class="cell statpa">Pa</div>
+                                <div class="cell statav">Av</div>
+                                <div class="cell skills">Skills</div>
+                                <div class="cell injuries">Inj</div>
+                                <div class="cell spp">SPP</div>
+                                <div class="cell cost">Cost</div>
+                                <div v-if="accessControl.canCreate()" class="cell removenewplayer"></div>
+                                <div v-else-if="accessControl.canEdit()" class="cell removenewplayer"></div>
+                            </template>
+                            <template v-else>
+                                <div class="cell">&nbsp;</div>
+                            </template>
+                        </div>
 
-        <div :class="{showhirerookies: showHireRookiesWithPermissionsCheck}">
-            <hirerookies
-                v-if="showHireRookiesWithPermissionsCheck"
-                :roster-position-data-for-buying-player="rosterPositionDataForBuyingPlayer"
-                :roster-icon-manager="rosterIconManager"
-                :has-empty-team-sheet-entry="team.hasEmptyNumbers()"
-                :max-big-guys="teamManagementSettings.maxBigGuys"
-                @hire-rookie="handleHireRookie"
-                @hide-panel="enableShowHireRookies"
-            ></hirerookies>
-            <div class="playerrowsouter">
-                <div :class="{playerrows: true, showplayercontrols:team.getTeamStatus().showPlayerControls()}" >
-                    <div class="playerrowsheader">
-                        <template v-if="! showHireRookiesWithPermissionsCheck">
-                            <div class="cell"></div>
-                            <div class="cell"></div>
-                            <div class="cell statma">Ma</div>
-                            <div class="cell statst">St</div>
-                            <div class="cell statag">Ag</div>
-                            <div class="cell statpa">Pa</div>
-                            <div class="cell statav">Av</div>
-                            <div class="cell skills">Skills</div>
-                            <div class="cell injuries">Inj</div>
-                            <div class="cell spp">SPP</div>
-                            <div class="cell cost">Cost</div>
-                            <div v-if="accessControl.canCreate()" class="cell removenewplayer"></div>
-                            <div v-else-if="accessControl.canEdit()" class="cell removenewplayer"></div>
+                        <SortableTable v-if="team.players !== undefined" :Items="team.players" :FootItems="team.extraPlayers" @onEnd="onPlayerRenumbered">
+                          <template v-slot="prop">
+                            <template v-if="!prop.item.empty">
+                              <player :key="prop.item.key"
+                                  :fumbbl-api="fumbblApi"
+                                  :player="prop.item"
+                                  :access-control="accessControl"
+                                  :roster-icon-manager="rosterIconManager"
+                                  :name-generator="teamManagementSettings.nameGenerator"
+                                  :compact-view="showHireRookiesWithPermissionsCheck"
+                                  :team-status="team.getTeamStatus()"
+                                  @remove-player="handleRemovePlayer"
+                                  @nominate-retire-player="handleNominateRetirePlayer"
+                                  @hire-journeyman="handleHireJourneyman"
+                                  @skill-player="showSkillPlayer"
+                                  @fold-out="handleFoldOut"
+                              ></player>
+                            </template>
+                            <template v-else>
+                              <div></div>
+                              <div>{{prop.item.number}}</div>
+                              <div>Empty</div>
+                            </template>
+                          </template>
+                        </SortableTable>
+                    </div>
+                    <div class="playerrowsfooter">
+                        <div class="playercount">{{ team.countPlayersAvailableNextGame() }} players (+{{ team.countMissNextGamePlayers() }} players missing next game)</div>
+                        <specialrules
+                            :fumbbl-api="fumbblApi"
+                            :team-id="team.getId()"
+                            :can-edit="accessControl.canCreate()"
+                            :raw-api-special-rules="rawApiSpecialRules"
+                            @rules-updated="handleSpecialRulesUpdated"
+                        ></specialrules>
+                    </div>
+                </div>
+            </div>
+            <div class="teammanagement" :class="{editteam: accessControl.canEdit()}">
+                <div class="teammanagementrow">
+                    <div class="title left">
+                        Coach:
+                    </div>
+                    <div class="info left">
+                        <a :href="'/~'+team.coach.name">{{ team.coach.name }}</a>
+                    </div>
+                    <div class="title right">
+                        Re-Rolls ({{ rerollCostForMode/1000 }}k):
+                    </div>
+                    <div class="info right">
+                        <addremove
+                            :current-value="team.getRerolls().toString()"
+                            :can-edit="accessControl.canEdit()"
+                            :can-remove-immediately="accessControl.canCreate()"
+                            :can-add="addRemovePermissions.rerolls.add"
+                            :can-remove="addRemovePermissions.rerolls.remove"
+                            :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
+                            :label-remove="accessControl.canCreate() ? 'Remove' : 'Discard'"
+                            @add="addReroll"
+                            @remove-with-confirm="modals.removeReroll = true"
+                            @remove-immediately="removeReroll"
+                        ></addremove>
+                    </div>
+                </div>
+                <div class="teammanagementrow">
+                    <div class="title left">
+                        Roster:
+                    </div>
+                    <div class="info left">
+                        {{ teamManagementSettings.rosterName }}
+                    </div>
+                    <div class="title right">
+                        Dedicated Fans:
+                    </div>
+                    <div class="info right">
+                        <template v-if="accessControl.canCreate()">
+                            <select v-model.number="dedicatedFansChoice">
+                                <option v-for="dedicatedFansStartValue in teamManagementSettings.getDedicatedFansAllowedValues(team.getDedicatedFans(), team.getTreasuryRef())" :key="dedicatedFansStartValue">{{ dedicatedFansStartValue }}</option>
+                            </select>&nbsp;
+                            <button v-if="dedicatedFansChoice != team.getDedicatedFans()" @click="updateDedicatedFans()" class="teambutton">Ok</button>
                         </template>
                         <template v-else>
-                            <div class="cell">&nbsp;</div>
+                            {{ team.getDedicatedFans() }}
                         </template>
                     </div>
-
-                    <SortableTable v-if="team.players !== undefined" :Items="team.players" :FootItems="team.extraPlayers" @onEnd="onPlayerRenumbered">
-                      <template v-slot="prop">
-                        <template v-if="!prop.item.empty">
-                          <player :key="prop.item.key"
-                              :fumbbl-api="fumbblApi"
-                              :player="prop.item"
-                              :access-control="accessControl"
-                              :roster-icon-manager="rosterIconManager"
-                              :name-generator="teamManagementSettings.nameGenerator"
-                              :compact-view="showHireRookiesWithPermissionsCheck"
-                              :team-status="team.getTeamStatus()"
-                              @remove-player="handleRemovePlayer"
-                              @nominate-retire-player="handleNominateRetirePlayer"
-                              @hire-journeyman="handleHireJourneyman"
-                              @skill-player="showSkillPlayer"
-                              @fold-out="handleFoldOut"
-                          ></player>
-                        </template>
-                        <template v-else>
-                          <div></div>
-                          <div>{{prop.item.number}}</div>
-                          <div>Empty</div>
-                        </template>
-                      </template>
-                    </SortableTable>
                 </div>
-                <div class="playerrowsfooter">
-                    <div class="playercount">{{ team.countPlayersAvailableNextGame() }} players (+{{ team.countMissNextGamePlayers() }} players missing next game)</div>
-                    <specialrules
-                        :fumbbl-api="fumbblApi"
-                        :team-id="team.getId()"
-                        :can-edit="accessControl.canCreate()"
-                        :raw-api-special-rules="rawApiSpecialRules"
-                        @rules-updated="handleSpecialRulesUpdated"
-                    ></specialrules>
-                </div>
-            </div>
-        </div>
-        <div class="teammanagement" :class="{editteam: accessControl.canEdit()}">
-            <div class="teammanagementrow">
-                <div class="title left">
-                    Coach:
-                </div>
-                <div class="info left">
-                    <a :href="'/~'+team.coach.name">{{ team.coach.name }}</a>
-                </div>
-                <div class="title right">
-                    Re-Rolls ({{ rerollCostForMode/1000 }}k):
-                </div>
-                <div class="info right">
-                    <addremove
-                        :current-value="team.getRerolls().toString()"
-                        :can-edit="accessControl.canEdit()"
-                        :can-remove-immediately="accessControl.canCreate()"
-                        :can-add="addRemovePermissions.rerolls.add"
-                        :can-remove="addRemovePermissions.rerolls.remove"
-                        :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
-                        :label-remove="accessControl.canCreate() ? 'Remove' : 'Discard'"
-                        @add="addReroll"
-                        @remove-with-confirm="modals.removeReroll = true"
-                        @remove-immediately="removeReroll"
-                    ></addremove>
-                </div>
-            </div>
-            <div class="teammanagementrow">
-                <div class="title left">
-                    Roster:
-                </div>
-                <div class="info left">
-                    {{ teamManagementSettings.rosterName }}
-                </div>
-                <div class="title right">
-                    Dedicated Fans:
-                </div>
-                <div class="info right">
-                    <template v-if="accessControl.canCreate()">
-                        <select v-model.number="dedicatedFansChoice">
-                            <option v-for="dedicatedFansStartValue in teamManagementSettings.getDedicatedFansAllowedValues(team.getDedicatedFans(), team.getTreasuryRef())" :key="dedicatedFansStartValue">{{ dedicatedFansStartValue }}</option>
-                        </select>&nbsp;
-                        <button v-if="dedicatedFansChoice != team.getDedicatedFans()" @click="updateDedicatedFans()" class="teambutton">Ok</button>
-                    </template>
-                    <template v-else>
-                        {{ team.getDedicatedFans() }}
-                    </template>
-                </div>
-            </div>
-            <div class="teammanagementrow">
-                <div class="title left">
-                    Current Team Value:
-                </div>
-                <div class="info left">
-                    {{ currentTeamValue/1000 }}k<span v-if="team.getTvLimitDisplay() !== 0"> (±{{ team.getTvLimitDisplay() }})</span>
-                </div>
-                <div class="title right">
-                    Assistant Coaches:
-                </div>
-                <div class="info right">
-                    <addremove
-                        :current-value="team.getAssistantCoaches().toString()"
-                        :can-edit="accessControl.canEdit()"
-                        :can-remove-immediately="accessControl.canCreate()"
-                        :can-add="addRemovePermissions.assistantCoaches.add"
-                        :can-remove="addRemovePermissions.assistantCoaches.remove"
-                        :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
-                        :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
-                        @add="addAssistantCoach"
-                        @remove-with-confirm="modals.removeAssistantCoach = true"
-                        @remove-immediately="removeAssistantCoach"
-                    ></addremove>
-                </div>
-            </div>
-            <div class="teammanagementrow">
-                <div class="title left">
-                    Treasury:
-                </div>
-                <div class="info left">
-                    {{ team.getTreasuryRef()/1000 }}k
-                </div>
-                <div class="title right">
-                    Cheerleaders:
-                </div>
-                <div class="info right">
-                    <addremove
-                        :current-value="team.getCheerleaders().toString()"
-                        :can-edit="accessControl.canEdit()"
-                        :can-remove-immediately="accessControl.canCreate()"
-                        :can-add="addRemovePermissions.cheerleaders.add"
-                        :can-remove="addRemovePermissions.cheerleaders.remove"
-                        :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
-                        :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
-                        @add="addCheerleader"
-                        @remove-with-confirm="modals.removeCheerleader = true"
-                        @remove-immediately="removeCheerleader"
-                    ></addremove>
-                </div>
-            </div>
-            <div class="teammanagementrow">
-                <div class="title left">
-                    Team Value:
-                </div>
-                <div class="info left">
-                    {{ teamValue/1000 }}k
-                </div>
-                <div class="title right">
-                    Apothecary:
-                </div>
-                <div class="info right">
-                    <addremove
-                        :current-value="team.getApothecary() ? 'Yes' : 'No'"
-                        :can-edit="accessControl.canEdit() && teamManagementSettings.apothecaryAllowed"
-                        :can-remove-immediately="accessControl.canCreate()"
-                        :can-add="addRemovePermissions.apothecary.add"
-                        :can-remove="addRemovePermissions.apothecary.remove"
-                        :label-add="accessControl.canCreate() ? 'Add' : 'Hire'"
-                        :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
-                        @add="addApothecary"
-                        @remove-with-confirm="modals.removeApothecary = true"
-                        @remove-immediately="removeApothecary"
-                    ></addremove>
-                </div>
-            </div>
-            <div v-if="accessControl.canViewHistory()" class="teammanagementrow">
-                <div class="title left">
-                    Games this Season:
-                </div>
-                <div class="info left">
-                    {{ team.getGamesPlayedInSeason() }} / {{ teamManagementSettings.seasonLength }} <span v-if="team.getCurrentSeason() > 1"> (Season {{ team.getCurrentSeason() }})</span>
-                </div>
-                <div class="title right">
-                    Current Re-draft Budget:
-                </div>
-                <div class="info right">
-                    <div class=data>
-                        todo
+                <div class="teammanagementrow">
+                    <div class="title left">
+                        Current Team Value:
                     </div>
-                    <div v-if="accessControl.canEdit()" class="editteamcontrols">
-                        <!-- deliberately empty -->
+                    <div class="info left">
+                        {{ currentTeamValue/1000 }}k<span v-if="team.getTvLimitDisplay() !== 0"> (±{{ team.getTvLimitDisplay() }})</span>
+                    </div>
+                    <div class="title right">
+                        Assistant Coaches:
+                    </div>
+                    <div class="info right">
+                        <addremove
+                            :current-value="team.getAssistantCoaches().toString()"
+                            :can-edit="accessControl.canEdit()"
+                            :can-remove-immediately="accessControl.canCreate()"
+                            :can-add="addRemovePermissions.assistantCoaches.add"
+                            :can-remove="addRemovePermissions.assistantCoaches.remove"
+                            :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
+                            :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
+                            @add="addAssistantCoach"
+                            @remove-with-confirm="modals.removeAssistantCoach = true"
+                            @remove-immediately="removeAssistantCoach"
+                        ></addremove>
+                    </div>
+                </div>
+                <div class="teammanagementrow">
+                    <div class="title left">
+                        Treasury:
+                    </div>
+                    <div class="info left">
+                        {{ team.getTreasuryRef()/1000 }}k
+                    </div>
+                    <div class="title right">
+                        Cheerleaders:
+                    </div>
+                    <div class="info right">
+                        <addremove
+                            :current-value="team.getCheerleaders().toString()"
+                            :can-edit="accessControl.canEdit()"
+                            :can-remove-immediately="accessControl.canCreate()"
+                            :can-add="addRemovePermissions.cheerleaders.add"
+                            :can-remove="addRemovePermissions.cheerleaders.remove"
+                            :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
+                            :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
+                            @add="addCheerleader"
+                            @remove-with-confirm="modals.removeCheerleader = true"
+                            @remove-immediately="removeCheerleader"
+                        ></addremove>
+                    </div>
+                </div>
+                <div class="teammanagementrow">
+                    <div class="title left">
+                        Team Value:
+                    </div>
+                    <div class="info left">
+                        {{ teamValue/1000 }}k
+                    </div>
+                    <div class="title right">
+                        Apothecary:
+                    </div>
+                    <div class="info right">
+                        <addremove
+                            :current-value="team.getApothecary() ? 'Yes' : 'No'"
+                            :can-edit="accessControl.canEdit() && teamManagementSettings.apothecaryAllowed"
+                            :can-remove-immediately="accessControl.canCreate()"
+                            :can-add="addRemovePermissions.apothecary.add"
+                            :can-remove="addRemovePermissions.apothecary.remove"
+                            :label-add="accessControl.canCreate() ? 'Add' : 'Hire'"
+                            :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
+                            @add="addApothecary"
+                            @remove-with-confirm="modals.removeApothecary = true"
+                            @remove-immediately="removeApothecary"
+                        ></addremove>
+                    </div>
+                </div>
+                <div v-if="accessControl.canViewHistory()" class="teammanagementrow">
+                    <div class="title left">
+                        Games this Season:
+                    </div>
+                    <div class="info left">
+                        {{ team.getGamesPlayedInSeason() }} / {{ teamManagementSettings.seasonLength }} <span v-if="team.getCurrentSeason() > 1"> (Season {{ team.getCurrentSeason() }})</span>
+                    </div>
+                    <div class="title right">
+                        Current Re-draft Budget:
+                    </div>
+                    <div class="info right">
+                        <div class=data>
+                            todo
+                        </div>
+                        <div v-if="accessControl.canEdit()" class="editteamcontrols">
+                            <!-- deliberately empty -->
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div v-if="accessControl.canCreate()" class="createteam">
-            <div class="deleteteam">
-                <button @click="modals.deleteTeam = true" class="teambutton">Delete Team</button>
+            <div v-if="accessControl.canCreate()" class="createteam">
+                <div class="deleteteam">
+                    <button @click="modals.deleteTeam = true" class="teambutton">Delete Team</button>
+                </div>
             </div>
+            <div v-if="accessControl.canRetireTeam()" class="retireteam">
+                <button @click="modals.retireTeam = true" class="teambutton">Retire Team</button>
+            </div>
+          </div>
+          <div class="panel teamstats">
+            <TeamStats @close="teamSheetHidden = false" :team="team" :fumbblApi="fumbblApi"></TeamStats>
+          </div>
         </div>
-        <div v-if="accessControl.canRetireTeam()" class="retireteam">
-            <button @click="modals.retireTeam = true" class="teambutton">Retire Team</button>
-        </div>
-
         <modal
             v-if="errorModalInfo !== null"
             :button-settings="{cancel: {enabled: true, label: 'Close'}, confirm: {enabled: false, label: ''}}"
@@ -584,6 +591,8 @@ import RetirePlayerComponent from "./RetirePlayer.vue";
 import ReadyToPlayComponent from "./ReadyToPlay.vue";
 import FumbblApi from "../include/FumbblApi";
 import Player from "../include/Player";
+import TeamStats from "./TeamStats.vue";
+
 import { EventDataFoldOut, EventDataRemovePlayer } from "../include/EventDataInterfaces";
 
 @Component({
@@ -597,7 +606,8 @@ import { EventDataFoldOut, EventDataRemovePlayer } from "../include/EventDataInt
         'retireplayer': RetirePlayerComponent,
         'readytoplay': ReadyToPlayComponent,
         SortableTable,
-        Die
+        Die,
+        TeamStats
     },
 })
 class TeamComponent extends Vue {
@@ -659,6 +669,7 @@ class TeamComponent extends Vue {
     private emResult: string = '';
     private emTreasuryLoss: string = '';
     private readyToPlayTriggered: boolean = false;
+    private teamSheetHidden: boolean = false;
 
     public modals: {
         activateTeam: boolean,
