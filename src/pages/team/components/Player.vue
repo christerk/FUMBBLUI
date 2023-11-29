@@ -98,12 +98,14 @@
             </div>
             <div v-else-if="!player.IsEmpty && accessControl.canEdit()" class="cell retireplayer">
                 <template v-if="player.canSkill">
-                    <a href="#" @click.prevent="triggerSkillPlayer">Skill</a>
+                    <a :class="{mustskill: player.mustSkill}" href="#" @click.prevent="triggerSkillPlayer">
+                    {{ player.mustSkill?"Must ":"" }}Skill
+                    </a>
                 </template>
-                <template v-if="! player.getIsJourneyman()">
+                <template v-if="!teamStatus.isSkill() && !player.getIsJourneyman()">
                     (<a href="#" @click.prevent="triggerNominateRetirePlayer">{{ player.getIsRefundable() ? 'Refund' : 'Retire' }}</a>)
                 </template>
-                <template v-else>
+                <template v-else-if=!teamStatus.isSkill()>
                     (<a href="#" @click.prevent="triggerHireJourneyman">Hire</a>)
                 </template>
             </div>
@@ -130,6 +132,7 @@ import AccessControl from "../include/AccessControl";
 import RosterIconManager from "../include/RosterIconManager";
 import { EventDataFoldOut, EventDataRemovePlayer } from "../include/EventDataInterfaces";
 import Player from "../include/Player";
+import TeamStatus from "../include/TeamStatus";
 
 @Component({
     components: {
@@ -172,6 +175,12 @@ class PlayerComponent extends Vue {
         required: true,
     })
     public compactView!: boolean;
+
+    @Prop({
+      type: TeamStatus,
+      required: true,
+    })
+    public teamStatus!: TeamStatus;
 
     @Emit('remove-player')
     public triggerRemovePlayer(): EventDataRemovePlayer {

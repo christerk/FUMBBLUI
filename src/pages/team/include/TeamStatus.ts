@@ -58,6 +58,10 @@ export default class TeamStatus {
         return this.status === 'POST_MATCH_SEQUENCE';
     }
 
+    public isSkill(): boolean {
+        return this.status === 'SKILL_ROLLS_PENDING';
+    }
+
     public showPlayerControls(): boolean {
       return this.status === 'NEW'
       || this.status === 'POST_MATCH_SEQUENCE'

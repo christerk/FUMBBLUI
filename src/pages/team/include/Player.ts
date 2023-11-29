@@ -365,9 +365,14 @@ export default class Player {
 
     public get canSkill(): boolean {
       let info = this.sppDisplayInfo;
-      console.log('canSkill', info);
       return info.tier > 0;
     }
+
+    public get mustSkill(): boolean {
+      let info = this.sppDisplayInfo;
+      return info.tier >= 4;
+    }
+
 
     public isMissNextGame(): boolean {
         return this.injuries.includes(Player.missNextGameInjury);

@@ -163,6 +163,7 @@
                               :roster-icon-manager="rosterIconManager"
                               :name-generator="teamManagementSettings.nameGenerator"
                               :compact-view="showHireRookiesWithPermissionsCheck"
+                              :team-status="team.getTeamStatus()"
                               @remove-player="handleRemovePlayer"
                               @nominate-retire-player="handleNominateRetirePlayer"
                               @hire-journeyman="handleHireJourneyman"
