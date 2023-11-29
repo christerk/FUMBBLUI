@@ -871,21 +871,28 @@
     }
 
     .readytoplay {
-        display: grid;
+        display: inline-grid;
+        grid-template-rows: 1fr;
+        background: white;
+        padding: 0 2rem;
+        border-radius: 9px;
         place-items: center;
         .jmtable {
             display: grid;
             grid-template-columns: 1fr;
+            place-self: center;
 
             &.l2 {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 5rem 1fr;
                 place-items: start;
 
                 .journeymanoption {
                     place-self: start;
                     line-height: 25px;
+                    grid-column: e("2 / 4");
                     &:first-child {
                         place-self: end;
+                        grid-column: e("1 / 2");
                     }
                 }
             }
@@ -893,9 +900,13 @@
       .journeymenquantities {
         justify-content: center;
         margin: 20px 0;
+        height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr;
         .journeymenrequiredinfo {
           text-align: center;
-          margin-bottom: 5px;
+          margin-top: 0.5rem;
+          font-size: 110%;
         }
         .journeymanoption {
           display: flex;
