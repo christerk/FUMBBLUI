@@ -725,14 +725,7 @@ class TeamComponent extends Vue {
                 this.rosterIconManager,
             );
 
-            console.log('reloadTeam PRE', newTeam);
-
             this.team = newTeam;
-
-            console.log('reloadTeam POST', this.team);
-
-            console.log('reloadTeam X', this.team.treasury);
-            console.log('reloadTeam Y', this.team.willTriggerExpensiveMistakes);
 
             this.dataAccessControl = new AccessControl(this.userRoles, this.team.getTeamStatus().getStatus());
 

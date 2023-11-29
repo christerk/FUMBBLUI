@@ -92,9 +92,6 @@ export default class Team {
                 )
             );
         }
-        console.log('fromApi', team.treasury);
-        let x = team.willTriggerExpensiveMistakes;
-        console.log('fromApi PostWillTrigger', x, team.treasury);
         return team;
     }
 

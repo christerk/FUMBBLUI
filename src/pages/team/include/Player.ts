@@ -346,7 +346,7 @@ export default class Player {
         const characteristicThresholds = {0: 18, 1: 20, 2: 24, 3: 28, 4: 32, 5: 50};
 
         return {
-            spendable: this.record.spp.total + this.record.spp.extra - this.record.spp.spent,
+            spendable: this.record.spp.total - this.record.spp.spent,
             maxLimit: this.skillStatus.maxLimit,
             status: this.skillStatus.status,
             tier: this.skillStatus.tier,
@@ -365,6 +365,7 @@ export default class Player {
 
     public get canSkill(): boolean {
       let info = this.sppDisplayInfo;
+      console.log('canSkill', info);
       return info.tier > 0;
     }
 
