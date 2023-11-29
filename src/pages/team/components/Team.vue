@@ -31,7 +31,7 @@
                     <ul class="teamnav">
                         <button v-if="team.getTeamStatus().isPostMatch() && accessControl.canReadyTeam()" class="menu" @click="interceptReadyToPlay">Complete</button>
                         <button v-else-if="team.getTeamStatus().isNew() && teamManagementSettings.isValidForCreate(team)" class="menu" @click="modals.activateTeam = true">Activate</button>
-                        <button v-else-if="team.getTeamStatus().isNew()" @click="modals.errorsForCreate = true" class="menu">Activate-error</button>
+                        <button v-else-if="team.getTeamStatus().isNew()" @click="modals.errorsForCreate = true" class="menu">Activate</button>
                         <li class="menu">
                           <a href="#" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">Hire Players</a>
                         </li>
@@ -334,17 +334,6 @@
             </div>
         </div>
         <div v-if="accessControl.canCreate()" class="createteam">
-            <div class="activateteam">
-                <template v-if="editTeamNameInProgress">
-                    NOTE: The activate team button is hidden whilst you are editing the team name above.
-                </template>
-                <template v-else-if="teamManagementSettings.isValidForCreate(team)">
-                    <button @click="modals.activateTeam = true" class="teambutton">Activate</button>
-                </template>
-                <template v-else>
-                    <button @click="modals.errorsForCreate = true" class="teambutton">Activate</button>
-                </template>
-            </div>
             <div class="deleteteam">
                 <button @click="modals.deleteTeam = true" class="teambutton">Delete Team</button>
             </div>
