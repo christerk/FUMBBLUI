@@ -92,7 +92,13 @@
         </div>
         <div v-if="accessControl.canCreate()" class="createteamstats">
             <div class="playerinfo">
-                <div class="currentplayercount">{{ team.getRosteredPlayers().length }}</div> <div class="currentplayercountlabel">Players ({{ teamManagementSettings.startPlayers }} required) <a href="#" @click.prevent="removeAllPlayers">Remove all players</a></div>
+                <span class="currentplayercount">{{ team.getRosteredPlayers().length }}</span>
+                <span class="text">Players ({{ teamManagementSettings.startPlayers }} required)</span>
+                <span class="text">&bull;</span>
+                <span class="text">Treasury</span>
+                <span class="treasury">{{ team.treasury/1000 }}k</span>
+                <span class="text">&bull;</span>
+                <a href="#" @click.prevent="removeAllPlayers">Remove all players</a>
             </div>
             <div class="costinfo">
                 <div class="currentteamcostlabel">Treasury spent (Max {{ teamManagementSettings.startTreasury/1000 }}k)</div> <div class="currentteamcost">{{ teamCreationCost/1000 }}k</div>

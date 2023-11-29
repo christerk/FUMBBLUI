@@ -1,7 +1,7 @@
 <template>
     <div class="hirerookies">
         <div class="controls">
-          <button @click.prevent="hidePanel">&lt;&lt; Close</button>
+          <div class="backbutton"><button @click.prevent="hidePanel">&lt;&lt; Close</button></div>
         </div>
         <div class="hirerookie" v-for="positionDataForBuyingPlayer in rosterPositionDataForBuyingPlayer" :key="positionDataForBuyingPlayer.positionId">
             <div class="rookieheader">

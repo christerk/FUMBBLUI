@@ -217,9 +217,20 @@
       display: flex;
       margin-bottom: 10px;
       .playerinfo {
+        line-height: 20px;
         width: 50%;
         .currentplayercount {
-          width: 30px;
+          width: 2rem;
+          display: inline-block;
+        }
+        .treasury {
+          width: 4rem;
+          display: inline-block;
+        }
+        a {
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 0.5rem;
         }
       }
       .costinfo {
@@ -230,17 +241,19 @@
         }
       }
 
-      .currentplayercount, .currentplayercountlabel, .currentteamcost, .currentteamcostlabel {
+      .currentplayercount, .currentplayercountlabel, .currentteamcost, .currentteamcostlabel, .text {
         display: inline-block;
         padding: 2px;
         border: solid transparent 1px;
         text-align: center;
+        vertical-align: middle;
       }
 
-      .currentplayercount, .currentteamcost {
+      .currentplayercount, .currentteamcost, .treasury {
         background-color: @White;
         border: solid @Forest 1px;
         text-align: center;
+        vertical-align: middle;
       }
     }
 
@@ -316,6 +329,24 @@
         .controls {
             margin: 8px;
             margin-top: 0;
+            display: flex;
+
+            .backbutton {
+                flex-grow: 1;
+                button {
+                    padding: 0.25rem 1rem;
+                }
+            }
+            .label {
+                padding: 0.25rem;
+            }
+            .treasury {
+                background: white;
+                padding: 0.25rem;
+                border-radius: 5px;
+                width: 3rem;
+                text-align: right;
+            }
         }
         .hirerookie {
           margin-bottom: 10px;
