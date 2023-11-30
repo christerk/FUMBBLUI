@@ -89,6 +89,11 @@ class TeamStats extends Vue {
 
   }
 
+  @Emit('unexpected-error')
+  public triggerUnexpectedError(errorMessage: string): string {
+      return errorMessage;
+  }
+
   private statistics: any = {};
 
   async mounted() {
@@ -125,7 +130,7 @@ class TeamStats extends Vue {
         this.statistics = list;
     } else {
         this.triggerUnexpectedError('Loading team stats: ' + apiResponse.getErrorMessage());
-    }    
+    }
   }
 
 }

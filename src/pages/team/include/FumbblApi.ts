@@ -332,8 +332,13 @@ export default class FumbblApi {
         return await this.enqueuePost(url, postData);
       }
 
-    public async getTeamStats(teamId: number): PRomise<ApiResponse> {
+    public async getTeamStats(teamId: number): Promise<ApiResponse> {
         const url = this.getUrl('/api/team/stats/'+teamId);
+        return await this.enqueuePost(url);
+    }
+
+    public async getTeamMatches(teamId: number): Promise<ApiResponse> {
+        const url = this.getUrl('/api/team/matches/'+teamId);
         return await this.enqueuePost(url);
     }
 

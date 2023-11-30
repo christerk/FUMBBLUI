@@ -40,8 +40,8 @@
                             <a href="#">Show<img src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"></a>
                             <ul class="submenu" v-show="mainMenuShow === 'show'">
                                 <li><a :href="`https://fumbbl.com/p/team?op=log&team_id=${team.getId()}`">Log</a></li>
-                                <li><a href="#" @click="showTeamPanel('teammatches')">Matches</a></li>
-                                <li><a href="#" @click="showTeamPanel('teamstats')">Stats</a></li>
+                                <li><a href="#" @click.prevent="showTeamPanel('teammatches')">Matches</a></li>
+                                <li><a href="#" @click.prevent="showTeamPanel('teamstats')">Stats</a></li>
                                 <li><a :href="`https://fumbbl.com/p/team?op=development&team_id=${team.id}`">Development</a></li>
                                 <li><a :href="`https://fumbbl.com/p/team?op=pastplayers&team_id=${team.id}`">Past Players</a></li>
                                 <li><a :href="`https://fumbbl.com/~${team.getCoach().name}/${team.getName()}`">View Roster</a></li>
@@ -354,10 +354,10 @@
           </div>
           <div class="panel sidepanel" :class="{hidden: !showSidePanel}" >
             <div v-show="sidePanel=='teamstats'" class="teamstats">
-              <TeamStats ref="teamStats" @close="showTeamPanel('main')" :team="team" :fumbblApi="fumbblApi"></TeamStats>
+              <TeamStats ref="teamStats" @unexpected-error="triggerUnexpectedError" @close="showTeamPanel('main')" :team="team" :fumbblApi="fumbblApi"></TeamStats>
             </div>
             <div v-show="sidePanel=='teammatches'" class="teammatches">
-              <TeamMatches ref="teamMatches" @close="showTeamPanel('main')" :team="team" :fumbblApi="fumbblApi"></TeamMatches>
+              <TeamMatches ref="teamMatches" @unexpected-error="triggerUnexpectedError" @close="showTeamPanel('main')" :team="team" :fumbblApi="fumbblApi"></TeamMatches>
             </div>
           </div>
         </div>

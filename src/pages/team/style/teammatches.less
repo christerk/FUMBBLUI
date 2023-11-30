@@ -10,4 +10,44 @@
         top: 0;
         left: 0;
     }
+
+    .matchpanel {
+        background: @OldLace;
+        border-top-left-radius: 9px;
+        border-top-right-radius: 9px;
+        .match {
+            color: black;
+            &:hover {
+                text-decoration: none;
+            }
+            padding: 0.5rem;
+            border-bottom: solid 1px @Forest;
+            display: grid;
+            grid-template-columns: 4rem 2rem 2rem 1fr 1fr 3rem 4rem 4rem;
+            grid-gap: 0.5rem;
+            place-items: center;
+
+            &:last-child {
+                border-bottom: 0;
+            }
+
+            .left {
+                justify-self: left;
+            }
+
+            &.title {
+                background: @Forest;
+                color: white;
+                border-top-left-radius: 9px;
+                border-top-right-radius: 9px;
+            }
+
+            &:not(.title) {
+                &:hover {
+                    cursor: pointer;
+                    background: lighten(@OldLace, 10%);
+                }
+            }
+        }
+    }
 }
