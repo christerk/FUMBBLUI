@@ -92,10 +92,9 @@ class TeamStats extends Vue {
   private statistics: any = {};
 
   async mounted() {
-    await this.loadStats();
   }
 
-  private async loadStats() {
+  public async loadStats() {
     const apiResponse = await this.fumbblApi.getTeamStats(this.team.id);
     if (apiResponse.isSuccessful()) {
         let stats = apiResponse.getData();

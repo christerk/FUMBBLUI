@@ -30,27 +30,19 @@
         width: 100%;
 
         .panel {
+            opacity: 1;
             margin-left: 0;
             width: 100%;
             transition: all ease-in-out 0.5s;
         }
 
-        .teamsheet {
-            opacity: 1;
-        }
-        .teamstats {
+        .hidden {
             opacity: 0;
         }
 
-        &.hidden {
+        &.showsidepanel {
             .panel {
                 margin-left: -100%;
-            }
-            .teamsheet {
-                opacity: 0;
-            }
-            .teamstats {
-                opacity: 1;
             }
         }
     }

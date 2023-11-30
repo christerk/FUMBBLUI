@@ -29,6 +29,7 @@ export default defineConfig({
       '/src': resolve(process.cwd(), 'src'),
       '@': fileURLToPath(new URL('../src', import.meta.url)),
       '@style': resolve(__dirname, 'src', 'style'),
+      '@pages': resolve(__dirname, 'src', 'pages'),
       '@components': resolve(__dirname, 'src', 'components')
     }
   },

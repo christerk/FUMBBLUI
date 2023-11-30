@@ -40,8 +40,8 @@
                             <a href="#">Show<img src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"></a>
                             <ul class="submenu" v-show="mainMenuShow === 'show'">
                                 <li><a :href="`https://fumbbl.com/p/team?op=log&team_id=${team.getId()}`">Log</a></li>
-                                <li><a :href="`https://fumbbl.com/p/team?op=view&showmatches=1&team_id=${team.id}`">Matches</a></li>
-                                <li><a href="#" @click="teamSheetHidden = !teamSheetHidden; mainMenuShow=''">Stats</a></li>
+                                <li><a href="#" @click="showTeamPanel('teammatches')">Matches</a></li>
+                                <li><a href="#" @click="showTeamPanel('teamstats')">Stats</a></li>
                                 <li><a :href="`https://fumbbl.com/p/team?op=development&team_id=${team.id}`">Development</a></li>
                                 <li><a :href="`https://fumbbl.com/p/team?op=pastplayers&team_id=${team.id}`">Past Players</a></li>
                                 <li><a :href="`https://fumbbl.com/~${team.getCoach().name}/${team.getName()}`">View Roster</a></li>
@@ -91,8 +91,8 @@
             </div>
         </div>
 
-        <div class="container" :class="{hidden: teamSheetHidden}">
-          <div class="panel teamsheet">
+        <div class="container" :class="{showsidepanel: showSidePanel}">
+          <div class="panel teamsheet" :class="{hidden: showSidePanel}" >
             <div v-if="accessControl.canCreate()" class="createteamstats">
                 <div class="playerinfo">
                     <span class="currentplayercount">{{ team.getRosteredPlayers().length }}</span>
@@ -352,8 +352,13 @@
                 <button @click="modals.retireTeam = true" class="teambutton">Retire Team</button>
             </div>
           </div>
-          <div class="panel teamstats">
-            <TeamStats @close="teamSheetHidden = false" :team="team" :fumbblApi="fumbblApi"></TeamStats>
+          <div class="panel sidepanel" :class="{hidden: !showSidePanel}" >
+            <div v-show="sidePanel=='teamstats'" class="teamstats">
+              <TeamStats ref="teamStats" @close="showTeamPanel('main')" :team="team" :fumbblApi="fumbblApi"></TeamStats>
+            </div>
+            <div v-show="sidePanel=='teammatches'" class="teammatches">
+              <TeamMatches ref="teamMatches" @close="showTeamPanel('main')" :team="team" :fumbblApi="fumbblApi"></TeamMatches>
+            </div>
           </div>
         </div>
         <modal
@@ -592,6 +597,7 @@ import ReadyToPlayComponent from "./ReadyToPlay.vue";
 import FumbblApi from "../include/FumbblApi";
 import Player from "../include/Player";
 import TeamStats from "./TeamStats.vue";
+import TeamMatches from "./TeamMatches.vue";
 
 import { EventDataFoldOut, EventDataRemovePlayer } from "../include/EventDataInterfaces";
 
@@ -607,7 +613,8 @@ import { EventDataFoldOut, EventDataRemovePlayer } from "../include/EventDataInt
         'readytoplay': ReadyToPlayComponent,
         SortableTable,
         Die,
-        TeamStats
+        TeamStats,
+        TeamMatches
     },
 })
 class TeamComponent extends Vue {
@@ -646,6 +653,11 @@ class TeamComponent extends Vue {
     @Ref
     private postMatchModal: ModalComponent;
 
+    @Ref
+    private teamStats: TeamStats;
+    @Ref
+    private teamMatches: TeamMatches;
+
     private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
 
     // the following properties (prefixed with data) must be initialized in order to become reactive data properties
@@ -670,6 +682,9 @@ class TeamComponent extends Vue {
     private emTreasuryLoss: string = '';
     private readyToPlayTriggered: boolean = false;
     private teamSheetHidden: boolean = false;
+
+    private sidePanel: string = "";
+    private showSidePanel: bool = false;
 
     public modals: {
         activateTeam: boolean,
@@ -718,6 +733,25 @@ class TeamComponent extends Vue {
                 this.reloadTeam();
             }
         });
+    }
+
+    private async showTeamPanel(panel: string) {
+      this.mainMenuShow=''
+
+      switch (panel) {
+        case 'teamstats':
+          await this.teamStats.loadStats();
+          break;
+        case 'teammatches':
+          await this.teamMatches.loadMatches();
+          break;
+      }
+
+      this.showSidePanel = panel != 'main';
+
+      if (this.showSidePanel) {
+        this.sidePanel = panel;
+      }
     }
 
     private async reloadTeam() {
