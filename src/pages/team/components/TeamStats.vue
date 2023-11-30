@@ -2,7 +2,7 @@
   <div class="panelwrapper">
     <button @click="close" class="backbutton">&lt;&lt; Back</button>
     <div class="statpanel">
-      <div class="teamstatrow header">
+      <div class="teamstatrow panelheader">
         <div class="top"></div>
         <div class="roster">Roster</div>
         <div class="record">Games</div>
@@ -10,7 +10,7 @@
         <div class="cas">Casualties</div>
         <div class="tv top">TV</div>
       </div>
-      <div class="teamstatrow header">
+      <div class="teamstatrow panelheader">
         <div></div>
         <div class="roster"></div>
         <div class="record small"># (WTL)</div>
