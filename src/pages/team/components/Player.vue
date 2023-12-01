@@ -31,7 +31,7 @@
                     <span v-else-if="player.isTemporaryPlayer || player.getIsJourneyman() || player.IsEmpty">{{ player.getPlayerName() }}</span>
                     <a v-else href="#" @click.exact.prevent="toggleFoldOutMore(false)" @click.ctrl.prevent="toggleFoldOutMore(true)" :title="`Player: ${player.getPlayerName()}, ID: ${player.id}`">{{ player.getPlayerName() }}</a>
                 </div>
-                <div v-if="!player.IsEmpty" class="playerposition" :title="player.getDisplayPositionName()">{{ player.getDisplayPositionName() }}</div>
+                <div v-if="!player.IsEmpty" class="playerposition" :title="player.getDisplayPositionName()">{{player.getDisplayPositionName() }}</div>
             </div>
             <template v-if="!compactView && !player.IsEmpty">
                 <div class="cell statma">
@@ -208,17 +208,22 @@ class PlayerComponent extends Vue {
 
     @Emit('fold-out')
     public triggerFoldOut(eventDataFoldOut: EventDataFoldOut): EventDataFoldOut {
+      console.log(this.key);
         return eventDataFoldOut;
     }
 
     readonly delayForFoldoutAnimations = 600;
     private intervalIdsScrollDuringCssTransition: number[] = [];
 
-    private get key() {
-      if (this.player.type.value == 'EMPTY') {
-        return this.player.type.value + ":" + -this.player.playerNumber.value + ":" + this.player.version.value;
+    public get key() {
+      if (this.player.type == 'EMPTY') {
+        return this.player.type + ":" + -this.player.playerNumber + ":" + this.player.version;
       }
-      return this.player.type.value + ":" + this.player.id.value + ":" + this.player.version.value;
+      return this.player.type + ":" + this.player.id + ":" + this.player.version;
+    }
+
+    public getKey() {
+      return this.key;
     }
 
     private mounted() {
