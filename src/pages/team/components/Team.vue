@@ -239,7 +239,7 @@
                     <div class="info right">
                         <template v-if="accessControl.canCreate()">
                             <select v-model.number="dedicatedFansChoice">
-                                <option v-for="dedicatedFansStartValue in teamManagementSettings.getDedicatedFansAllowedValues(team.getDedicatedFans(), team.getTreasuryRef())" :key="dedicatedFansStartValue">{{ dedicatedFansStartValue }}</option>
+                                <option v-for="dedicatedFansStartValue in teamManagementSettings.getDedicatedFansAllowedValues(team.getDedicatedFans(), team.treasury)" :key="dedicatedFansStartValue">{{ dedicatedFansStartValue }}</option>
                             </select>&nbsp;
                             <button v-if="dedicatedFansChoice != team.getDedicatedFans()" @click="updateDedicatedFans()" class="teambutton">Ok</button>
                         </template>
@@ -278,7 +278,7 @@
                         Treasury:
                     </div>
                     <div class="info left">
-                        {{ team.getTreasuryRef()/1000 }}k
+                        {{ team.treasury/1000 }}k
                     </div>
                     <div class="title right">
                         Cheerleaders:
@@ -923,7 +923,7 @@ class TeamComponent extends Vue {
         }
 
         return this.teamManagementSettings.getRosterPositionDataForBuyingPlayer(
-            this.team.getTreasuryRef(),
+            this.team.treasury,
             positionQuantities,
         );
     }

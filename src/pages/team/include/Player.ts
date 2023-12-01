@@ -1,14 +1,12 @@
 import {PlayerGender, PlayerRecord, PlayerSkillStatus, Position} from "./Interfaces";
 import UpdatePlayerDetails from "./UpdatePlayerDetails";
-import { ref, computed } from 'vue'
-import type { Ref } from 'vue'
 
 export default class Player {
     private static readonly temporaryPlayerId = 0;
     private static readonly temporaryPlayerName = 'Temporary Player';
     static missNextGameInjury = 'm';
 
-    public playerNumber: Ref<number> = ref(0);
+    public playerNumber: number = 0;
     private playerName: string;
     private gender: PlayerGender = 'NEUTRAL';
     private iconRowVersionPosition: number; // allows selection of icon for display when position has multiple versions in the icon image
@@ -22,18 +20,11 @@ export default class Player {
     private isRefundable: boolean = true;
     public foldOut: PlayerRowFoldOutMode = 'CLOSED';
 
-    private type: Ref<{'EMPTY', 'TEMP', 'NORMAL'}> = ref('NORMAL');
-    public id: Ref<number> = ref(0);
-    private version: Ref<number> = ref(0);
+    private type: {'EMPTY', 'TEMP', 'NORMAL'} = 'NORMAL';
+    public id: number = 0;
+    private version: number = 0;
 
-    public _key = computed(() => {
-      if (this.type.value == 'EMPTY') {
-        return this.type.value + ":" + -this.playerNumber.value + ":" + this.version.value;
-      }
-      return this.type.value + ":" + this.id.value + ":" + this.version.value;
-    });
-
-    public isTemporaryPlayer = computed(() => this.type.value == 'TEMP');
+    public isTemporaryPlayer = this.type == 'TEMP';
 
     constructor(
         type: {'EMPTY', 'TEMP', 'NORMAL'},
@@ -44,11 +35,11 @@ export default class Player {
         iconRowVersionPosition: number,
         gender: PlayerGender,
     ) {
-        this.type.value = type;
-        this.id.value = id;
-        this.version.value = 0;
+        this.type = type;
+        this.id = id;
+        this.version = 0;
 
-        this.playerNumber.value = playerNumber;
+        this.playerNumber = playerNumber;
         this.playerName = playerName;
         this.position = position;
         this.iconRowVersionPosition = iconRowVersionPosition;
@@ -130,7 +121,7 @@ export default class Player {
     }
 
     public getId(): number {
-        return this.id.value;
+        return this.id;
     }
 
     public get key(): number {
@@ -139,13 +130,13 @@ export default class Player {
 
     public setIdForTemporaryPlayer(playerId: number) {
         if (this.isTemporaryPlayer) {
-            this.id.value = playerId;
-            this.type.value = 'NORMAL';
+            this.id = playerId;
+            this.type = 'NORMAL';
         }
     }
 
     public get number(): number {
-      return this.playerNumber.value;
+      return this.playerNumber;
     }
 
     public get IsEmpty(): bool {
@@ -165,7 +156,7 @@ export default class Player {
     }
 
     public setPlayerNumber(playerNumber: number): void {
-        this.playerNumber.value = playerNumber;
+        this.playerNumber = playerNumber;
     }
 
     public getPlayerName(): string {
@@ -174,7 +165,7 @@ export default class Player {
 
     public setPlayerName(playerName: string) {
         this.playerName = playerName;
-        this.version.value++;
+        this.version++;
     }
 
     public getPosition(): Position {
@@ -383,11 +374,11 @@ export default class Player {
     }
 
     public increasePlayerNumber() {
-        this.playerNumber.value += 1;
+        this.playerNumber += 1;
     }
 
     public decreasePlayerNumber() {
-        this.playerNumber.value -= 1;
+        this.playerNumber -= 1;
     }
 
     public updatePlayerDetails(updatePlayerDetails: UpdatePlayerDetails) {

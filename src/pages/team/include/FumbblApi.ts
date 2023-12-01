@@ -27,6 +27,7 @@ export default class FumbblApi {
     }
 
     protected async getAccessToken(): string {
+      console.log(this.accessToken, Date.now(), this.tokenExpiry)
       if (Date.now() > this.tokenExpiry) {
         let data = {
           grant_type: "client_credentials",
@@ -38,10 +39,9 @@ export default class FumbblApi {
         this.enableOauth = true;
         let tokenData = result.data;
 
-        this.tokenExpiry = Date.now() + tokenData.expires_in/1000 - 10;
+        this.tokenExpiry = Date.now() + tokenData.expires_in*1000 - 10;
         this.accessToken = tokenData.access_token;
       }
-
       return this.accessToken;
     }
 

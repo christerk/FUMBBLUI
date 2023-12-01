@@ -1,5 +1,5 @@
 <template>
-    <div :class="{playerrow: true, playerinrow: player != undefined, empty: player.IsEmpty}" :key="player.key">
+    <div :class="{playerrow: true, playerinrow: player != undefined, empty: player.IsEmpty}" :key="key">
         <div class="main" :class="{missnextgame: player != undefined && player.isMissNextGame(), compact: compactView}">
             <div v-if="!player.getIsJourneyman()" class="cell draghandle handle">
                 <svg fill="#000000" version="1.1" id="icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -213,6 +213,13 @@ class PlayerComponent extends Vue {
 
     readonly delayForFoldoutAnimations = 600;
     private intervalIdsScrollDuringCssTransition: number[] = [];
+
+    private get key() {
+      if (this.player.type.value == 'EMPTY') {
+        return this.player.type.value + ":" + -this.player.playerNumber.value + ":" + this.player.version.value;
+      }
+      return this.player.type.value + ":" + this.player.id.value + ":" + this.player.version.value;
+    }
 
     private mounted() {
         this.$el.getElementsByClassName('foldout')[0].addEventListener('transitionend', () => {

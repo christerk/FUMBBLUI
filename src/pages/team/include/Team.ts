@@ -3,8 +3,6 @@ import Player from "./Player";
 import RosterIconManager from "./RosterIconManager";
 import TeamManagementSettings from "./TeamManagementSettings";
 import TeamStatus from "./TeamStatus";
-import { ref, computed } from 'vue';
-import type { Ref } from 'vue'
 
 export default class Team {
     private readonly COMPETITIVE_DIVISION_NAME: string = 'Competitive';
@@ -156,10 +154,6 @@ export default class Team {
 
     public getRosteredPlayers(): Player[] {
         return this.players.filter(player => !player.IsEmpty && !player.getIsJourneyman());
-    }
-
-    public getTreasuryRef(): Ref<number> {
-      return this.treasury;
     }
 
     public initializePlayers() {
