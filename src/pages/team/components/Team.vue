@@ -1295,13 +1295,12 @@ class TeamComponent extends Vue {
 
         // Add quick temporary player for user interface responsiveness
         // This temporary player is removed when reload team is called later in this method
-        const temporaryPlayer = this.team.buyTemporaryPlayer(
+        const temporaryPlayer = this.buyTemporaryPlayer(
             firstEmptyNumber,
             this.teamManagementSettings.getPosition(positionId),
             iconRowVersionPosition,
             gender,
         );
-
 
         const apiResponsePlayerName = await this.fumbblApi.generatePlayerName(this.teamManagementSettings.nameGenerator, gender);
 
@@ -1317,16 +1316,15 @@ class TeamComponent extends Vue {
         const playerName = apiResponsePlayerName.getData();
         temporaryPlayer.setPlayerName(playerName);
 
-
         const apiResponse = await this.fumbblApi.addPlayer(this.team.getId(), positionId, gender, playerName);
         if (apiResponse.isSuccessful()) {
             const newPlayerResponseData: {playerId: number, number: number} = apiResponse.getData();
             temporaryPlayer.setIdForTemporaryPlayer(newPlayerResponseData.playerId);
 
-            this.reloadTeamWithDelay();
+            //this.reloadTeamWithDelay();
             if (temporaryPlayer.playerNumber !== newPlayerResponseData.number) {
                 await this.recoverFromUnexpectedError(
-                    'Your player has been purchased but your team page is out of synch with the latest version on the server. Please refresh the page if this problem continues.',
+                    'Your player has been purchased but your team page is out of sync with the latest version on the server. Please refresh the page if this problem continues.',
                     `Expected player number ${temporaryPlayer.playerNumber}, got ${newPlayerResponseData.number}`,
                 );
             }
@@ -1337,6 +1335,17 @@ class TeamComponent extends Vue {
                 apiResponse.getErrorMessage(),
             );
         }
+    }
+
+    private buyTemporaryPlayer(number: number, position: Position, iconRowVersionPosition: number, playerGender: PlayerGender): Player {
+        const temporaryPlayer = Player.temporaryPlayer(
+            number,
+            position,
+            iconRowVersionPosition,
+            playerGender,
+        );
+        this.team.buyPlayer(temporaryPlayer);
+        return this.team.players[number-1]; // Return the reactive version of the player
     }
 
     public async handleSpecialRulesUpdated(callback: any) {

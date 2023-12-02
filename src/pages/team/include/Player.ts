@@ -4,6 +4,7 @@ import UpdatePlayerDetails from "./UpdatePlayerDetails";
 export default class Player {
     private static readonly temporaryPlayerId = 0;
     private static readonly temporaryPlayerName = 'Temporary Player';
+    private static generatedId = 0;
     static missNextGameInjury = 'm';
 
     public playerNumber: number = 0;
@@ -110,12 +111,12 @@ export default class Player {
     }
 
     static emptyPlayer(number: number) {
-      let player = new Player('EMPTY', -number, number, "Empty", 0, null, 'NEUTRAL');
+      let player = new Player('EMPTY', ++this.generatedId, number, "Empty", 0, null, 'NEUTRAL');
       return player;
     }
 
     static temporaryPlayer(teamSheetEntryNumber: number, position: Position, iconRowVersionPosition: number, playerGender: PlayerGender): Player {
-        return new Player('TEMP', -teamSheetEntryNumber, teamSheetEntryNumber, Player.temporaryPlayerName, position, iconRowVersionPosition, playerGender);
+        return new Player('TEMP', ++this.generatedId, teamSheetEntryNumber, Player.temporaryPlayerName, position, iconRowVersionPosition, playerGender);
     }
 
     public get isTemporaryPlayer() { return this.type == 'TEMP'; }
