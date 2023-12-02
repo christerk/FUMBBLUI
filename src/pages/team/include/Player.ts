@@ -24,8 +24,6 @@ export default class Player {
     public id: number = 0;
     private version: number = 0;
 
-    public isTemporaryPlayer = this.type == 'TEMP';
-
     constructor(
         type: PlayerType,
         id: number,
@@ -119,6 +117,8 @@ export default class Player {
     static temporaryPlayer(teamSheetEntryNumber: number, position: Position, iconRowVersionPosition: number, playerGender: PlayerGender): Player {
         return new Player('TEMP', -teamSheetEntryNumber, teamSheetEntryNumber, Player.temporaryPlayerName, position, iconRowVersionPosition, playerGender);
     }
+
+    public get isTemporaryPlayer() { return this.type == 'TEMP'; }
 
     public getId(): number {
         return this.id;
