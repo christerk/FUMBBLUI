@@ -1,4 +1,4 @@
-import {PlayerGender, PlayerRecord, PlayerSkillStatus, Position} from "./Interfaces";
+import {PlayerGender, PlayerRecord, PlayerRowFoldOutMode, PlayerSkillStatus, Position} from "./Interfaces";
 import UpdatePlayerDetails from "./UpdatePlayerDetails";
 
 export default class Player {
