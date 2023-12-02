@@ -94,7 +94,7 @@ class TeamStats extends Vue {
       return errorMessage;
   }
 
-  private statistics: any = {};
+  public statistics: any = {};
 
   async mounted() {
   }
