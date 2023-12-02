@@ -581,6 +581,7 @@ import {
     PositionDataForBuyingPlayer,
     RawApiSpecialRules,
     UserRole,
+    Position,
 } from "../include/Interfaces";
 import AccessControl from "../include/AccessControl";
 import Team from "../include/Team";
