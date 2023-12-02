@@ -559,7 +559,7 @@
               ></readytoplay>
             </template>
         </modal>
-        
+
         <retireplayer
             v-if="playerToRetire"
             :fumbblApi="fumbblApi"
@@ -781,7 +781,7 @@ class TeamComponent extends Vue {
 
             this.dataAccessControl = new AccessControl(this.userRoles, this.team.getTeamStatus().getStatus());
 
-            
+
         } else {
             this.triggerUnexpectedError('Loading team information: ' + apiResponse.getErrorMessage());
         }
@@ -988,14 +988,14 @@ class TeamComponent extends Vue {
              apiResponse.getErrorMessage(),
          );
          return;
-      }      
+      }
     }
 
     public async removeAllPlayers() {
         const playerIdsToRemove = this.team.getPlayers().filter(p => !p.IsEmpty).map(player => player.id);
         this.team.removeAllPlayers();
         // call this to immediately show the players have gone (handleGeneralTeamUpdate needs to be called after all have been fully removed).
-        
+
 
         for (const playerId of playerIdsToRemove) {
             const apiResponse = await this.fumbblApi.removePlayer(this.team.getId(), playerId);
@@ -1081,7 +1081,7 @@ class TeamComponent extends Vue {
         let apiResponse = null;
         if (this.accessControl.canCreate()) {
             apiResponse = await this.fumbblApi.removeAssistantCoach(this.team.getId());
-        } else { 
+        } else {
             apiResponse = await this.fumbblApi.fireAssistantCoach(this.team.getId());
         }
         if (! apiResponse.isSuccessful()) {
@@ -1180,7 +1180,7 @@ class TeamComponent extends Vue {
         }
 
         this.team.removePlayer(player);
-        
+
         this.reloadTeamWithDelay();
 
         const apiResponse = await this.fumbblApi.removePlayer(this.team.id, player.id);
@@ -1206,7 +1206,7 @@ class TeamComponent extends Vue {
         }
 
         this.team.removePlayer(this.playerToRetire);
-        
+
         this.reloadTeamWithDelay();
 
         const playerToRetireId = this.playerToRetire.id;
@@ -1259,7 +1259,7 @@ class TeamComponent extends Vue {
     public async handleSkillPlayer() {
       await this.reloadTeam();
       this.modals.skillPlayer = false;
-    }    
+    }
 
     public handleFoldOut(eventDataFoldOut: EventDataFoldOut) {
         let playerRowFoldOutMode = eventDataFoldOut.playerRowFoldOutMode;
@@ -1301,7 +1301,7 @@ class TeamComponent extends Vue {
             iconRowVersionPosition,
             gender,
         );
-        
+
 
         const apiResponsePlayerName = await this.fumbblApi.generatePlayerName(this.teamManagementSettings.nameGenerator, gender);
 
@@ -1316,18 +1316,18 @@ class TeamComponent extends Vue {
 
         const playerName = apiResponsePlayerName.getData();
         temporaryPlayer.setPlayerName(playerName);
-        
+
 
         const apiResponse = await this.fumbblApi.addPlayer(this.team.getId(), positionId, gender, playerName);
         if (apiResponse.isSuccessful()) {
             const newPlayerResponseData: {playerId: number, number: number} = apiResponse.getData();
             temporaryPlayer.setIdForTemporaryPlayer(newPlayerResponseData.playerId);
-            
+
             this.reloadTeamWithDelay();
-            if (temporaryPlayer.playerNumber.value !== newPlayerResponseData.number) {
+            if (temporaryPlayer.playerNumber !== newPlayerResponseData.number) {
                 await this.recoverFromUnexpectedError(
                     'Your player has been purchased but your team page is out of synch with the latest version on the server. Please refresh the page if this problem continues.',
-                    `Expected player number ${temporaryPlayer.playerNumber.value}, got ${newPlayerResponseData.number}`,
+                    `Expected player number ${temporaryPlayer.playerNumber}, got ${newPlayerResponseData.number}`,
                 );
             }
         } else {
@@ -1439,7 +1439,7 @@ class TeamComponent extends Vue {
       setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 500);
     }
 
-    public get willTriggerExpensiveMistakes() { 
+    public get willTriggerExpensiveMistakes() {
       return this.team.treasury >= this.teamManagementSettings.expensiveMistakesStart;
     }
 }

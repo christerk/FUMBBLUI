@@ -1,4 +1,4 @@
-import {PlayerGender, PlayerRecord, PlayerSkillStatus, Position} from "./Interfaces";
+import {PlayerGender, PlayerRecord, PlayerRowFoldOutMode, PlayerSkillStatus, PlayerType, Position} from "./Interfaces";
 import UpdatePlayerDetails from "./UpdatePlayerDetails";
 
 export default class Player {
@@ -20,14 +20,14 @@ export default class Player {
     private isRefundable: boolean = true;
     public foldOut: PlayerRowFoldOutMode = 'CLOSED';
 
-    private type: {'EMPTY', 'TEMP', 'NORMAL'} = 'NORMAL';
+    private type: PlayerType = 'NORMAL';
     public id: number = 0;
     private version: number = 0;
 
     public isTemporaryPlayer = this.type == 'TEMP';
 
     constructor(
-        type: {'EMPTY', 'TEMP', 'NORMAL'},
+        type: PlayerType,
         id: number,
         playerNumber: number,
         playerName: string,

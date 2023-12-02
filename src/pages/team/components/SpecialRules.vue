@@ -296,6 +296,8 @@ class SpecialRulesComponent extends Vue {
                 general: 'An error occurred updating the teams special rule.',
                 technical: apiResponse.getErrorMessage(),
             };
+            this.showOneOfOptions = false;
+            this.showTeamOptions = false;
         }
     }
 

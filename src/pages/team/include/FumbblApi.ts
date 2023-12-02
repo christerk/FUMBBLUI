@@ -7,23 +7,17 @@ export default class FumbblApi {
     private readonly ERROR_WITHIN_SUCCESS_PREFIX = 'Error:'
     private queue: PromiseQueue;
     private readonly simulateDelay: boolean = false;
-    private isDevMode: boolean = false;
     private enableOauth: boolean = false;
     private accessToken: string = '';
     private tokenExpiry: number = 0;
 
     constructor() {
         this.queue = new PromiseQueue();
-        this.isDevMode = import.meta.env.VITE_API_URL !== import.meta.env.VITE_API_URL_RESTRICTED;
         this.enableOauth = import.meta.env.VITE_ENABLE_OAUTH == 'true';
     }
 
     protected getUrl(apiUrl: string): string {
         return import.meta.env.VITE_API_URL + apiUrl;
-    }
-
-    protected getUrlRestricted(apiUrl: string): string {
-        return import.meta.env.VITE_API_URL_RESTRICTED + apiUrl;
     }
 
     protected async getAccessToken(): string {
@@ -107,42 +101,6 @@ export default class FumbblApi {
         });
     }
 
-    protected async enqueuePostForm(url: string, data: any, transform: (d: any) => any = null): Promise<ApiResponse> {
-        return await this.queue.add(async () => {
-            if (this.simulateDelay) {
-                await this.delay(1000);
-            }
-
-            const bodyFormData = new FormData();
-
-            for (const dataKey of Object.keys(data)) {
-                bodyFormData.append(dataKey, data[dataKey]);
-            }
-
-            let result;
-            try {
-                result = await Axios({
-                    method: "post",
-                    url: url,
-                    data: bodyFormData,
-                });
-            } catch(error) {
-                return ApiResponse.error(error);
-            }
-
-            let resultData = result.data;
-            if (this.isErrorWithinSuccess(resultData)) {
-                return ApiResponse.customErrorString(resultData.replace(this.ERROR_WITHIN_SUCCESS_PREFIX, ''));
-            }
-
-            if (transform !== null) {
-                resultData = transform(resultData);
-            }
-
-            return ApiResponse.success(resultData);
-        });
-    }
-
     /**
      * Only used during testing to simulate delays
      */
@@ -155,15 +113,9 @@ export default class FumbblApi {
     }
 
     public async setSpecialRule(teamId: number, ruleName: string, ruleValue: string): Promise<ApiResponse> {
-        const url = this.getUrlRestricted('/api/team/setSpecialRule/' + teamId);
+        const url = this.getUrl('/api/team/setSpecialRule/' + teamId);
         const data = {rule: ruleName, val: ruleValue};
-
-        // local proxy does not support form posts
-        if (this.isDevMode) {
-            return await this.enqueuePost(url, data);
-        }
-        
-        return await this.enqueuePostForm(url, data);
+        return await this.enqueuePost(url, data);
     }
 
     public async getRulesetIdForDivision(divisionId: number): Promise<ApiResponse> {
@@ -213,13 +165,13 @@ export default class FumbblApi {
     }
 
     public async checkTeamName(teamName: string): Promise<ApiResponse> {
-        const url = this.getUrlRestricted('/api/team/checkName');
+        const url = this.getUrl('/api/team/checkName');
         const data = {name: teamName};
         return await this.post(url, data);
     }
 
     public async renameTeam(teamId: number, newName: string): Promise<ApiResponse> {
-        const url = this.getUrlRestricted('/api/team/rename');
+        const url = this.getUrl('/api/team/rename');
         const data = {teamId: teamId, newName: newName};
         return await this.enqueuePost(url, data);
     }
@@ -230,103 +182,103 @@ export default class FumbblApi {
     }
 
     public async addReroll(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/addReroll'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/addReroll'));
     }
 
     public async removeReroll(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/removeReroll'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/removeReroll'));
     }
 
     public async discardReroll(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/discardReroll'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/discardReroll'));
     }
 
     public async addAssistantCoach(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/addAssistantCoach'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/addAssistantCoach'));
     }
 
     public async removeAssistantCoach(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/removeAssistantCoach'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/removeAssistantCoach'));
     }
 
     public async fireAssistantCoach(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/fireAssistantCoach'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/fireAssistantCoach'));
     }
 
     public async addCheerleader(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/addCheerleader'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/addCheerleader'));
     }
 
     public async removeCheerleader(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/removeCheerleader'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/removeCheerleader'));
     }
 
     public async fireCheerleader(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/fireCheerleader'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/fireCheerleader'));
     }
 
     public async addApothecary(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/addApothecary'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/addApothecary'));
     }
 
     public async removeApothecary(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/removeApothecary'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/removeApothecary'));
     }
 
     public async fireApothecary(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/fireApothecary'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/fireApothecary'));
     }
 
     public async setDedicatedFans(teamId: number, newDedicatedFans: number): Promise<ApiResponse> {
-        const url = this.getUrlRestricted('/api/team/setDedicatedFans');
+        const url = this.getUrl('/api/team/setDedicatedFans');
         const data = {teamId: teamId, newDf: newDedicatedFans};
         return await this.enqueuePost(url, data);
     }
 
     public async addPlayer(teamId: number, positionId: number, gender: PlayerGender, playerName: string): Promise<ApiResponse> {
-        const url = this.getUrlRestricted('/api/team/addPlayer');
+        const url = this.getUrl('/api/team/addPlayer');
         const data = {teamId: teamId, positionId: positionId, gender: gender.toLowerCase(), name: playerName};
         return await this.enqueuePost(url, data);
     }
 
     public async removePlayer(teamId: number, playerId: number): Promise<ApiResponse> {
-        const url = this.getUrlRestricted('/api/team/removePlayer');
+        const url = this.getUrl('/api/team/removePlayer');
         const data = {teamId: teamId, playerId: playerId};
         return await this.enqueuePost(url, data);
     }
 
     public async retirePlayer(teamId: number, playerId: number): Promise<ApiResponse> {
-        const url = this.getUrlRestricted('/api/team/retirePlayer');
+        const url = this.getUrl('/api/team/retirePlayer');
         const data = {teamId: teamId, playerId: playerId};
         return await this.enqueuePost(url, data);
     }
 
     public async hireJourneyman(teamId: number, playerId: number): Promise<ApiResponse> {
-        const url = this.getUrlRestricted('/api/team/hireJourneyman');
+        const url = this.getUrl('/api/team/hireJourneyman');
         const data = {teamId: teamId, playerId: playerId};
         return await this.enqueuePost(url, data);
     }
 
     public async updatePlayer(playerId: number, playerName: string, gender: PlayerGender): Promise<ApiResponse> {
-        const url = this.getUrlRestricted('/api/player/update');
+        const url = this.getUrl('/api/player/update');
         const data = {playerId: playerId, gender: gender.toLowerCase(), name: playerName};
         return await this.enqueuePost(url, data);
     }
 
     public async deleteTeam(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/delete'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/delete'));
     }
 
     public async retireTeam(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/retire'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/retire'));
     }
 
     public async activateTeam(teamId: number): Promise<ApiResponse> {
-        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrlRestricted('/api/team/activate'));
+        return await this.simplePostWithOnlyTeamIdInBody(teamId, this.getUrl('/api/team/activate'));
     }
 
     public async readyTeam(teamId: number, postData: any): Promise<ApiResponse> {
-        const url = this.getUrlRestricted('/api/team/ready');
+        const url = this.getUrl('/api/team/ready');
         postData['teamId'] = teamId;
         return await this.enqueuePost(url, postData);
       }
@@ -342,7 +294,7 @@ export default class FumbblApi {
     }
 
     public async renumberPlayers(teamId: number, playerNumbers: any): Promise<ApiResponse> {
-        const url = this.getUrlRestricted('/api/team/renumber');
+        const url = this.getUrl('/api/team/renumber');
         const data = {teamId, playerNumbers};
         return await this.enqueuePost(url, data);
     }

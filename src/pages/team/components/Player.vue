@@ -20,7 +20,6 @@
                 <span class="normalplayernumber">
                     {{ player.playerNumber }}
                 </span>
-                <div class="draggingnowindicator">&#8597;</div>
             </div>
             <div class="cell playericoncontainer">
                 <div v-if="!player.IsEmpty" class="iconusingbackground" :style="rosterIconManager.getIconStyle(player.getPositionId(), player.getIconRowVersionPosition())"></div>
