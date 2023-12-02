@@ -24,7 +24,7 @@ export default class AccessControl {
                 grantAccessToList: [
                     {
                         userRoles: ['OWNER'],
-                        teamStatusValues: ['NEW', 'POST_MATCH_SEQUENCE'],
+                        teamStatusValues: ['NEW', 'POST_MATCH_SEQUENCE', 'SKILL_ROLLS_PENDING'],
                     }
                 ]
             },
@@ -60,7 +60,7 @@ export default class AccessControl {
                 grantAccessToList: [
                     {
                         userRoles: ['OWNER', 'LEAGUE_STAFF', 'SITE_STAFF'],
-                        teamStatusValues: ['ACTIVE', 'POST_MATCH_SEQUENCE'],
+                        teamStatusValues: ['ACTIVE', 'POST_MATCH_SEQUENCE', 'SKILL_ROLLS_PENDING'],
                     }
                 ]
             },
