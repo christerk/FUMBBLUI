@@ -183,17 +183,6 @@ export default class Team {
         this.treasury -= player.getPositionCost();
     }
 
-    public buyTemporaryPlayer(teamSheetEntryNumber: number, position: Position, iconRowVersionPosition: number, playerGender: PlayerGender): Player {
-        const temporaryPlayer = Player.temporaryPlayer(
-            teamSheetEntryNumber,
-            position,
-            iconRowVersionPosition,
-            playerGender,
-        );
-        this.buyPlayer(temporaryPlayer);
-        return temporaryPlayer;
-    }
-
     public findPlayerByNumber(playerNumber: number): Player | null {
         return this.players[playerNumber-1];
     }
@@ -226,7 +215,7 @@ export default class Team {
 
     public removeAllPlayers(): void {
         if (this.teamStatus.isNew()) {
-            const playerCost = this.players.reduce((cost: number, player: Player) => cost + player.getPositionCost(), 0);
+            const playerCost = this.players.filter(p => !p.IsEmpty).reduce((cost: number, player: Player) => cost + player.getPositionCost(), 0);
             if (playerCost > 0) {
                 this.treasury += playerCost;
             }
