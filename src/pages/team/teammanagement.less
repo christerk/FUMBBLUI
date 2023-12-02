@@ -9,7 +9,7 @@
 
 .teammanagement {
   margin-top: 20px;
- 
+
   .team {
     position: relative;
     overflow: hidden;
@@ -528,9 +528,11 @@
           &.playerdetails {
             margin-right: 20px;
             .playername {
+              max-width: 200px;
               .mixin_abbreviate();
             }
             .playerposition {
+              max-width: 200px;
               .mixin_abbreviate();
             }
           }
@@ -609,7 +611,7 @@
 
       .playerrow {
         background-color: @OldLace;
-        &.empty { 
+        &.empty {
             background: @LightSilver;
         }
 
