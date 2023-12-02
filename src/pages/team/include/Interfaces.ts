@@ -23,6 +23,8 @@ export type GrantAccessTo = {
     teamStatusValues: TeamStatusValue[],
 };
 
+export type PlayerType = 'EMPTY' | 'TEMP' | 'NORMAL';
+
 export type PlayerRowFoldOutMode = 'BUY' | 'MORE' | 'CLOSED';
 
 export type PlayerGender = 'FEMALE' | 'MALE' | 'NEUTRAL' | 'NONBINARY';
