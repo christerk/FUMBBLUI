@@ -620,78 +620,11 @@
             cursor: move;
           }
         }
-        .seperator {
-          padding: 0 5px;
-          &.normal {
-            .line {
-              border-bottom: solid @Forest 1px;
-              height: 2px;
-            }
-          }
-          &.active {
-            background-color: @White;
-            .line {
-              background-color: @Carmine;
-              height: 2px;
-            }
-          }
-          &.spacer {
-            .line {
-              background-color: @OldLace;
-              height: 2px;
-            }
-          }
-        }
-        &.dragsource {
-          .main {
-            background-color: @Quicksilver;
-            .playernumber {
-              .normalplayernumber {
-                display: none;
-              }
-              .draggingnowindicator {
-                display: block;
-              }
-            }
-          }
-          .seperator {
-            &.normal, &.spacer, .line {
-              background-color: @Quicksilver;
-            }
-          }
-        }
-        &.droptarget {
-          background-color: @White;
-          .main {
-            .droptargetindicator {
-              display: block;
-              font-size: 20px;
-            }
-          }
-          .spacer {
-            .line {
-              background-color: @White;
-            }
-          }
-        }
         .main {
 
           min-height: 38px;
           display: grid;
 
-          .emptyplayer, .isupdating {
-            margin: auto 0;
-          }
-          .isupdating {
-            font-size: 16px;
-            font-weight: bold;
-          }
-          .draggingnowindicator {
-            display: none;
-          }
-          .droptargetindicator {
-            display: none;
-          }
           .playernumber {
             font-size: 20px;
             text-align: center;
@@ -785,13 +718,6 @@
         }
         .iconusingbackground {
           image-rendering: pixelated;
-        }
-      }
-      .playerrow:last-child {
-        .seperator.normal {
-          .line {
-            border-bottom-color: transparent;
-          }
         }
       }
       .sortable {
@@ -1125,28 +1051,6 @@
 
     .emRoll {
         text-align: center;
-    }
-  }
-
-  .loadingellipsis:after {
-    overflow: hidden;
-    display: inline-block;
-    vertical-align: bottom;
-    -webkit-animation: ellipsis steps(4,end) 900ms infinite;
-    animation: ellipsis steps(4,end) 900ms infinite;
-    content: "\2026"; /* ascii code for the ellipsis character */
-    width: 0px;
-  }
-
-  @keyframes ellipsis {
-    to {
-      width: 1.25em;
-    }
-  }
-
-  @-webkit-keyframes ellipsis {
-    to {
-      width: 1.25em;
     }
   }
 
