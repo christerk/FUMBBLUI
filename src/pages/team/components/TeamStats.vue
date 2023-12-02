@@ -18,7 +18,7 @@
         <div class="cas small">For / Against</div>
         <div class="tv small">Avg TV</div>
       </div>
-      <template v-for="stats in statistics" :key="roster">
+      <template v-for="stats in statistics" :key="stats.info.roster">
 
         <div class="teamstatrow">
           <div><img :src="'https://fumbbl.com/i/'+stats.info.logo" /></div>
