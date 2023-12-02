@@ -124,10 +124,6 @@ export default class Player {
         return this.id;
     }
 
-    public get key(): number {
-      return this._key;
-    }
-
     public setIdForTemporaryPlayer(playerId: number) {
         if (this.isTemporaryPlayer) {
             this.id = playerId;
