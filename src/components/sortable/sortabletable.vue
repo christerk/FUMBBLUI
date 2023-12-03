@@ -1,13 +1,13 @@
 <template>
   <div class="sortable">
-    <Sortable class="sortwrap" :list="Items" item-key="id" :options="options" @change="onChange" @end="onEnd">
+    <Sortable class="sortwrap" :list="Items" item-key="key" :options="options" @change="onChange" @end="onEnd">
       <template #item="{element}">
         <div :class="{sortablerow: true, active: !element.empty}">
           <slot :item="element"></slot>
         </div>
       </template>
     </Sortable>
-    <Sortable class="sortwrap" :list="FootItems" item-key="id" :options="options" @change="onChange" @end="onEnd">
+    <Sortable class="sortwrap" :list="FootItems" item-key="key" :options="options" @change="onChange" @end="onEnd">
       <template #item="{element}">
         <div :class="{sortablerow: true, active: !element.empty}">
           <slot :item="element"></slot>
@@ -41,7 +41,7 @@ class SortableTable extends Vue {
   public options = {
     animation: 150,
     handle: ".handle",
-    draggable: ".sortablerow"
+    draggable: ".sortablerow",
   }
 
   public mounted() {
@@ -74,14 +74,17 @@ class SortableTable extends Vue {
 
       this.Items[i].number = newNumber;
     }
-
-
   }
 
   @Emit
   public onEnd(evt) {
-    let item = this.Items.splice(evt.oldDraggableIndex, 1);
-    this.Items.splice(evt.newDraggableIndex, 0, item[0]);
+    if (evt.oldDraggableIndex > evt.newDraggableIndex) {
+      let item = this.Items.splice(evt.oldDraggableIndex, 1);
+      this.Items.splice(evt.newDraggableIndex, 0, item[0]);
+    } else {
+      let items = this.Items.splice(evt.oldDraggableIndex+1, evt.newDraggableIndex-evt.oldDraggableIndex);
+      Array.prototype.splice.apply(this.Items, [evt.oldDraggableIndex, 0].concat(items));
+    }
   }
 }
 

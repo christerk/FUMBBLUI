@@ -215,7 +215,7 @@ class PlayerComponent extends Vue {
     private intervalIdsScrollDuringCssTransition: number[] = [];
 
     public get key() {
-      return this.player.type + ":" + this.player.id + ":" + this.player.version;
+      return this.player.key;
     }
 
     public getKey() {

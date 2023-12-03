@@ -162,7 +162,7 @@
                             </template>
                         </div>
 
-                        <SortableTable v-if="team.players !== undefined" :Items="team.players" :FootItems="team.extraPlayers" @onEnd="onPlayerRenumbered">
+                        <SortableTable v-if="team.players !== undefined" :Items="team.players" :FootItems="team.extraPlayers" @onEnd="onPlayerRenumbered" :key="playerListKey">
                           <template v-slot="prop">
                             <template v-if="!prop.item.empty">
                               <player :key="prop.item.key"
@@ -686,6 +686,7 @@ class TeamComponent extends Vue {
 
     private sidePanel: string = "";
     private showSidePanel: bool = false;
+    private playerListKey: number = 0;
 
     public modals: {
         activateTeam: boolean,
@@ -988,8 +989,8 @@ class TeamComponent extends Vue {
              'An error occurred whilst renumbering your players.',
              apiResponse.getErrorMessage(),
          );
-         return;
       }
+      this.playerListKey++;
     }
 
     public async removeAllPlayers() {
