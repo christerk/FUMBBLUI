@@ -727,6 +727,9 @@
           grid-template-columns: 1fr;
           grid-row-gap: 1px;
           background: @Forest;
+          &:not(first-child) {
+            border-top: solid @Forest 1px;
+          }
           .sortable-drag {
             opacity: 0;
           }

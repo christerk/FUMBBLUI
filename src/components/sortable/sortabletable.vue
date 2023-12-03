@@ -7,7 +7,7 @@
         </div>
       </template>
     </Sortable>
-    <Sortable class="sortwrap" :list="FootItems" item-key="key" :options="options" @change="onChange" @end="onEnd">
+    <Sortable v-if="FootItems.length > 0" class="sortwrap" :list="FootItems" item-key="key" :options="options" @change="onChange" @end="onEnd">
       <template #item="{element}">
         <div :class="{sortablerow: true, active: !element.empty}">
           <slot :item="element"></slot>
@@ -29,7 +29,7 @@ import { Sortable } from 'sortablejs-vue3'
 @Component({
   components: {
     Sortable
-  }  
+  }
 })
 class SortableTable extends Vue {
   @Prop
