@@ -727,6 +727,10 @@ class TeamComponent extends Vue {
             this.userRoles.push('OWNER');
         }
 
+        if (this.team.getTeamStatus().isNew()) {
+            this.showHireRookies = true;
+        }
+
         this.dedicatedFansChoice = this.team.getDedicatedFans();
 
         // Reload the team when someone returns to the tab
