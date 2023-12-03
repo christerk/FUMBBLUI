@@ -893,10 +893,6 @@ class TeamComponent extends Vue {
             this.dataRosterIconManager !== undefined;
     }
 
-    public get team2(): Team {
-        return this.dataTeam!;
-    }
-
     public get teamManagementSettings(): TeamManagementSettings {
         return this.dataTeamManagementSettings!;
     }
