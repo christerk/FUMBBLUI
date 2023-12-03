@@ -37,7 +37,7 @@
                         </li>
                         <div class="spacer"></div>
                         <li v-if="accessControl.canViewHistory()" class="menu" @mouseenter="menuShow('show')" @mouseleave="menuHide('show')">
-                            <a href="#">Show<img src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"></a>
+                            <a @click.prevent="menuToggle('show')" href="#">Show<img src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"></a>
                             <ul class="submenu" v-show="mainMenuShow === 'show'">
                                 <li><a :href="`https://fumbbl.com/p/team?op=log&team_id=${team.getId()}`">Log</a></li>
                                 <li><a href="#" @click.prevent="showTeamPanel('teammatches')">Matches</a></li>
@@ -52,7 +52,7 @@
                             <a :href="`https://fumbbl.com/p/teamoptions?id=${team.getId()}`">Team options</a>
                         </li>
                         <li class="menu" @mouseenter="menuShow('misc')" @mouseleave="menuHide('misc')">
-                            <a href="#">Misc <img src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"></a>
+                            <a @click.prevent="menuToggle('misc')" href="#">Misc <img src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"></a>
                             <ul class="submenu" v-show="mainMenuShow === 'misc'">
                                 <li><a :href="`https://fumbbl.com/p/gallery3?team=${team.getId()}`">Change Image</a></li>
                                 <li><a :href="`https://fumbbl.com/p/team?op=editbio&amp;team_id=${team.getId()}`">Edit Bio</a></li>
@@ -714,6 +714,10 @@ class TeamComponent extends Vue {
 
     public menuShow(menu: string) {
         this.mainMenuShow = menu;
+    }
+
+    public menuToggle(menu: string) {
+        this.mainMenuShow = menu == this.mainMenuShow ? 'none' : menu;
     }
 
     public menuHide(menu: string) {
