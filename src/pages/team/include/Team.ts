@@ -188,7 +188,7 @@ export default class Team {
     }
 
     public removePlayer(player: Player): void {
-        if (this.teamStatus.isNew()) {
+        if (this.teamStatus.isNew() || player.getIsRefundable()) {
             this.treasury += player.getPositionCost();
         }
         const index = this.players.findIndex(playerToMatch => playerToMatch.id === player.id);

@@ -561,7 +561,7 @@
         </modal>
 
         <retireplayer
-            v-if="playerToRetire"
+            v-if="playerToRetire && !playerToRetire.getIsRefundable()"
             :fumbblApi="fumbblApi"
             :player="playerToRetire"
             @nominate-retire-player-cancel="handleNominateRetirePlayerCancel"
@@ -1200,6 +1200,11 @@ class TeamComponent extends Vue {
 
     public handleNominateRetirePlayer(player: Player) {
         this.playerToRetire = player;
+
+        // automatically confirm the retirement if the player is refundable
+        if (player.getIsRefundable()) {
+            this.handleNominateRetirePlayerConfirm();
+        }
     }
 
     public handleNominateRetirePlayerCancel() {
