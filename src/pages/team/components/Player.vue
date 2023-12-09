@@ -104,7 +104,7 @@
                 <template v-if="!teamStatus.isSkill() && !player.getIsJourneyman()">
                     (<a href="#" @click.prevent="triggerNominateRetirePlayer">{{ player.getIsRefundable() ? 'Refund' : 'Retire' }}</a>)
                 </template>
-                <template v-else-if=!teamStatus.isSkill()>
+                <template v-else-if="!teamStatus.isSkill() && treasury >= player.getPlayerCost()">
                     (<a href="#" @click.prevent="triggerHireJourneyman">Hire</a>)
                 </template>
             </div>
@@ -180,6 +180,12 @@ class PlayerComponent extends Vue {
       required: true,
     })
     public teamStatus!: TeamStatus;
+
+    @Prop({
+      type: Number,
+      required: true,
+    })
+    public treasury!: number;
 
     @Emit('remove-player')
     public triggerRemovePlayer(): EventDataRemovePlayer {

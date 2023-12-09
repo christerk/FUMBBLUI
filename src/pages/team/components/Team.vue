@@ -173,6 +173,7 @@
                                   :name-generator="teamManagementSettings.nameGenerator"
                                   :compact-view="showHireRookiesWithPermissionsCheck"
                                   :team-status="team.getTeamStatus()"
+                                  :treasury="team.treasury"
                                   @remove-player="handleRemovePlayer"
                                   @nominate-retire-player="handleNominateRetirePlayer"
                                   @hire-journeyman="handleHireJourneyman"
