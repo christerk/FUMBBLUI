@@ -1233,12 +1233,7 @@ class TeamComponent extends Vue {
     }
 
     public async handleHireJourneyman(player: Player) {
-        const firstEmptyNumber = this.team.findFirstEmptyNumber();
-        if (! firstEmptyNumber) {
-            return;
-        }
-
-        player.permanentlyHireJourneyman(firstEmptyNumber);
+        this.team.hireJourneyman(player);
 
         this.reloadTeamWithDelay();
 

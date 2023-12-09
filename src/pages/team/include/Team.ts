@@ -180,7 +180,24 @@ export default class Team {
 
     public buyPlayer(player: Player): void {
         this.addPlayer(player);
-        this.treasury -= player.getPositionCost();
+        this.treasury -= player.getPlayerCost();
+    }
+
+    public hireJourneyman(player: Player): void {
+        if (! player.getIsJourneyman()) {
+            return;
+        }
+
+        const firstEmptyNumber = this.findFirstEmptyNumber();
+        if (! firstEmptyNumber) {
+            return;
+        }
+
+        const extraPlayerIndex = this.extraPlayers.findIndex(extraPlayer => extraPlayer.getId() === player.getId());
+        this.extraPlayers[extraPlayerIndex] = Player.emptyPlayer(player.playerNumber);
+        player.permanentlyHireJourneyman(firstEmptyNumber);
+
+        this.buyPlayer(player);
     }
 
     public findPlayerByNumber(playerNumber: number): Player | null {
