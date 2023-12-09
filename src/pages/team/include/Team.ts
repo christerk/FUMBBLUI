@@ -1,4 +1,4 @@
-import {Coach, PlayerGender, Position} from "./Interfaces";
+import {Coach} from "./Interfaces";
 import Player from "./Player";
 import RosterIconManager from "./RosterIconManager";
 import TeamManagementSettings from "./TeamManagementSettings";
