@@ -98,7 +98,9 @@ class RetirePlayerComponent extends Vue {
             this.errors.push('Local SPP out of sync with saved SPP.');
         }
 
-        if (this.player.getInjuries().length !== rawApiPlayer.injuries.length) {
+        // api data includes miss next game injuries twice, for this purpose we can ignore any containing '(MNG)'
+        const rawApiPlayerInjuryCountWithoutDuplicates = rawApiPlayer.injuries.filter(injury => !injury.includes('(MNG)')).length;
+        if (this.player.getInjuries().length !== rawApiPlayerInjuryCountWithoutDuplicates) {
             this.errors.push('Local injuries out of sync with saved injuries.');
         }
 
