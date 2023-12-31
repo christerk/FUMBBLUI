@@ -9,7 +9,7 @@ export interface RawApiSpecialRules {
 
 export type UserRole = 'OWNER' | 'LEAGUE_STAFF' | 'SITE_STAFF';
 
-export type TeamStatusValue = 'NEW' | 'ACTIVE' | 'PENDING_APPROVAL' | 'BLOCKED' | 'RETIRED' | 'WAITING_FOR_OPPONENT' | 'SKILL_ROLLS_PENDING' | 'POST_MATCH_SEQUENCE' | 'REDRAFTING';
+export type TeamStatusValue = 'NEW' | 'ACTIVE' | 'READY_FOR_TOURNAMENT' | 'PENDING_APPROVAL' | 'BLOCKED' | 'RETIRED' | 'WAITING_FOR_OPPONENT' | 'SKILL_ROLLS_PENDING' | 'POST_MATCH_SEQUENCE' | 'REDRAFTING';
 
 export type TeamAction = 'CREATE' | 'EDIT' | 'RETIRE_TEAM' | 'READY_TEAM' | 'VIEW_HISTORY' | 'HIRE_ROOKIE';
 

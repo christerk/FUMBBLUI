@@ -51,7 +51,7 @@ export default class AccessControl {
                 grantAccessToList: [
                     {
                         userRoles: ['OWNER', 'LEAGUE_STAFF', 'SITE_STAFF'],
-                        teamStatusValues: ['ACTIVE'],
+                        teamStatusValues: ['ACTIVE', 'READY_FOR_TOURNAMENT'],
                     }
                 ]
             },
@@ -60,7 +60,7 @@ export default class AccessControl {
                 grantAccessToList: [
                     {
                         userRoles: ['OWNER', 'LEAGUE_STAFF', 'SITE_STAFF'],
-                        teamStatusValues: ['ACTIVE', 'POST_MATCH_SEQUENCE', 'SKILL_ROLLS_PENDING'],
+                        teamStatusValues: ['ACTIVE', 'READY_FOR_TOURNAMENT', 'POST_MATCH_SEQUENCE', 'SKILL_ROLLS_PENDING'],
                     }
                 ]
             },
