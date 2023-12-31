@@ -864,6 +864,11 @@ class TeamComponent extends Vue {
 
             await this.setupRosterIconManager(rawApiRoster.positions);
             this.dataTeamManagementSettings = new TeamManagementSettings(rawApiRuleset, rawApiRoster, hasLowCostLinemen);
+            const rulesetVersion = rawApiRuleset.options.rulesetOptions.version;
+            const skillProgressionType = rawApiRuleset.options.teamSettings.skillProgressionType;
+            if (rulesetVersion !== '2020' || skillProgressionType !== 'bb2020'){
+                this.triggerUnexpectedError('Unsupported team type. Currently this page only supports Teams using the 2020 ruleset (must be using 2020 skill progression as well.)');
+            }
         } else {
             let currentAction = '';
             let errorMessage = '';
