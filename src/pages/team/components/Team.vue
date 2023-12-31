@@ -440,7 +440,7 @@
         <modal
             v-show="modals.activateTeam === true"
             :button-settings="{cancel: {enabled: true, label: 'Oops, let me go back and check!'}, confirm: {enabled: true, label: 'Yes, my team complies'}}"
-            :modal-size="'small'"
+            :modal-size="'medium'"
             @cancel="modals.activateTeam = false"
             @confirm="handleActivateTeam"
         >
