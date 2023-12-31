@@ -147,7 +147,7 @@ class SpecialRulesComponent extends Vue {
     }
 
     public labelHasChoice(label: string): boolean {
-        return Object.keys(this.teamChoices).includes(label) && this.teamChoices[label] !== null;
+        return Object.keys(this.teamChoices).includes(label) && this.teamChoices[label];
     }
 
     public labelHasOptions(label: string): boolean {
