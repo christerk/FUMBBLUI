@@ -30,7 +30,7 @@
                     </div>
                     <ul class="teamnav">
                         <button v-if="team.getTeamStatus().isPostMatch() && accessControl.canReadyTeam()" class="menu" @click="interceptReadyToPlay">Complete</button>
-                        <button v-else-if="team.getTeamStatus().isNew() && teamManagementSettings.isValidForCreate(team)" class="menu" @click="modals.activateTeam = true">Activate</button>
+                        <button v-else-if="team.getTeamStatus().isNew() && teamManagementSettings.isValidForCreate(team) && !specialRuleErrors" class="menu" @click="modals.activateTeam = true">Activate</button>
                         <button v-else-if="team.getTeamStatus().isNew()" @click="modals.errorsForCreate = true" class="menu">Activate</button>
                         <li class="menu">
                           <a href="#" v-if="accessControl.canEdit()" @click.prevent="enableShowHireRookies()">Hire Players</a>
@@ -470,6 +470,10 @@
                         <template v-if="error === 'teamNameBlank'">Team name is blank.</template>
                         <template v-if="error === 'insufficientTreasury'">Insufficient treasury for chosen players and sideline staff.</template>
                         <template v-if="error === 'insufficientPlayers'">Less than minimum required starting players selected.</template>
+                    </li>
+                    <li v-for="error in specialRuleErrors" :key="error">
+                        <template v-if="error === 'oneOfNotChosen'">Special rules: team requires a choice from the "one of" options.</template>
+                        <template v-if="error === 'specialRuleNotChosen'">Special rules: team requires a choice from the list of special rule options.</template>
                     </li>
                 </ul>
             </template>
@@ -1457,6 +1461,47 @@ class TeamComponent extends Vue {
 
     public get willTriggerExpensiveMistakes() {
       return this.team.treasury >= this.teamManagementSettings.expensiveMistakesStart;
+    }
+
+    public get specialRuleErrors(): string[] {
+        const errors: string[] = [];
+
+        const teamSpecialRules = this.rawApiSpecialRules.fromTeam;
+        let oneOfChoiceRequired: boolean = false;
+        let oneOfChoice: string | null = null;
+
+        // Find out if a one of choice is required
+        // Also find the choice made for the one of
+        for (const specialRuleLabel of Object.keys(teamSpecialRules)) {
+            const teamSpecialRule = teamSpecialRules[specialRuleLabel];
+            const teamSpecialRuleChoice = teamSpecialRule[1];
+            const teamSpecialRuleSettings = teamSpecialRule[2];
+            if (typeof teamSpecialRuleSettings === 'object' && teamSpecialRuleSettings !== null) {
+                if (teamSpecialRuleSettings.oneOf === true) {
+                    oneOfChoiceRequired = true;
+                    oneOfChoice = teamSpecialRuleChoice;
+                    if (!teamSpecialRuleChoice) {
+                        errors.push('oneOfNotChosen');
+                    }
+                }
+            }
+        }
+
+        // For any multiple choice special rules, if they are a one of choice make sure the choice has been made, otherwise always make sure the choice has been made.
+        for (const specialRuleLabel of Object.keys(teamSpecialRules)) {
+            const teamSpecialRule = teamSpecialRules[specialRuleLabel];
+            const teamSpecialRuleOptions = teamSpecialRule[0];
+            const teamSpecialRuleChoice = teamSpecialRule[1];
+            if (Array.isArray(teamSpecialRuleOptions)) {
+                if (!teamSpecialRuleChoice) {
+                    if (!oneOfChoiceRequired || oneOfChoice === specialRuleLabel) {
+                        errors.push('specialRuleNotChosen');
+                    }
+                }
+            }
+        }
+
+        return errors;
     }
 }
 
