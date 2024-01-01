@@ -19,18 +19,17 @@
         <div class="tv small">Avg TV</div>
       </div>
       <template v-for="stats in statistics" :key="stats.info.roster">
-
         <div class="teamstatrow">
-          <div><img :src="'https://fumbbl.com/i/'+stats.info.logo" /></div>
+          <div><img :src="'https://fumbbl.com/i/' + stats.info.logo" /></div>
           <div class="roster">{{ stats.info.roster }}</div>
           <div>
             {{ stats.record.games }}
             (
-              {{ stats.record.wins }}
-              /
-              {{ stats.record.ties }}
-              /
-              {{ stats.record.losses }}
+            {{ stats.record.wins }}
+            /
+            {{ stats.record.ties }}
+            /
+            {{ stats.record.losses }}
             )
           </div>
 
@@ -62,18 +61,17 @@
             {{ stats.tv.for }}
           </div>
         </div>
-
       </template>
     </div>
   </div>
 </template>
 
 <style scoped>
-@import '@pages/team/style/teamstats.less';
+@import "@pages/team/style/teamstats.less";
 </style>
 
 <script lang="ts">
-import { Emit, Prop, Component, Vue, toNative } from 'vue-facing-decorator'
+import { Emit, Prop, Component, Vue, toNative } from "vue-facing-decorator";
 import FumbblApi from "../include/FumbblApi";
 
 @Component
@@ -82,57 +80,55 @@ class TeamStats extends Vue {
   public team;
 
   @Prop
-  public fumbblApi : FumbblApi;
+  public fumbblApi: FumbblApi;
 
   @Emit
-  public close() {
+  public close() {}
 
-  }
-
-  @Emit('unexpected-error')
+  @Emit("unexpected-error")
   public triggerUnexpectedError(errorMessage: string): string {
-      return errorMessage;
+    return errorMessage;
   }
 
   public statistics: any = {};
 
-  async mounted() {
-  }
+  async mounted() {}
 
   public async loadStats() {
     const apiResponse = await this.fumbblApi.getTeamStats(this.team.id);
     if (apiResponse.isSuccessful()) {
-        let stats = apiResponse.getData();
+      let stats = apiResponse.getData();
 
-        let list = [];
+      let list = [];
 
-        Object.keys(stats).forEach(roster => {
-          stats[roster].info["roster"] = roster;
-          list.push(stats[roster]);
-        });
+      Object.keys(stats).forEach((roster) => {
+        stats[roster].info["roster"] = roster;
+        list.push(stats[roster]);
+      });
 
-        list.sort((a,b) => {
-          let d = b.record.games - a.record.games;
-          if (d != 0) return d;
+      list.sort((a, b) => {
+        let d = b.record.games - a.record.games;
+        if (d != 0) return d;
 
-          d = b.record.wins - a.record.wins;
-          if (d != 0) return d;
+        d = b.record.wins - a.record.wins;
+        if (d != 0) return d;
 
-          d = b.record.ties - a.record.ties;
-          if (d != 0) return d;
+        d = b.record.ties - a.record.ties;
+        if (d != 0) return d;
 
-          d = b.td.for - a.td.for;
-          if (d != 0) return d;
+        d = b.td.for - a.td.for;
+        if (d != 0) return d;
 
-          return 0;
-        });
+        return 0;
+      });
 
-        this.statistics = list;
+      this.statistics = list;
     } else {
-        this.triggerUnexpectedError('Loading team stats: ' + apiResponse.getErrorMessage());
+      this.triggerUnexpectedError(
+        "Loading team stats: " + apiResponse.getErrorMessage(),
+      );
     }
   }
-
 }
 
 export default toNative(TeamStats);
