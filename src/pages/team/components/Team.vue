@@ -1582,7 +1582,17 @@ class TeamComponent extends Vue {
       this.team.id,
       player.id,
     );
-    if (!apiResponse.isSuccessful()) {
+    if (apiResponse.isSuccessful()) {
+      const refundPlayerResponseData = apiResponse.getData();
+
+      // Refunded journeyman must be added back into the team
+      // number property of response data is journeyman number
+      if (refundPlayerResponseData.number !== null) {
+        player.setPlayerNumber(refundPlayerResponseData.number);
+        player.setIsJourneyman(true);
+        this.team.addPlayer(player);
+      }
+    } else {
       await this.recoverFromUnexpectedError(
         "An error occurred refunding a player.",
         apiResponse.getErrorMessage(),
