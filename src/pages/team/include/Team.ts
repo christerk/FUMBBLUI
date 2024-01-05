@@ -206,8 +206,8 @@ export default class Team {
       return;
     }
 
-    const firstEmptyNumber = this.findFirstEmptyNumber();
-    if (!firstEmptyNumber) {
+    const lastEmptyNumber = this.findLastEmptyNumber();
+    if (!lastEmptyNumber) {
       return;
     }
 
@@ -217,7 +217,7 @@ export default class Team {
     this.extraPlayers[extraPlayerIndex] = Player.emptyPlayer(
       player.playerNumber,
     );
-    player.permanentlyHireJourneyman(firstEmptyNumber);
+    player.permanentlyHireJourneyman(lastEmptyNumber);
 
     this.buyPlayer(player);
   }
@@ -411,17 +411,28 @@ export default class Team {
   }
 
   public findFirstEmptyNumber(): number | null {
-    if (this.players.length === 0) {
-      return 1;
-    }
+    let firstEmptyIndex;
 
     for (let i = 0; i < this.players.length; i++) {
       if (this.players[i].IsEmpty) {
-        return i + 1;
+        firstEmptyIndex = i;
+        break;
       }
     }
 
-    return null;
+    return firstEmptyIndex !== undefined ? firstEmptyIndex + 1 : null;
+  }
+
+  public findLastEmptyNumber(): number | null {
+    let lastEmptyIndex;
+
+    for (let i = 0; i < this.players.length; i++) {
+      if (this.players[i].IsEmpty) {
+        lastEmptyIndex = i;
+      }
+    }
+
+    return lastEmptyIndex !== undefined ? lastEmptyIndex + 1 : null;
   }
 
   public hasEmptyNumbers(): boolean {
