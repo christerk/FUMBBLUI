@@ -338,6 +338,7 @@
                       :team-status="team.getTeamStatus()"
                       :treasury="team.treasury"
                       @remove-player="handleRemovePlayer"
+                      @refund-player="handleRefundPlayer"
                       @nominate-retire-player="handleNominateRetirePlayer"
                       @hire-journeyman="handleHireJourneyman"
                       @skill-player="showSkillPlayer"
@@ -883,6 +884,7 @@ import TeamMatches from "./TeamMatches.vue";
 
 import {
   EventDataFoldOut,
+  EventDataRefundPlayer,
   EventDataRemovePlayer,
 } from "../include/EventDataInterfaces";
 
@@ -1529,13 +1531,13 @@ class TeamComponent extends Vue {
     eventDataRemovePlayer: EventDataRemovePlayer,
   ) {
     const player = this.team.findPlayerByNumber(
-      eventDataRemovePlayer.teamSheetEntryNumber,
+      eventDataRemovePlayer.playerNumber,
     );
     if (player === null || player.id !== eventDataRemovePlayer.playerId) {
       await this.recoverFromUnexpectedError(
         "Unable to remove player, if this problem continues please reload the page.",
         `Removing playerId ${eventDataRemovePlayer.playerId} from number ${
-          eventDataRemovePlayer.teamSheetEntryNumber
+          eventDataRemovePlayer.playerNumber
         } but found playerId ${player ? player.id : "empty"}`,
       );
       return;
@@ -1552,6 +1554,38 @@ class TeamComponent extends Vue {
     if (!apiResponse.isSuccessful()) {
       await this.recoverFromUnexpectedError(
         "An error occurred removing a player.",
+        apiResponse.getErrorMessage(),
+      );
+    }
+  }
+
+  public async handleRefundPlayer(
+    eventDataRefundPlayer: EventDataRefundPlayer,
+  ) {
+    const player = this.team.findPlayerByNumber(
+      eventDataRefundPlayer.playerNumber,
+    );
+    if (player === null || player.id !== eventDataRefundPlayer.playerId) {
+      await this.recoverFromUnexpectedError(
+        "Unable to refund player, if this problem continues please reload the page.",
+        `Refunding playerId ${eventDataRefundPlayer.playerId} from number ${
+          eventDataRefundPlayer.playerNumber
+        } but found playerId ${player ? player.id : "empty"}`,
+      );
+      return;
+    }
+
+    this.team.removePlayer(player);
+
+    this.reloadTeamWithDelay();
+
+    const apiResponse = await this.fumbblApi.refundPlayer(
+      this.team.id,
+      player.id,
+    );
+    if (!apiResponse.isSuccessful()) {
+      await this.recoverFromUnexpectedError(
+        "An error occurred refunding a player.",
         apiResponse.getErrorMessage(),
       );
     }
@@ -1639,7 +1673,7 @@ class TeamComponent extends Vue {
   public handleFoldOut(eventDataFoldOut: EventDataFoldOut) {
     let playerRowFoldOutMode = eventDataFoldOut.playerRowFoldOutMode;
     let multipleOpenMode = eventDataFoldOut.multipleOpenMode;
-    let playerNumber = eventDataFoldOut.teamSheetEntryNumber;
+    let playerNumber = eventDataFoldOut.playerNumber;
 
     if (playerRowFoldOutMode !== "CLOSED" && !multipleOpenMode) {
       this.team.players.forEach((player) => {

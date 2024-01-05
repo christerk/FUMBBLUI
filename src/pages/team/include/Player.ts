@@ -144,7 +144,7 @@ export default class Player {
   }
 
   static temporaryPlayer(
-    teamSheetEntryNumber: number,
+    playerNumber: number,
     position: Position,
     iconRowVersionPosition: number,
     playerGender: PlayerGender,
@@ -152,7 +152,7 @@ export default class Player {
     return new Player(
       "TEMP",
       ++this.generatedId,
-      teamSheetEntryNumber,
+      playerNumber,
       Player.temporaryPlayerName,
       position,
       iconRowVersionPosition,
@@ -273,9 +273,9 @@ export default class Player {
     this.isJourneyman = isJourneyman;
   }
 
-  public permanentlyHireJourneyman(newTeamSheetEntryNumber: number) {
+  public permanentlyHireJourneyman(playerNumber: number) {
     if (this.getIsJourneyman()) {
-      this.setPlayerNumber(newTeamSheetEntryNumber);
+      this.setPlayerNumber(playerNumber);
       this.setIsJourneyman(false);
     }
   }

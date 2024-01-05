@@ -202,10 +202,13 @@
           </a>
         </template>
         <template v-if="!teamStatus.isSkill() && !player.getIsJourneyman()">
-          (<a href="#" @click.prevent="triggerNominateRetirePlayer">{{
-            player.getIsRefundable() ? "Refund" : "Retire"
-          }}</a
-          >)
+          <template v-if="player.getIsRefundable()">
+            (<a href="#" @click.prevent="triggerRefundPlayer">Refund</a>)
+          </template>
+          <template v-else>
+            (<a href="#" @click.prevent="triggerNominateRetirePlayer">Retire</a
+            >)
+          </template>
         </template>
         <template
           v-else-if="
@@ -238,6 +241,7 @@ import AccessControl from "../include/AccessControl";
 import RosterIconManager from "../include/RosterIconManager";
 import {
   EventDataFoldOut,
+  EventDataRefundPlayer,
   EventDataRemovePlayer,
 } from "../include/EventDataInterfaces";
 import Player from "../include/Player";
@@ -301,8 +305,17 @@ class PlayerComponent extends Vue {
   public triggerRemovePlayer(): EventDataRemovePlayer {
     const player = this.player;
     return {
-      teamSheetEntryNumber: this.player.playerNumber,
+      playerNumber: this.player.playerNumber,
       playerId: player ? player.id : 0,
+    };
+  }
+
+  @Emit("refund-player")
+  public triggerRefundPlayer(): EventDataRefundPlayer {
+    const player = this.player;
+    return {
+      playerNumber: this.player.playerNumber,
+      playerId: player.id,
     };
   }
 
@@ -372,7 +385,7 @@ class PlayerComponent extends Vue {
     multipleOpenMode = false,
   ) {
     this.triggerFoldOut({
-      teamSheetEntryNumber: this.player.playerNumber,
+      playerNumber: this.player.playerNumber,
       playerRowFoldOutMode,
       multipleOpenMode,
     });

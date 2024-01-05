@@ -1,12 +1,17 @@
 import { PlayerRowFoldOutMode } from "./Interfaces";
 
 export interface EventDataFoldOut {
-  teamSheetEntryNumber: number;
+  playerNumber: number;
   playerRowFoldOutMode: PlayerRowFoldOutMode;
   multipleOpenMode: boolean;
 }
 
 export interface EventDataRemovePlayer {
-  teamSheetEntryNumber: number;
+  playerNumber: number;
+  playerId: number;
+}
+
+export interface EventDataRefundPlayer {
+  playerNumber: number;
   playerId: number;
 }
