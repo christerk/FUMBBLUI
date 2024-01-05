@@ -1506,7 +1506,6 @@ class TeamComponent extends Vue {
   }
 
   public enableShowHireRookies(): void {
-    window.scrollTo({ top: 0, behavior: "smooth" });
     this.showHireRookies = !this.showHireRookies;
   }
 
