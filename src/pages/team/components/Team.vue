@@ -48,7 +48,7 @@
               v-else-if="
                 team.getTeamStatus().isNew() &&
                 teamManagementSettings.isValidForCreate(team) &&
-                !specialRuleErrors
+                specialRuleErrors.length === 0
               "
               class="menu"
               @click="modals.activateTeam = true"
