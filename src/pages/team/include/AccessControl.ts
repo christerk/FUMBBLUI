@@ -87,7 +87,7 @@ export default class AccessControl {
         action: "VIEW_HISTORY",
         grantAccessToList: [
           {
-            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            userRoles: ["ANYONE"],
             teamStatusValues: [
               "ACTIVE",
               "READY_FOR_TOURNAMENT",

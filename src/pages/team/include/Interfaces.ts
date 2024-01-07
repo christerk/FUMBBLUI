@@ -7,7 +7,13 @@ export interface RawApiSpecialRules {
   fromTeam: any;
 }
 
-export type UserRole = "OWNER" | "LEAGUE_STAFF" | "SITE_STAFF";
+export type UserRole =
+  | "ANYONE"
+  | "ANONYMOUS"
+  | "LOGGED_IN"
+  | "OWNER"
+  | "LEAGUE_STAFF"
+  | "SITE_STAFF";
 
 export type TeamStatusValue =
   | "NEW"

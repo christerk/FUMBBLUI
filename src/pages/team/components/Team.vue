@@ -1016,6 +1016,10 @@ class TeamComponent extends Vue {
   async mounted() {
     await this.reloadTeam();
 
+    this.userRoles.push("ANYONE");
+
+    this.userRoles.push(this.coachName === '' ? "ANONYMOUS" : "LOGGED_IN");
+
     if (this.team.getCoach().name === this.coachName) {
       this.userRoles.push("OWNER");
     }
