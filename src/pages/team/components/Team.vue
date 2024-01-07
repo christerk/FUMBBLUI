@@ -759,16 +759,16 @@
     </modal>
     <modal
       v-show="modals.skillPlayer === true"
-      :button-settings="{
-        cancel: { enabled: false },
-        confirm: { enabled: true, label: 'Close' },
-      }"
       :modal-size="'skill'"
-      @confirm="handleSkillPlayer"
+      :exclude-header="true"
+      :exclude-buttons="true"
     >
       <template v-slot:header> Skill Player </template>
 
       <template v-slot:body>
+        <button @click="handleSkillPlayer" class="largeclosebutton">
+          <img src="https://fumbbl.com/FUMBBL/Images/cross.png" />
+        </button>
         <iframe
           v-if="modals.skillPlayer"
           style="border-radius: 5px; width: 800px; height: 496px"
