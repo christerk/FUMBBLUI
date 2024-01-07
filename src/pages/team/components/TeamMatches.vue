@@ -64,6 +64,9 @@
           </template>
         </a>
       </template>
+      <div v-if="showMoreButton && matches.length < team.record.games" class="morematches">
+        <button @click="loadMoreMatches" class="morebutton">Load More</button>
+      </div>
     </div>
   </div>
 </template>
@@ -79,6 +82,7 @@ import FumbblApi from "../include/FumbblApi";
 @Component
 class TeamMatches extends Vue {
   private matches: any = [];
+  private showMoreButton: boolean = true;
 
   @Prop
   public team;
@@ -98,15 +102,25 @@ class TeamMatches extends Vue {
 
   async mounted() {}
 
-  public async loadMatches() {
-    const apiResponse = await this.fumbblApi.getTeamMatches(this.team.id);
+  public async loadMatches(lastId: number = 0) {
+    const apiResponse = await this.fumbblApi.getTeamMatches(this.team.id, lastId);
     if (apiResponse.isSuccessful()) {
-      this.matches = apiResponse.getData();
+      if (lastId == 0) {
+        this.matches = apiResponse.getData();
+      } else {
+        this.matches = this.matches.concat(apiResponse.getData());
+      }
     } else {
       this.triggerUnexpectedError(
         "Loading team matches: " + apiResponse.getErrorMessage(),
       );
     }
+  }
+
+  public async loadMoreMatches() {
+    this.showMoreButton = false;
+    await this.loadMatches(this.matches.at(-1).id - 1);
+    this.showMoreButton = true;
   }
 
   private teamUrl(id: number) {
