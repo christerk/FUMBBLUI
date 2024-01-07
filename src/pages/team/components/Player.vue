@@ -196,15 +196,6 @@
         v-else-if="!player.IsEmpty && accessControl.canEdit()"
         class="cell retireplayer"
       >
-        <template v-if="player.canSkill">
-          <a
-            :class="{ mustskill: player.mustSkill }"
-            href="#"
-            @click.prevent="triggerSkillPlayer"
-          >
-            {{ player.mustSkill ? "Must " : "" }}Skill
-          </a>
-        </template>
         <template v-if="!teamStatus.isSkill() && !player.getIsJourneyman()">
           <template v-if="player.getIsRefundable()">
             (<a href="#" @click.prevent="triggerRefundPlayer">Refund</a>)
@@ -220,6 +211,15 @@
           "
         >
           (<a href="#" @click.prevent="triggerHireJourneyman">Hire</a>)
+        </template>
+        <template v-if="player.canSkill">
+          <a
+            :class="{ mustskill: player.mustSkill }"
+            href="#"
+            @click.prevent="triggerSkillPlayer"
+          >
+            {{ player.mustSkill ? "Must " : "" }}Skill
+          </a>
         </template>
       </div>
     </div>
