@@ -7,7 +7,13 @@ export interface RawApiSpecialRules {
   fromTeam: any;
 }
 
-export type UserRole = "OWNER" | "LEAGUE_STAFF" | "SITE_STAFF";
+export type UserRole =
+  | "ANYONE"
+  | "ANONYMOUS"
+  | "LOGGED_IN"
+  | "OWNER"
+  | "LEAGUE_STAFF"
+  | "SITE_STAFF";
 
 export type TeamStatusValue =
   | "NEW"
@@ -27,7 +33,9 @@ export type TeamAction =
   | "RETIRE_TEAM"
   | "READY_TEAM"
   | "VIEW_HISTORY"
-  | "HIRE_ROOKIE";
+  | "HIRE_ROOKIE"
+  | "RENUMBER_PLAYERS"
+  | "SHOW_PLAYER_CONTROLS";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;

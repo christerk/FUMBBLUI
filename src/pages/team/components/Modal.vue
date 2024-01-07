@@ -8,7 +8,11 @@
         aria-labelledby="modalTitle"
         aria-describedby="modalDescription"
       >
-        <header class="modalheader" id="modalTitle">
+        <header
+          v-if="excludeHeader !== true"
+          class="modalheader"
+          id="modalTitle"
+        >
           <slot name="header"></slot>
           <button
             v-if="excludeCloseTopRight !== true"
@@ -27,7 +31,10 @@
 
         <section
           class="modalbuttons"
-          v-if="buttonSettings.cancel.enabled || buttonSettings.confirm.enabled"
+          v-if="
+            excludeButtons !== true &&
+            (buttonSettings.cancel.enabled || buttonSettings.confirm.enabled)
+          "
         >
           <div>
             <button
@@ -81,6 +88,20 @@ class ModalComponent extends Vue {
     default: false,
   })
   public excludeCloseTopRight: boolean = false;
+
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false,
+  })
+  public excludeHeader: boolean = false;
+
+  @Prop({
+    type: Boolean,
+    required: false,
+    default: false,
+  })
+  public excludeButtons: boolean = false;
 
   @Emit("cancel")
   public triggerCancel() {}

@@ -38,6 +38,21 @@ export default class AccessControl {
         ],
       },
       {
+        action: "RENUMBER_PLAYERS",
+        grantAccessToList: [
+          {
+            userRoles: ["OWNER"],
+            teamStatusValues: [
+              "NEW",
+              "ACTIVE",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "READY_FOR_TOURNAMENT",
+            ],
+          },
+        ],
+      },
+      {
         action: "EDIT",
         grantAccessToList: [
           {
@@ -72,12 +87,26 @@ export default class AccessControl {
         action: "VIEW_HISTORY",
         grantAccessToList: [
           {
-            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            userRoles: ["ANYONE"],
             teamStatusValues: [
               "ACTIVE",
               "READY_FOR_TOURNAMENT",
               "POST_MATCH_SEQUENCE",
               "SKILL_ROLLS_PENDING",
+            ],
+          },
+        ],
+      },
+      {
+        action: "SHOW_PLAYER_CONTROLS",
+        grantAccessToList: [
+          {
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: [
+              "NEW",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "REDRAFTING",
             ],
           },
         ],
@@ -138,5 +167,13 @@ export default class AccessControl {
 
   public canHireRookie(): boolean {
     return this.isGranted("HIRE_ROOKIE");
+  }
+
+  public canRenumberPlayers(): boolean {
+    return this.isGranted("RENUMBER_PLAYERS");
+  }
+
+  public canShowPlayerControls(): boolean {
+    return this.isGranted("SHOW_PLAYER_CONTROLS");
   }
 }
