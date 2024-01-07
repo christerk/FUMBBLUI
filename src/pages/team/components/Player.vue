@@ -340,7 +340,6 @@ class PlayerComponent extends Vue {
 
   @Emit("fold-out")
   public triggerFoldOut(eventDataFoldOut: EventDataFoldOut): EventDataFoldOut {
-    console.log(this.key);
     return eventDataFoldOut;
   }
 
