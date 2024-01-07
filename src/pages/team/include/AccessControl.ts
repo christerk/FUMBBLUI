@@ -97,6 +97,20 @@ export default class AccessControl {
           },
         ],
       },
+      {
+        action: "SHOW_PLAYER_CONTROLS",
+        grantAccessToList: [
+          {
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: [
+              "NEW",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "REDRAFTING",
+            ],
+          },
+        ],
+      },
     );
   }
 
@@ -157,5 +171,9 @@ export default class AccessControl {
 
   public canRenumberPlayers(): boolean {
     return this.isGranted("RENUMBER_PLAYERS");
+  }
+
+  public canShowPlayerControls(): boolean {
+    return this.isGranted("SHOW_PLAYER_CONTROLS");
   }
 }

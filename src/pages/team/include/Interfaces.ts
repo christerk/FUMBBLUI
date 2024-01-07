@@ -34,7 +34,8 @@ export type TeamAction =
   | "READY_TEAM"
   | "VIEW_HISTORY"
   | "HIRE_ROOKIE"
-  | "RENUMBER_PLAYERS";
+  | "RENUMBER_PLAYERS"
+  | "SHOW_PLAYER_CONTROLS";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;

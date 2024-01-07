@@ -288,7 +288,7 @@
             <div
               :class="{
                 playerrows: true,
-                showplayercontrols: team.getTeamStatus().showPlayerControls(),
+                showplayercontrols: accessControl.canShowPlayerControls(),
               }"
             >
               <div class="playerrowsheader">
@@ -1018,7 +1018,7 @@ class TeamComponent extends Vue {
 
     this.userRoles.push("ANYONE");
 
-    this.userRoles.push(this.coachName === '' ? "ANONYMOUS" : "LOGGED_IN");
+    this.userRoles.push(this.coachName === "" ? "ANONYMOUS" : "LOGGED_IN");
 
     if (this.team.getCoach().name === this.coachName) {
       this.userRoles.push("OWNER");
