@@ -27,7 +27,8 @@ export type TeamAction =
   | "RETIRE_TEAM"
   | "READY_TEAM"
   | "VIEW_HISTORY"
-  | "HIRE_ROOKIE";
+  | "HIRE_ROOKIE"
+  | "RENUMBER_PLAYERS";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;

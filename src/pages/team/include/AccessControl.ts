@@ -38,6 +38,21 @@ export default class AccessControl {
         ],
       },
       {
+        action: "RENUMBER_PLAYERS",
+        grantAccessToList: [
+          {
+            userRoles: ["OWNER"],
+            teamStatusValues: [
+              "NEW",
+              "ACTIVE",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "READY_FOR_TOURNAMENT",
+            ],
+          },
+        ],
+      },
+      {
         action: "EDIT",
         grantAccessToList: [
           {
@@ -138,5 +153,9 @@ export default class AccessControl {
 
   public canHireRookie(): boolean {
     return this.isGranted("HIRE_ROOKIE");
+  }
+
+  public canRenumberPlayers(): boolean {
+    return this.isGranted("RENUMBER_PLAYERS");
   }
 }

@@ -15,7 +15,11 @@
       }"
     >
       <div
-        v-if="!player.getIsJourneyman() && !player.isTemporaryPlayer"
+        v-if="
+          accessControl.canRenumberPlayers() &&
+          !player.getIsJourneyman() &&
+          !player.isTemporaryPlayer
+        "
         class="cell draghandle handle"
       >
         <svg
