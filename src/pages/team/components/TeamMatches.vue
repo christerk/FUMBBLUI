@@ -12,6 +12,7 @@
              - 
             <span :class="{bold: match.team1.score < match.team2.score }">{{ match.team2.score }}</span>
           </div>
+          <div class="matchowncoach">({{ match.team1.coach.cr }}) <a :href="coachUrl(match.team1.coach.name)">{{ match.team1.coach.name }}</a></div>
           <div class="matchoppcoach"><a :href="coachUrl(match.team2.coach.name)">{{ match.team2.coach.name }}</a> ({{ match.team2.coach.cr }})</div>
           <div class="matchownteam">
             <a :href="teamUrl(match.team2.id)">{{ match.team1.name }}</a>
