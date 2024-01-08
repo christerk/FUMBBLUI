@@ -2,66 +2,31 @@
   <div class="panelwrapper">
     <button @click="close" class="backbutton">&lt;&lt; Back</button>
     <div class="matchpanel">
-      <div class="match title">
-        <div>Date</div>
-        <div style="grid-column: 2/4">Score</div>
-        <div style="grid-column: 4/6">Opponent</div>
-        <div>TV</div>
-        <div style="grid-column: 7/9">Cas</div>
+      <div class="title">
+        Match History
       </div>
       <template v-for="match in matches" :key="match.id">
         <a class="match" :href="matchUrl(match.id)">
-          <div>{{ match.date }}</div>
-          <template v-if="match.team1.id == team.id">
-            <div>{{ match.team1.score }} - {{ match.team2.score }}</div>
-            <div>
-              {{
-                match.team2.score < match.team1.score
-                  ? "Win"
-                  : match.team2.score > match.team1.score
-                  ? "Loss"
-                  : "Tie"
-              }}
-            </div>
-            <div class="left">{{ match.team2.roster }}</div>
-            <div class="left">
-              <a :href="teamUrl(match.team2.id)">{{ match.team2.name }}</a>
-            </div>
-            <div>{{ match.team1.teamValue }}</div>
-            <div>
-              {{ match.team1.casualties.bh }} /
-              {{ match.team1.casualties.si }} / {{ match.team1.casualties.rip }}
-            </div>
-            <div>
-              {{ match.team2.casualties.bh }} /
-              {{ match.team2.casualties.si }} / {{ match.team2.casualties.rip }}
-            </div>
-          </template>
-          <template v-else>
-            <div>{{ match.team2.score }} - {{ match.team1.score }}</div>
-            <div>
-              {{
-                match.team1.score < match.team2.score
-                  ? "Win"
-                  : match.team1.score > match.team2.score
-                  ? "Loss"
-                  : "Tie"
-              }}
-            </div>
-            <div class="left">{{ match.team1.roster }}</div>
-            <div class="left">
-              <a :href="teamUrl(match.team1.id)">{{ match.team1.name }}</a>
-            </div>
-            <div>{{ match.team1.teamValue }}</div>
-            <div>
-              {{ match.team2.casualties.bh }} /
-              {{ match.team2.casualties.si }} / {{ match.team2.casualties.rip }}
-            </div>
-            <div>
-              {{ match.team1.casualties.bh }} /
-              {{ match.team1.casualties.si }} / {{ match.team1.casualties.rip }}
-            </div>
-          </template>
+          <div class="matchscore">
+            <span :class="{bold: match.team1.score > match.team2.score }">{{ match.team1.score }}</span>
+             - 
+            <span :class="{bold: match.team1.score < match.team2.score }">{{ match.team2.score }}</span>
+          </div>
+          <div class="matchoppcoach"><a :href="coachUrl(match.team2.coach.name)">{{ match.team2.coach.name }}</a> ({{ match.team2.coach.cr }})</div>
+          <div class="matchownteam">
+            <a :href="teamUrl(match.team2.id)">{{ match.team1.name }}</a>
+          </div>
+          <div class="matchoppteam">
+            <a :href="teamUrl(match.team2.id)">{{ match.team2.name }}</a>
+          </div>
+          <div class="matchownroster">
+            TV {{ match.team1.teamValue }} {{ match.team1.roster }}
+          </div>
+          <div class="matchopproster">
+            {{ match.team2.roster }} TV {{ match.team2.teamValue }}
+          </div>
+          <div class="matchownlogo"><img :src="'https://fumbbl.com/i/' + match.team1.logo" /></div>
+          <div class="matchopplogo"><img :src="'https://fumbbl.com/i/' + match.team2.logo" /></div>
         </a>
       </template>
       <div v-if="showMoreButton && matches.length < team.record.games" class="morematches">
@@ -105,10 +70,11 @@ class TeamMatches extends Vue {
   public async loadMatches(lastId: number = 0) {
     const apiResponse = await this.fumbblApi.getTeamMatches(this.team.id, lastId);
     if (apiResponse.isSuccessful()) {
+      let loadedMatches = this.flipMatches(apiResponse.getData());
       if (lastId == 0) {
-        this.matches = apiResponse.getData();
+        this.matches = loadedMatches;
       } else {
-        this.matches = this.matches.concat(apiResponse.getData());
+        this.matches = this.matches.concat(loadedMatches);
       }
     } else {
       this.triggerUnexpectedError(
@@ -123,12 +89,29 @@ class TeamMatches extends Vue {
     this.showMoreButton = true;
   }
 
+  private flipMatches(matches: any[]) {
+    let result = [];
+
+    matches.forEach( (match) => {
+      if (match.team1.id != this.team.id) {
+        let t1 = match.team1;
+        match.team1 = match.team2;
+        match.team2 = t1;
+      }
+      result.push(match);
+    });
+    return result;
+  }
+
   private teamUrl(id: number) {
     return "https://fumbbl.com/p/team?team_id=" + id;
   }
 
   private matchUrl(id: number) {
     return "https://fumbbl.com/p/match?id=" + id;
+  }
+  private coachUrl(coach: string) {
+    return "https://fumbbl.com/~"+encodeURI(coach);
   }
 }
 
