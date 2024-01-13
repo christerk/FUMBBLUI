@@ -11,7 +11,8 @@
     "deploy": "vite build --outDir ../distlive --mode live",
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "format": "prettier --write src/"
+    "team-format-check": "prettier src/pages/team --check",
+    "team-format": "prettier src/pages/team --write"
   },
   "dependencies": {
     "@observablehq/plot": "^0.6.7",
