@@ -277,6 +277,7 @@ export default class Player {
     if (this.getIsJourneyman()) {
       this.setPlayerNumber(playerNumber);
       this.setIsJourneyman(false);
+      this.isRefundable = true;
     }
   }
 
