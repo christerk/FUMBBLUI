@@ -165,7 +165,10 @@
         {{ displayInjuries(player.getInjuries()) }}
       </div>
       <div v-if="!player.IsEmpty" class="cell spp" :title="sppSummaryText">
-        <template v-if="isLegend">Legend</template>
+        <template v-if="isLegend"
+          >Legend
+          <div class="legendspptotal">{{ sppDisplayInfo.total }}</div>
+        </template>
         <template v-else-if="player.getPosition().isPeaked">
           <div>Peak-{{ sppDisplayInfo.spendable }}</div>
         </template>

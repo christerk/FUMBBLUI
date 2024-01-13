@@ -386,6 +386,7 @@ export default class Player {
   }
 
   public get sppDisplayInfo(): {
+    total: number;
     spendable: number;
     maxLimit: number;
     status: PlayerSkillStatus;
@@ -425,6 +426,7 @@ export default class Player {
     };
 
     return {
+      total: this.record.spp.total,
       spendable: this.record.spp.total - this.record.spp.spent,
       maxLimit: this.skillStatus.maxLimit,
       status: this.skillStatus.status,
