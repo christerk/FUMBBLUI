@@ -354,9 +354,7 @@ class PlayerComponent extends Vue {
   }
 
   @Emit("show-hire-rookies")
-  public triggerShowHireRookies(): Player {
-    return this.player!;
-  }
+  public triggerShowHireRookies() {}
 
   readonly delayForFoldoutAnimations = 600;
   private intervalIdsScrollDuringCssTransition: number[] = [];
