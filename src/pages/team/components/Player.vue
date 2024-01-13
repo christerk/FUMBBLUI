@@ -180,9 +180,9 @@
       <div v-if="!player.IsEmpty" class="cell cost">
         <div class="costbasic">{{ player.getPlayerCost() / 1000 }}k</div>
         <div class="costbreakdown">
-          ({{ player.getPositionCost() / 1000 }}+{{
+          {{ player.getPositionCost() / 1000 }}+{{
             player.getSkillCost() / 1000
-          }})k
+          }}
         </div>
       </div>
       <div
