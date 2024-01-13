@@ -93,9 +93,11 @@ export default class TeamManagementSettings {
       },
       ruleset: {
         expensiveMistakes: {
-          active: rawApiRuleset.options.rulesetOptions.expensiveMistakes === true || rawApiRuleset.options.rulesetOptions.expensiveMistakes === 'true',
+          active:
+            rawApiRuleset.options.rulesetOptions.expensiveMistakes === true ||
+            rawApiRuleset.options.rulesetOptions.expensiveMistakes === "true",
           start: rawApiRuleset.options.rulesetOptions.expensiveMistakesStart,
-        }
+        },
       },
     };
 
