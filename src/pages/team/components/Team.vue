@@ -507,7 +507,9 @@
             </div>
             <div class="title right">Current Re-draft Budget:</div>
             <div class="info right">
-              <div class="data">todo</div>
+              <div class="data" :title="team.getRedraftTooltip()">
+                {{ team.getRedraftCappedBudget() / 1000 }}k
+              </div>
               <div v-if="accessControl.canEdit()" class="editteamcontrols">
                 <!-- deliberately empty -->
               </div>

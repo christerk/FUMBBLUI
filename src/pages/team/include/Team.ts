@@ -29,6 +29,11 @@ export default class Team {
     gamesPlayedInCurrentSeason: number;
     currentSeason: number;
   } = { gamesPlayedInCurrentSeason: 0, currentSeason: 1 };
+  private redrafting: {
+    redraftCap: number;
+    cappedBudget: number;
+    tooltip: string;
+  } = { redraftCap: 0, cappedBudget: 0, tooltip: "" };
   private maxPlayers: 0;
   public record: any = {};
 
@@ -81,6 +86,9 @@ export default class Team {
     team.seasonInfo.gamesPlayedInCurrentSeason =
       rawApiTeam.seasonInfo.gamesPlayedInCurrentSeason;
     team.seasonInfo.currentSeason = rawApiTeam.seasonInfo.currentSeason;
+    team.redrafting.redraftCap = rawApiTeam.redrafting.redraftCap;
+    team.redrafting.cappedBudget = rawApiTeam.redrafting.cappedBudget;
+    team.redrafting.tooltip = rawApiTeam.redrafting.tooltip;
     team.record = rawApiTeam.record;
 
     team.initializePlayers();
@@ -306,6 +314,14 @@ export default class Team {
 
   public getCurrentSeason(): number {
     return this.seasonInfo.currentSeason;
+  }
+
+  public getRedraftCappedBudget(): number {
+    return this.redrafting.cappedBudget;
+  }
+
+  public getRedraftTooltip(): string {
+    return this.redrafting.tooltip;
   }
 
   public countPlayersOfPositionId(positionId: number): number {
