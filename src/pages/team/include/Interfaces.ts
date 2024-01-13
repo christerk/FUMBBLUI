@@ -158,7 +158,10 @@ export interface SetupTeamManagementSettings {
     seasonLength: number;
   };
   ruleset: {
-    expensiveMistakesStart: number;
+    expensiveMistakes: {
+      active: boolean;
+      start: number;
+    };
   };
 }
 

@@ -92,8 +92,10 @@ export default class TeamManagementSettings {
         seasonLength: rawApiRuleset.options.rulesetOptions.seasonLength,
       },
       ruleset: {
-        expensiveMistakesStart:
-          rawApiRuleset.options.rulesetOptions.expensiveMistakesStart,
+        expensiveMistakes: {
+          active: rawApiRuleset.options.rulesetOptions.expensiveMistakes === true || rawApiRuleset.options.rulesetOptions.expensiveMistakes === 'true',
+          start: rawApiRuleset.options.rulesetOptions.expensiveMistakesStart,
+        }
       },
     };
 
@@ -144,8 +146,12 @@ export default class TeamManagementSettings {
     return this.settings.seasons.seasonLength;
   }
 
+  public get expensiveMistakesActive(): boolean {
+    return this.settings.ruleset.expensiveMistakes.active;
+  }
+
   public get expensiveMistakesStart(): number {
-    return this.settings.ruleset.expensiveMistakesStart * 1000;
+    return this.settings.ruleset.expensiveMistakes.start * 1000;
   }
 
   public get startPlayers() {

@@ -1906,6 +1906,7 @@ class TeamComponent extends Vue {
 
   public get willTriggerExpensiveMistakes() {
     return (
+      this.teamManagementSettings.expensiveMistakesActive &&
       this.team.treasury >= this.teamManagementSettings.expensiveMistakesStart
     );
   }
