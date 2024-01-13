@@ -165,7 +165,8 @@
         {{ displayInjuries(player.getInjuries()) }}
       </div>
       <div v-if="!player.IsEmpty" class="cell spp" :title="sppSummaryText">
-        <template v-if="player.getPosition().isPeaked">
+        <template v-if="isLegend">Legend</template>
+        <template v-else-if="player.getPosition().isPeaked">
           <div>Peak-{{ sppDisplayInfo.spendable }}</div>
         </template>
         <template v-else>
@@ -459,7 +460,15 @@ class PlayerComponent extends Vue {
     return this.player.sppDisplayInfo;
   }
 
+  public get isLegend(): boolean {
+    return this.player.sppDisplayInfo.maxLimit === null;
+  }
+
   public get sppSummaryText(): string {
+    if (this.isLegend) {
+      return "Player has reached Legend.";
+    }
+
     const spendable = this.sppDisplayInfo.spendable;
 
     const randomPrimaryThreshold = this.sppDisplayInfo.thresholds.randomPrimary;
