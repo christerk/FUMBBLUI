@@ -1753,7 +1753,7 @@ class TeamComponent extends Vue {
         apiResponse.getData();
       temporaryPlayer.setIdForTemporaryPlayer(newPlayerResponseData.playerId);
 
-      //this.reloadTeamWithDelay();
+      this.reloadTeamWithDelay();
       if (temporaryPlayer.playerNumber !== newPlayerResponseData.number) {
         await this.recoverFromUnexpectedError(
           "Your player has been purchased but your team page is out of sync with the latest version on the server. Please refresh the page if this problem continues.",
