@@ -1260,25 +1260,6 @@ class TeamComponent extends Vue {
     return this.showHireRookies && this.accessControl.canHireRookie();
   }
 
-  public get gamesPlayedStatDisplay(): string {
-    return "0 (0/0/0)"; // todo
-  }
-
-  public get tdDiffStatDisplay(): string {
-    return "0 (0 - 0)"; // todo
-  }
-
-  public get casDiffStatDisplay(): string {
-    return "0 (0/0/0 - 0/0/0)"; // todo
-  }
-
-  public get lastPlayedTeamData(): { id: number; name: string } {
-    return {
-      id: 10000000000,
-      name: "Todo United",
-    };
-  }
-
   public get addRemovePermissions(): AddRemovePermissions {
     return this.teamManagementSettings.getAddRemovePermissions(this.team);
   }
