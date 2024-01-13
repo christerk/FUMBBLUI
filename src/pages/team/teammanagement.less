@@ -664,6 +664,12 @@
         &.empty {
           background: @LightSilver;
         }
+        &.empty.canhirerookie {
+          cursor: pointer;
+          :hover {
+            background-color: lighten(@LightSilver, 10%);
+          }
+        }
 
         &.playerinrow {
           .draghandle {

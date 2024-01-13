@@ -360,6 +360,7 @@
                       @hire-journeyman="handleHireJourneyman"
                       @skill-player="showSkillPlayer"
                       @fold-out="handleFoldOut"
+                      @show-hire-rookies="enableShowHireRookies"
                     ></player>
                   </template>
                   <template v-else>

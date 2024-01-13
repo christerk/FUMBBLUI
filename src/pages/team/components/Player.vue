@@ -4,6 +4,7 @@
       playerrow: true,
       playerinrow: player != undefined,
       empty: player.IsEmpty,
+      canhirerookie: accessControl.canHireRookie(),
     }"
     :key="key"
   >
@@ -13,6 +14,11 @@
         missnextgame: player != undefined && player.isMissNextGame(),
         compact: compactView,
       }"
+      v-on="
+        accessControl.canHireRookie() && player.IsEmpty
+          ? { click: triggerShowHireRookies }
+          : {}
+      "
     >
       <div
         v-if="
@@ -345,6 +351,11 @@ class PlayerComponent extends Vue {
   @Emit("fold-out")
   public triggerFoldOut(eventDataFoldOut: EventDataFoldOut): EventDataFoldOut {
     return eventDataFoldOut;
+  }
+
+  @Emit("show-hire-rookies")
+  public triggerShowHireRookies(): Player {
+    return this.player!;
   }
 
   readonly delayForFoldoutAnimations = 600;
