@@ -11,10 +11,29 @@
     left: 0;
   }
 
+  .morematches {
+    text-align: center;
+    padding: 5px;
+  }
+
   .matchpanel {
     background: @OldLace;
     border-top-left-radius: 9px;
     border-top-right-radius: 9px;
+    width: 90%;
+    margin-left: 10%;
+
+    .title {
+      background: @Forest;
+      color: white;
+      border-top-left-radius: 9px;
+      border-top-right-radius: 9px;
+      font-size: 20px;
+      text-align: center;
+      padding: 5px;
+    }
+
+
     .match {
       color: black;
       &:hover {
@@ -23,7 +42,14 @@
       padding: 0.5rem;
       border-bottom: solid 1px @Forest;
       display: grid;
-      grid-template-columns: 4rem 2rem 2rem 1fr 1fr 3rem 4rem 4rem;
+
+      grid-template-areas: 
+      "ownteam ownlogo score opplogo oppteam"
+      "ownroster ownlogo score opplogo opproster"
+      "owncoach ownlogo score opplogo oppcoach";
+
+      grid-template-columns: 1fr auto auto auto 1fr;
+
       grid-gap: 0.5rem;
       place-items: center;
 
@@ -35,18 +61,57 @@
         justify-self: left;
       }
 
-      &.title {
-        background: @Forest;
-        color: white;
-        border-top-left-radius: 9px;
-        border-top-right-radius: 9px;
-      }
-
       &:not(.title) {
         &:hover {
           cursor: pointer;
           background: lighten(@OldLace, 10%);
         }
+      }
+
+      div {
+        width: 100%;
+      }
+
+      .matchscore {
+        grid-area: score;
+        text-align: center;
+        font-size: 18px;
+
+        .bold {
+            font-weight: bold;
+        }
+      }
+      .matchowncoach {
+        grid-area: owncoach;
+        text-align: right;
+      }
+      .matchoppcoach {
+        grid-area: oppcoach;
+        text-align: left;
+      }
+      .matchownteam {
+        font-size: 18px;
+        grid-area: ownteam;
+        text-align: right;
+      }
+      .matchoppteam {
+        font-size: 18px;
+        grid-area: oppteam;
+        text-align: left;
+      }
+      .matchownroster {
+        grid-area: ownroster;
+        text-align: right;
+      }
+      .matchopproster {
+        grid-area: opproster;
+        text-align: left;
+      }
+      .matchownlogo {
+        grid-area: ownlogo;
+      }
+      .matchopplogo {
+        grid-area: opplogo;
       }
     }
   }

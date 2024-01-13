@@ -75,7 +75,7 @@ class Die extends Vue {
     this.bgx = this.targetX;
     this.bgy = this.targetY;
 
-    setTimeout(this.tick.bind(this), 16);
+    window.requestAnimationFrame(() => this.tick());
   }
 
   @Emit
@@ -91,7 +91,7 @@ class Die extends Vue {
     pct = this.ease(Math.min(1, pct));
 
     if (pct < 1) {
-      setTimeout(this.tick.bind(this), 16);
+      window.requestAnimationFrame(() => this.tick());
     } else {
       this.complete(this.number);
     }

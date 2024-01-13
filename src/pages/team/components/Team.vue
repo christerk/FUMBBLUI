@@ -355,10 +355,10 @@
             </div>
             <div class="playerrowsfooter">
               <div class="playercount">
-                {{ team.countPlayersAvailableNextGame() }} players (+{{
+                {{ team.countPlayersAvailableNextGame() }} players <span v-if="team.countMissNextGamePlayers() > 0">(+{{
                   team.countMissNextGamePlayers()
                 }}
-                players missing next game)
+                players missing next game)</span>
               </div>
               <specialrules
                 :fumbbl-api="fumbblApi"

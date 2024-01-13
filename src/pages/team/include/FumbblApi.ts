@@ -404,8 +404,8 @@ export default class FumbblApi {
     return await this.enqueuePost(url);
   }
 
-  public async getTeamMatches(teamId: number): Promise<ApiResponse> {
-    const url = this.getUrl("/api/team/matches/" + teamId);
+  public async getTeamMatches(teamId: number, lastId: number = 0): Promise<ApiResponse> {
+    const url = this.getUrl("/api/team/matches/" + teamId + (lastId > 0 ? '/'+lastId : ''));
     return await this.enqueuePost(url);
   }
 
