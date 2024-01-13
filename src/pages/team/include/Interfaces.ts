@@ -159,7 +159,7 @@ export interface SetupTeamManagementSettings {
   };
   ruleset: {
     expensiveMistakes: {
-      active: boolean;
+      enabled: boolean;
       start: number;
     };
   };

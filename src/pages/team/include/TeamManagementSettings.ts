@@ -93,7 +93,7 @@ export default class TeamManagementSettings {
       },
       ruleset: {
         expensiveMistakes: {
-          active:
+          enabled:
             rawApiRuleset.options.rulesetOptions.expensiveMistakes === true ||
             rawApiRuleset.options.rulesetOptions.expensiveMistakes === "true",
           start: rawApiRuleset.options.rulesetOptions.expensiveMistakesStart,
@@ -148,8 +148,8 @@ export default class TeamManagementSettings {
     return this.settings.seasons.seasonLength;
   }
 
-  public get expensiveMistakesActive(): boolean {
-    return this.settings.ruleset.expensiveMistakes.active;
+  public get expensiveMistakesEnabled(): boolean {
+    return this.settings.ruleset.expensiveMistakes.enabled;
   }
 
   public get expensiveMistakesStart(): number {
