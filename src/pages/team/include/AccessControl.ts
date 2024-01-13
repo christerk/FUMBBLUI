@@ -111,6 +111,38 @@ export default class AccessControl {
           },
         ],
       },
+      {
+        action: "EDIT_BIO",
+        grantAccessToList: [
+          {
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: [
+              "NEW",
+              "ACTIVE",
+              "READY_FOR_TOURNAMENT",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "REDRAFTING",
+            ],
+          },
+        ],
+      },
+      {
+        action: "REPORT",
+        grantAccessToList: [
+          {
+            userRoles: ["NOT_OWNER"],
+            teamStatusValues: [
+              "NEW",
+              "ACTIVE",
+              "READY_FOR_TOURNAMENT",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "REDRAFTING",
+            ],
+          },
+        ],
+      },
     );
   }
 
@@ -175,5 +207,13 @@ export default class AccessControl {
 
   public canShowPlayerControls(): boolean {
     return this.isGranted("SHOW_PLAYER_CONTROLS");
+  }
+
+  public canEditBio(): boolean {
+    return this.isGranted("EDIT_BIO");
+  }
+
+  public canReport(): boolean {
+    return this.isGranted("REPORT");
   }
 }

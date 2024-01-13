@@ -12,6 +12,7 @@ export type UserRole =
   | "ANONYMOUS"
   | "LOGGED_IN"
   | "OWNER"
+  | "NOT_OWNER"
   | "LEAGUE_STAFF"
   | "SITE_STAFF";
 
@@ -35,7 +36,9 @@ export type TeamAction =
   | "VIEW_HISTORY"
   | "HIRE_ROOKIE"
   | "RENUMBER_PLAYERS"
-  | "SHOW_PLAYER_CONTROLS";
+  | "SHOW_PLAYER_CONTROLS"
+  | "EDIT_BIO"
+  | "REPORT";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;

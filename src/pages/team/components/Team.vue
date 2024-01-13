@@ -72,16 +72,69 @@
             </li>
             <div class="spacer"></div>
             <li
+              v-if="accessControl.canEditBio()"
+              class="menu"
+              @mouseenter="menuShow('misc')"
+              @mouseleave="menuHide('misc')"
+            >
+              <a @click.prevent="menuToggle('misc')" href="#"
+                >Edit
+                <img
+                  src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"
+              /></a>
+              <ul class="submenu" v-show="mainMenuShow === 'misc'">
+                <li>
+                  <a
+                    :href="`https://fumbbl.com/p/gallery3?team=${team.getId()}`"
+                    >Change Image</a
+                  >
+                </li>
+                <li>
+                  <a
+                    :href="`https://fumbbl.com/p/team?op=editbio&amp;team_id=${team.getId()}`"
+                    >Edit Bio</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li
+              v-else-if="accessControl.canReport()"
+              class="menu"
+              @mouseenter="menuShow('misc')"
+              @mouseleave="menuHide('misc')"
+            >
+              <a @click.prevent="menuToggle('misc')" href="#"
+                >Report
+                <img
+                  src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"
+              /></a>
+              <ul class="submenu" v-show="mainMenuShow === 'misc'">
+                <li>
+                  <a
+                    :href="`https://fumbbl.com/p/team?op=reportteam&team_id=${team.getId()}`"
+                    >Report</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li
               v-if="accessControl.canViewHistory()"
               class="menu"
               @mouseenter="menuShow('show')"
               @mouseleave="menuHide('show')"
             >
               <a @click.prevent="menuToggle('show')" href="#"
-                >Show<img
+                >Show
+                <img
                   src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"
               /></a>
               <ul class="submenu" v-show="mainMenuShow === 'show'">
+                <li v-if="team.isLeagueDivision()" class="menu">
+                  <a
+                    :href="`https://fumbbl.com/p/teamoptions?id=${team.getId()}`"
+                    >Team options</a
+                  >
+                </li>
                 <li>
                   <a
                     :href="`https://fumbbl.com/p/team?op=log&team_id=${team.getId()}`"
@@ -121,42 +174,6 @@
                 <li>
                   <a :href="`https://fumbbl.com/p/yearbook?team_id=${team.id}`"
                     >Yearbook</a
-                  >
-                </li>
-              </ul>
-            </li>
-            <li v-if="team.isLeagueDivision()" class="menu">
-              <a :href="`https://fumbbl.com/p/teamoptions?id=${team.getId()}`"
-                >Team options</a
-              >
-            </li>
-            <li
-              class="menu"
-              @mouseenter="menuShow('misc')"
-              @mouseleave="menuHide('misc')"
-            >
-              <a @click.prevent="menuToggle('misc')" href="#"
-                >Misc
-                <img
-                  src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"
-              /></a>
-              <ul class="submenu" v-show="mainMenuShow === 'misc'">
-                <li>
-                  <a
-                    :href="`https://fumbbl.com/p/gallery3?team=${team.getId()}`"
-                    >Change Image</a
-                  >
-                </li>
-                <li>
-                  <a
-                    :href="`https://fumbbl.com/p/team?op=editbio&amp;team_id=${team.getId()}`"
-                    >Edit Bio</a
-                  >
-                </li>
-                <li>
-                  <a
-                    :href="`https://fumbbl.com/p/team?op=reportteam&team_id=${team.getId()}`"
-                    >Report</a
                   >
                 </li>
               </ul>
@@ -1031,6 +1048,8 @@ class TeamComponent extends Vue {
 
     if (this.team.getCoach().name === this.coachName) {
       this.userRoles.push("OWNER");
+    } else {
+      this.userRoles.push("NOT_OWNER");
     }
 
     if (this.team.getTeamStatus().isNew()) {
