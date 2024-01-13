@@ -496,7 +496,13 @@
               ></addremove>
             </div>
           </div>
-          <div v-if="accessControl.canViewHistory()" class="teammanagementrow">
+          <div
+            v-if="
+              teamManagementSettings.seasonsEnabled &&
+              accessControl.canViewHistory()
+            "
+            class="teammanagementrow"
+          >
             <div class="title left">Games this Season:</div>
             <div class="info left">
               {{ team.getGamesPlayedInSeason() }} /

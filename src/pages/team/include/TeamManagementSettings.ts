@@ -89,6 +89,9 @@ export default class TeamManagementSettings {
         },
       },
       seasons: {
+        enabled:
+          rawApiRuleset.options.rulesetOptions.seasons === true ||
+          rawApiRuleset.options.rulesetOptions.seasons === "true",
         seasonLength: rawApiRuleset.options.rulesetOptions.seasonLength,
       },
       ruleset: {
@@ -142,6 +145,10 @@ export default class TeamManagementSettings {
 
   public get nameGenerator() {
     return this.settings.players.nameGenerator;
+  }
+
+  public get seasonsEnabled(): number {
+    return this.settings.seasons.enabled;
   }
 
   public get seasonLength(): number {

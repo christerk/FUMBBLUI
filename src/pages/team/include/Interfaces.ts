@@ -155,6 +155,7 @@ export interface SetupTeamManagementSettings {
     };
   };
   seasons: {
+    enabled: boolean;
     seasonLength: number;
   };
   ruleset: {
