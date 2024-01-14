@@ -71,7 +71,7 @@
               >
             </li>
             <li
-              v-if="accessControl.showAdminMenu()"
+              v-if="accessControl.canShowAdminMenu()"
               class="menu"
               @mouseenter="menuShow('admin')"
               @mouseleave="menuHide('admin')"
@@ -81,6 +81,7 @@
                 <li v-if="accessControl.canUnreadyTeam()">
                   <a href="#" @click.prevent="unreadyTeam()">Unready</a>
                 </li>
+                <li v-else>Under construction</li>
               </ul>
             </li>
             <div class="spacer"></div>
@@ -1711,26 +1712,24 @@ class TeamComponent extends Vue {
       this.readyToPlayTriggered = false;
       this.modals.readyTeam = true;
     } else {
-      this.team.setTeamStatus("Active");
+      this.team.setTeamStatus("ACTIVE");
       this.triggerReadyToPlay();
     }
   }
 
   public async unreadyTeam() {
-    this.team.setTeamStatus("Post Match Sequence");
-     const apiResponse = await this.fumbblApi.unreadyTeam(
-      this.team.getId()
-    );
+    const originalTeamStatus = this.team.getTeamStatus();
+    this.team.setTeamStatus("POST_MATCH_SEQUENCE");
+    this.reloadTeamWithDelay();
+    const apiResponse = await this.fumbblApi.unreadyTeam(this.team.getId());
 
-     if (apiResponse.isSuccessful()) {
-      await this.reloadTeam();
-     } else {
-      this.team.setTeamStatus("Ready");
+    if (!apiResponse.isSuccessful()) {
+      this.team.setTeamStatus(originalTeamStatus.getStatus());
       await this.recoverFromUnexpectedError(
-        "An error occurred unretiring the team.",
+        "An error occurred unreadying the team.",
         apiResponse.getErrorMessage(),
-      );      
-     }
+      );
+    }
   }
 
   public async showSkillPlayer(player: Player) {

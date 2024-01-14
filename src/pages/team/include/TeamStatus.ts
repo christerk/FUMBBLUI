@@ -2,11 +2,28 @@ import { TeamStatusValue } from "./Interfaces";
 
 export default class TeamStatus {
   private status: TeamStatusValue = "NEW";
-  private displayNames: Map<TeamStatusValue, string>;
+  private displayNames: Map<TeamStatusValue, string> = new Map<
+    TeamStatusValue,
+    string
+  >([
+    ["NEW", "New"],
+    ["ACTIVE", "Active"],
+    ["READY_FOR_TOURNAMENT", "Ready for Tournament"],
+    ["WAITING_FOR_OPPONENT", "Waiting for Opponent"],
+    ["SKILL_ROLLS_PENDING", "Skill Rolls Pending"],
+    ["POST_MATCH_SEQUENCE", "Post-Match"],
+    ["REDRAFTING", "Redrafting"],
+    ["RETIRED", "Retired"],
+    ["PENDING_APPROVAL", "Reported"],
+    ["BLOCKED", "Blocked"],
+  ]);
 
-  constructor(rawApiStatus?: string) {
-    rawApiStatus = rawApiStatus !== undefined ? rawApiStatus : "New";
-    const statusLookup = {
+  constructor(teamStatusValue: TeamStatusValue) {
+    this.status = teamStatusValue;
+  }
+
+  static fromApi(rawApiStatus: string): TeamStatus {
+    const statusLookup: any = {
       New: "NEW", // Newly created, not yet submitted. Full edit capability
       Active: "ACTIVE", // Ready to Play. Shouldn't be able to do things that affect CTV or on-pitch effects. Should still allow reordering of the players and things like icons / genders of players.
       "Ready for Tournament": "READY_FOR_TOURNAMENT", // Clone of Active (Ready to Play). The only current use is to prevent these teams from being accidentally enrolled into the Blackbox scheduler.
@@ -19,21 +36,7 @@ export default class TeamStatus {
       Blocked: "BLOCKED", // I don't remember fully what this does
     };
 
-    this.displayNames = new Map<TeamStatusValue, string>([
-      ["NEW", "New"],
-      ["ACTIVE", "Active"],
-      ["READY_FOR_TOURNAMENT", "Ready for Tournament"],
-      ["WAITING_FOR_OPPONENT", "Waiting for Opponent"],
-      ["SKILL_ROLLS_PENDING", "Skill Rolls Pending"],
-      ["POST_MATCH_SEQUENCE", "Post-Match"],
-      ["REDRAFTING", "Redrafting"],
-      ["RETIRED", "Retired"],
-      ["PENDING_APPROVAL", "Reported"],
-      ["BLOCKED", "Blocked"],
-    ]);
-
-    this.statusName = rawApiStatus;
-    this.status = statusLookup[rawApiStatus];
+    return new TeamStatus(statusLookup[rawApiStatus]);
   }
 
   public getStatus() {

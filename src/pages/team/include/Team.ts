@@ -1,4 +1,4 @@
-import { Coach } from "./Interfaces";
+import { Coach, TeamStatusValue } from "./Interfaces";
 import Player from "./Player";
 import RosterIconManager from "./RosterIconManager";
 import TeamManagementSettings from "./TeamManagementSettings";
@@ -9,7 +9,7 @@ export default class Team {
   private readonly LEAGUE_DIVISION_NAME: string = "League";
   private readonly QUANTITY_ALLOWED_DENOTING_LINEMEN: number = 12;
   public id: number = 0;
-  private teamStatus: TeamStatus = new TeamStatus();
+  private teamStatus: TeamStatus = new TeamStatus("NEW");
   private name: string = "";
   private division: string = "";
   private coach: Coach = null;
@@ -69,7 +69,7 @@ export default class Team {
       teamManagementSettings.maxPlayers,
     );
     team.id = rawApiTeam.id;
-    team.teamStatus = new TeamStatus(rawApiTeam.status);
+    team.teamStatus = TeamStatus.fromApi(rawApiTeam.status);
     team.name = rawApiTeam.name;
     team.coach = {
       id: rawApiTeam.coach.id,
@@ -143,8 +143,8 @@ export default class Team {
     return this.teamStatus;
   }
 
-  public setTeamStatus(newStatus: string) {
-    this.teamStatus = new TeamStatus(newStatus);
+  public setTeamStatus(teamStatusValue: TeamStatusValue) {
+    this.teamStatus = new TeamStatus(teamStatusValue);
   }
 
   public getName(): string {

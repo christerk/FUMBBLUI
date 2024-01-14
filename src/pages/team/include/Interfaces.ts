@@ -33,12 +33,14 @@ export type TeamAction =
   | "EDIT"
   | "RETIRE_TEAM"
   | "READY_TEAM"
+  | "UNREADY_TEAM"
   | "VIEW_HISTORY"
   | "HIRE_ROOKIE"
   | "RENUMBER_PLAYERS"
   | "SHOW_PLAYER_CONTROLS"
   | "EDIT_BIO"
-  | "REPORT";
+  | "REPORT"
+  | "SHOW_ADMIN_MENU";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;

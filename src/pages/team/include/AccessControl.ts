@@ -152,6 +152,22 @@ export default class AccessControl {
           },
         ],
       },
+      {
+        action: "SHOW_ADMIN_MENU",
+        grantAccessToList: [
+          {
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: [
+              "NEW",
+              "ACTIVE",
+              "READY_FOR_TOURNAMENT",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "REDRAFTING",
+            ],
+          },
+        ],
+      },
     );
   }
 
@@ -186,8 +202,8 @@ export default class AccessControl {
     return false;
   }
 
-  public showAdminMenu(): boolean {
-    return this.canUnreadyTeam();
+  public canShowAdminMenu(): boolean {
+    return this.isGranted("SHOW_ADMIN_MENU");
   }
 
   public canEdit(): boolean {
