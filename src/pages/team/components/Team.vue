@@ -70,6 +70,26 @@
                 >Hire Players</a
               >
             </li>
+            <li 
+              v-if="accessControl.showAdminMenu()"
+              class="menu"
+              @mouseenter="menuShow('admin')"
+              @mouseleave="menuHide('admin')"
+            >
+              <a
+                href="#"
+                >Admin</a>
+              <ul class="submenu" v-show="mainMenuShow === 'admin'">
+                <li
+                  v-if="accessControl.canUnreadyTeam()"
+                >
+                  <a
+                  href="#"
+                  @click.prevent="unreadyTeam()"
+                  >Unready</a>
+                </li>
+              </ul>
+            </li>
             <div class="spacer"></div>
             <li
               v-if="accessControl.canEditBio()"
@@ -1702,6 +1722,23 @@ class TeamComponent extends Vue {
       this.team.setTeamStatus("Active");
       this.triggerReadyToPlay();
     }
+  }
+
+  public async unreadyTeam() {
+    this.team.setTeamStatus("Post Match Sequence");
+     const apiResponse = await this.fumbblApi.unreadyTeam(
+      this.team.getId()
+    );
+
+     if (apiResponse.isSuccessful()) {
+      await this.reloadTeam();
+     } else {
+      this.team.setTeamStatus("Ready");
+      await this.recoverFromUnexpectedError(
+        "An error occurred unretiring the team.",
+        apiResponse.getErrorMessage(),
+      );      
+     }
   }
 
   public async showSkillPlayer(player: Player) {
