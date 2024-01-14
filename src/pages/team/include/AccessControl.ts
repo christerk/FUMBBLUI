@@ -75,6 +75,15 @@ export default class AccessControl {
         ],
       },
       {
+        action: "UNREADY_TEAM",
+        grantAccessToList: [
+          {
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["ACTIVE"],
+          },
+        ],
+      },
+      {
         action: "RETIRE_TEAM",
         grantAccessToList: [
           {
@@ -177,6 +186,10 @@ export default class AccessControl {
     return false;
   }
 
+  public showAdminMenu(): boolean {
+    return this.canUnreadyTeam();
+  }
+
   public canEdit(): boolean {
     return this.isGrantedAny(["CREATE", "EDIT"]);
   }
@@ -187,6 +200,10 @@ export default class AccessControl {
 
   public canReadyTeam(): boolean {
     return this.isGranted("READY_TEAM");
+  }
+
+  public canUnreadyTeam(): boolean {
+    return this.isGranted("UNREADY_TEAM");
   }
 
   public canCreate(): boolean {
