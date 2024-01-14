@@ -70,23 +70,16 @@
                 >Hire Players</a
               >
             </li>
-            <li 
+            <li
               v-if="accessControl.showAdminMenu()"
               class="menu"
               @mouseenter="menuShow('admin')"
               @mouseleave="menuHide('admin')"
             >
-              <a
-                href="#"
-                >Admin</a>
+              <a href="#">Admin</a>
               <ul class="submenu" v-show="mainMenuShow === 'admin'">
-                <li
-                  v-if="accessControl.canUnreadyTeam()"
-                >
-                  <a
-                  href="#"
-                  @click.prevent="unreadyTeam()"
-                  >Unready</a>
+                <li v-if="accessControl.canUnreadyTeam()">
+                  <a href="#" @click.prevent="unreadyTeam()">Unready</a>
                 </li>
               </ul>
             </li>

@@ -406,7 +406,6 @@ export default class FumbblApi {
     );
   }
 
-
   public async getTeamStats(teamId: number): Promise<ApiResponse> {
     const url = this.getUrl("/api/team/stats/" + teamId);
     return await this.enqueuePost(url);
