@@ -132,7 +132,7 @@
               </ul>
             </li>
             <li
-              v-if="accessControl.canViewHistory()"
+              v-if="accessControl.canViewHistory() || team.isLeagueDivision()"
               class="menu"
               @mouseenter="menuShow('show')"
               @mouseleave="menuHide('show')"
@@ -149,47 +149,50 @@
                     >Team options</a
                   >
                 </li>
-                <li>
-                  <a
-                    :href="`https://fumbbl.com/p/team?op=log&team_id=${team.getId()}`"
-                    >Log</a
-                  >
-                </li>
-                <li>
-                  <a href="#" @click.prevent="showTeamPanel('teammatches')"
-                    >Matches</a
-                  >
-                </li>
-                <li>
-                  <a href="#" @click.prevent="showTeamPanel('teamstats')"
-                    >Stats</a
-                  >
-                </li>
-                <li>
-                  <a
-                    :href="`https://fumbbl.com/p/team?op=development&team_id=${team.id}`"
-                    >Development</a
-                  >
-                </li>
-                <li>
-                  <a
-                    :href="`https://fumbbl.com/p/team?op=pastplayers&team_id=${team.id}`"
-                    >Past Players</a
-                  >
-                </li>
-                <li>
-                  <a
-                    :href="`https://fumbbl.com/~${
-                      team.getCoach().name
-                    }/${team.getName()}`"
-                    >View Roster</a
-                  >
-                </li>
-                <li>
-                  <a :href="`https://fumbbl.com/p/yearbook?team_id=${team.id}`"
-                    >Yearbook</a
-                  >
-                </li>
+                <template v-if="accessControl.canViewHistory()">
+                  <li>
+                    <a
+                      :href="`https://fumbbl.com/p/team?op=log&team_id=${team.getId()}`"
+                      >Log</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#" @click.prevent="showTeamPanel('teammatches')"
+                      >Matches</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#" @click.prevent="showTeamPanel('teamstats')"
+                      >Stats</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      :href="`https://fumbbl.com/p/team?op=development&team_id=${team.id}`"
+                      >Development</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      :href="`https://fumbbl.com/p/team?op=pastplayers&team_id=${team.id}`"
+                      >Past Players</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      :href="`https://fumbbl.com/~${
+                        team.getCoach().name
+                      }/${team.getName()}`"
+                      >View Roster</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      :href="`https://fumbbl.com/p/yearbook?team_id=${team.id}`"
+                      >Yearbook</a
+                    >
+                  </li>
+                </template>
               </ul>
             </li>
           </ul>
