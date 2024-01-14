@@ -1139,7 +1139,6 @@ class TeamComponent extends Vue {
         this.userRoles,
         this.team.getTeamStatus().getStatus(),
       );
-      console.log(this.dataAccessControl);
     } else {
       this.triggerUnexpectedError(
         "Loading team information: " + apiResponse.getErrorMessage(),
