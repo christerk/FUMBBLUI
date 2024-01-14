@@ -73,15 +73,11 @@ export default class TeamManagement extends Vue {
   mounted() {
     this.fumbblApi = new FumbblApi();
 
-    const teamIdFromAttribute = document
-      .getElementById("app")!
-      .getAttribute("teamid");
-    const siteStaffFromAttribute = document
-      .getElementById("app")!
-      .getAttribute("sitestaff");
-    const leagueStaffFromAttribute = document
-      .getElementById("app")!
-      .getAttribute("leaguestaff");
+    const appElement = document.getElementById("app")!;
+    const teamIdFromAttribute = appElement.getAttribute("teamid")!;
+    const siteStaffFromAttribute = appElement.getAttribute("sitestaff")!;
+    const leagueStaffFromAttribute = appElement.getAttribute("leaguestaff")!;
+
     this.teamId = Number(teamIdFromAttribute);
     this.isSiteStaff = /true/i.test(siteStaffFromAttribute);
     this.isLeagueStaff = /true/i.test(leagueStaffFromAttribute);
