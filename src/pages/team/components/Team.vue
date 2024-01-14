@@ -1030,7 +1030,7 @@ class TeamComponent extends Vue {
   private teamSheetHidden: boolean = false;
 
   private sidePanel: string = "";
-  private showSidePanel: bool = false;
+  private showSidePanel: boolean = false;
   private playerListKey: number = 0;
 
   public modals: {

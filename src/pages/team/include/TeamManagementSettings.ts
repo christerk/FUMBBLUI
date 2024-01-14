@@ -147,7 +147,7 @@ export default class TeamManagementSettings {
     return this.settings.players.nameGenerator;
   }
 
-  public get seasonsEnabled(): number {
+  public get seasonsEnabled(): boolean {
     return this.settings.seasons.enabled;
   }
 
