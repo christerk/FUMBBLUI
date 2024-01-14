@@ -171,7 +171,7 @@
         {{ displayInjuries(player.getInjuries()) }}
       </div>
       <div v-if="!player.IsEmpty" class="cell spp" :title="sppSummaryText">
-        <template v-if="isLegend"
+        <template v-if="player.IsLegend"
           >Legend
           <div class="legendspptotal">{{ sppDisplayInfo.total }}</div>
         </template>
@@ -472,12 +472,8 @@ class PlayerComponent extends Vue {
     return this.player.sppDisplayInfo;
   }
 
-  public get isLegend(): boolean {
-    return this.player.sppDisplayInfo.maxLimit === null;
-  }
-
   public get sppSummaryText(): string {
-    if (this.isLegend) {
+    if (this.player.IsLegend) {
       return "Player has reached Legend.";
     }
 

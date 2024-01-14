@@ -36,6 +36,7 @@ export default class Team {
   } = { redraftCap: 0, cappedBudget: 0, tooltip: "" };
   private maxPlayers: 0;
   public record: any = {};
+  private sppLimits: any;
 
   constructor(
     division: string,
@@ -90,6 +91,7 @@ export default class Team {
     team.redrafting.cappedBudget = rawApiTeam.redrafting.cappedBudget;
     team.redrafting.tooltip = rawApiTeam.redrafting.tooltip;
     team.record = rawApiTeam.record;
+    team.sppLimits = rawApiTeam.skillLimits.spp;
 
     team.initializePlayers();
 
@@ -113,6 +115,7 @@ export default class Team {
           teamManagementSettings.getPosition(rawApiPlayer.positionId),
           iconRowVersionPosition,
           isJourneyman,
+          team.getNumberOfSkillsForLegend(),
         ),
       );
     }
@@ -361,6 +364,10 @@ export default class Team {
 
   public countPlayersAvailableNextGame(): number {
     return this.getRosteredPlayers().length - this.countMissNextGamePlayers();
+  }
+
+  public getNumberOfSkillsForLegend(): number {
+    return this.sppLimits.length;
   }
 
   public updateDedicatedFans(

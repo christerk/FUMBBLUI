@@ -35,6 +35,7 @@ export default class Player {
   private type: PlayerType = "NORMAL";
   public id: number = 0;
   private version: number = 0;
+  private numberOfSkillsForLegend: number = 9999;
 
   constructor(
     type: PlayerType,
@@ -80,6 +81,7 @@ export default class Player {
     position: Position,
     iconRowVersionPosition: number,
     isJourneyman: boolean,
+    numberOfSkillsForLegend: number,
   ): Player {
     const player = new Player(
       "NORMAL",
@@ -124,6 +126,7 @@ export default class Player {
       maxLimit: rawApiPlayer.skillStatus.maxLimit,
       tier: rawApiPlayer.skillStatus.tier,
     };
+    player.numberOfSkillsForLegend = numberOfSkillsForLegend;
 
     player.isRefundable = rawApiPlayer.refundable;
 
@@ -193,6 +196,10 @@ export default class Player {
 
   public set number(value) {
     this.playerNumber = value;
+  }
+
+  public get IsLegend(): bool {
+    return this.skills.length === this.numberOfSkillsForLegend;
   }
 
   public getPlayerNumber(): number {
