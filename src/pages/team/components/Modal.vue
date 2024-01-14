@@ -21,7 +21,7 @@
             @click="triggerCancel"
             aria-label="Close modal"
           >
-            x
+            &#10006;
           </button>
         </header>
 
