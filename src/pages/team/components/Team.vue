@@ -1155,6 +1155,7 @@ class TeamComponent extends Vue {
       this.dataAccessControl = new AccessControl(
         this.userRoles,
         this.team.getTeamStatus().getStatus(),
+        this.teamManagementSettings.isProgression,
       );
     } else {
       this.triggerUnexpectedError(
@@ -1236,6 +1237,7 @@ class TeamComponent extends Vue {
         rawApiRoster,
         hasLowCostLinemen,
       );
+
       const rulesetVersion = rawApiRuleset.options.rulesetOptions.version;
       const skillProgressionType =
         rawApiRuleset.options.teamSettings.skillProgressionType;

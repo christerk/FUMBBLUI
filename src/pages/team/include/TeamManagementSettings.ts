@@ -101,6 +101,8 @@ export default class TeamManagementSettings {
             rawApiRuleset.options.rulesetOptions.expensiveMistakes === "true",
           start: rawApiRuleset.options.rulesetOptions.expensiveMistakesStart,
         },
+        isProgression:
+          rawApiRuleset.options.teamSettings.teamProgression === "standard",
       },
     };
 
@@ -161,6 +163,10 @@ export default class TeamManagementSettings {
 
   public get expensiveMistakesStart(): number {
     return this.settings.ruleset.expensiveMistakes.start * 1000;
+  }
+
+  public get isProgression(): boolean {
+    return this.settings.ruleset.isProgression;
   }
 
   public get startPlayers() {

@@ -168,6 +168,7 @@ export interface SetupTeamManagementSettings {
       enabled: boolean;
       start: number;
     };
+    isProgression: boolean;
   };
 }
 

@@ -9,10 +9,68 @@ export default class AccessControl {
   private accessRules: ActionGrantAccessTo[] = [];
   private userRoles: UserRole[] = [];
   private teamStatus: TeamStatusValue = "RETIRED";
+  private isProgression: boolean = true;
 
-  constructor(userRoles: UserRole[], teamStatus: TeamStatusValue) {
+  constructor(
+    userRoles: UserRole[],
+    teamStatus: TeamStatusValue,
+    isProgression: boolean,
+  ) {
     this.userRoles = userRoles;
     this.teamStatus = teamStatus;
+    this.isProgression = isProgression;
+
+    if (this.isProgression) {
+      this.accessRules.push(
+        {
+          action: "EDIT",
+          grantAccessToList: [
+            {
+              userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+              teamStatusValues: [
+                "NEW",
+                "POST_MATCH_SEQUENCE",
+                "SKILL_ROLLS_PENDING",
+              ],
+            },
+          ],
+        },
+        {
+          action: "HIRE_ROOKIE",
+          grantAccessToList: [
+            {
+              userRoles: ["OWNER"],
+              teamStatusValues: [
+                "NEW",
+                "POST_MATCH_SEQUENCE",
+                "SKILL_ROLLS_PENDING",
+              ],
+            },
+          ],
+        },
+      );
+    } else {
+      this.accessRules.push(
+        {
+          action: "EDIT",
+          grantAccessToList: [
+            {
+              userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+              teamStatusValues: ["NEW"],
+            },
+          ],
+        },
+        {
+          action: "HIRE_ROOKIE",
+          grantAccessToList: [
+            {
+              userRoles: ["OWNER"],
+              teamStatusValues: ["NEW"],
+            },
+          ],
+        },
+      );
+    }
 
     this.accessRules.push(
       {
@@ -21,19 +79,6 @@ export default class AccessControl {
           {
             userRoles: ["OWNER"],
             teamStatusValues: ["NEW"],
-          },
-        ],
-      },
-      {
-        action: "HIRE_ROOKIE",
-        grantAccessToList: [
-          {
-            userRoles: ["OWNER"],
-            teamStatusValues: [
-              "NEW",
-              "POST_MATCH_SEQUENCE",
-              "SKILL_ROLLS_PENDING",
-            ],
           },
         ],
       },
@@ -48,19 +93,6 @@ export default class AccessControl {
               "POST_MATCH_SEQUENCE",
               "SKILL_ROLLS_PENDING",
               "READY_FOR_TOURNAMENT",
-            ],
-          },
-        ],
-      },
-      {
-        action: "EDIT",
-        grantAccessToList: [
-          {
-            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
-            teamStatusValues: [
-              "NEW",
-              "POST_MATCH_SEQUENCE",
-              "SKILL_ROLLS_PENDING",
             ],
           },
         ],
