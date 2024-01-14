@@ -5,6 +5,8 @@
       :fumbbl-api="fumbblApi"
       :coach-name="coachName"
       :team-id="teamId"
+      :isSiteStaff="isSiteStaff"
+      :isLeagueStaff="isLeagueStaff"
       @unexpected-error="handleUnexpectedError"
       @delete-team="handleDeleteTeam"
     ></team>
@@ -65,6 +67,8 @@ export default class TeamManagement extends Vue {
   public fumbblApi?: FumbblApi = undefined;
   public unexpectedErrorMessage?: string = undefined;
   public teamDeleted: boolean = false;
+  public isLeagueStaff: boolean = false;
+  public isSiteStaff: boolean = false;
 
   mounted() {
     this.fumbblApi = new FumbblApi();
@@ -72,7 +76,15 @@ export default class TeamManagement extends Vue {
     const teamIdFromAttribute = document
       .getElementById("app")!
       .getAttribute("teamid");
+    const siteStaffFromAttribute = document
+      .getElementById("app")!
+      .getAttribute("sitestaff");
+    const leagueStaffFromAttribute = document
+      .getElementById("app")!
+      .getAttribute("leaguestaff");
     this.teamId = Number(teamIdFromAttribute);
+    this.isSiteStaff = (/true/i).test(siteStaffFromAttribute);
+    this.isLeagueStaff = (/true/i).test(leagueStaffFromAttribute);
 
     const coachName = document.getElementById("app")!.getAttribute("coach")!;
     this.coachName = coachName;

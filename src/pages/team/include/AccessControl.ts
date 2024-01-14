@@ -69,7 +69,7 @@ export default class AccessControl {
         action: "READY_TEAM",
         grantAccessToList: [
           {
-            userRoles: ["OWNER"],
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
             teamStatusValues: ["POST_MATCH_SEQUENCE"],
           },
         ],
@@ -186,7 +186,7 @@ export default class AccessControl {
   }
 
   public canReadyTeam(): boolean {
-    return this.isGrantedAny(["READY_TEAM"]);
+    return this.isGranted("READY_TEAM");
   }
 
   public canCreate(): boolean {

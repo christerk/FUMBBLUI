@@ -950,6 +950,18 @@ class TeamComponent extends Vue {
   })
   public teamId!: number;
 
+  @Prop({
+    type: Boolean,
+    required: true,
+  })
+  public isSiteStaff!: boolean;
+
+  @Prop({
+    type: Boolean,
+    required: true,
+  })
+  public isLeagueStaff!: boolean;
+
   @Emit("unexpected-error")
   public triggerUnexpectedError(errorMessage: string): string {
     return errorMessage;
@@ -1053,6 +1065,14 @@ class TeamComponent extends Vue {
       this.userRoles.push("NOT_OWNER");
     }
 
+    if (this.isSiteStaff) {
+      this.userRoles.push("SITE_STAFF");
+    }
+
+    if (this.isLeagueStaff) {
+      this.userRoles.push("LEAGUE_STAFF");
+    }
+
     if (this.team.getTeamStatus().isNew()) {
       this.showHireRookies = true;
     }
@@ -1119,6 +1139,7 @@ class TeamComponent extends Vue {
         this.userRoles,
         this.team.getTeamStatus().getStatus(),
       );
+      console.log(this.dataAccessControl);
     } else {
       this.triggerUnexpectedError(
         "Loading team information: " + apiResponse.getErrorMessage(),
