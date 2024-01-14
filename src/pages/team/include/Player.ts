@@ -199,7 +199,10 @@ export default class Player {
   }
 
   public get IsLegend(): bool {
-    return this.skills.length === this.numberOfSkillsForLegend;
+    return (
+      this.numberOfSkillsForLegend > 0 &&
+      this.skills.length === this.numberOfSkillsForLegend
+    );
   }
 
   public getPlayerNumber(): number {
