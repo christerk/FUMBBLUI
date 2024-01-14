@@ -83,8 +83,8 @@ export default class TeamManagement extends Vue {
       .getElementById("app")!
       .getAttribute("leaguestaff");
     this.teamId = Number(teamIdFromAttribute);
-    this.isSiteStaff = (/true/i).test(siteStaffFromAttribute);
-    this.isLeagueStaff = (/true/i).test(leagueStaffFromAttribute);
+    this.isSiteStaff = /true/i.test(siteStaffFromAttribute);
+    this.isLeagueStaff = /true/i.test(leagueStaffFromAttribute);
 
     const coachName = document.getElementById("app")!.getAttribute("coach")!;
     this.coachName = coachName;
