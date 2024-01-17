@@ -902,6 +902,15 @@
       @nominate-retire-player-confirm="handleNominateRetirePlayerConfirm"
     ></retireplayer>
   </div>
+  <div class="team" v-else>
+    <div class="teamheader loading">
+      <Spinner></Spinner>
+    </div>
+    <div class="container">
+      <div class="panel loadersheet">
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -914,7 +923,7 @@ import {
   Emit,
   Ref,
 } from "vue-facing-decorator";
-import { SortableTable, Die } from "@components/fumbblcomponents";
+import { SortableTable, Die, Spinner } from "@components/fumbblcomponents";
 import {
   AddRemovePermissions,
   JourneymanQuantityChoice,
@@ -962,7 +971,8 @@ import {
     Die,
     TeamStats,
     TeamMatches,
-    TeamBio
+    TeamBio,
+    Spinner
   },
 })
 class TeamComponent extends Vue {
