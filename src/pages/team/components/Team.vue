@@ -143,7 +143,13 @@
                   src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"
               /></a>
               <ul class="submenu" v-show="mainMenuShow === 'show'">
-                <li v-if="team.isLeagueDivision()" class="menu">
+                  <li>
+                    <a
+                      href="#" @click.prevent="showTeamPanel('teambio')"
+                      >Bio</a
+                    >
+                  </li>
+                  <li v-if="team.isLeagueDivision()" class="menu">
                   <a
                     :href="`https://fumbbl.com/p/teamoptions?id=${team.getId()}`"
                     >Team options</a
@@ -589,6 +595,15 @@
             :fumbblApi="fumbblApi"
           ></TeamMatches>
         </div>
+        <div v-show="sidePanel == 'teambio'" class="teambio">
+          <TeamBio
+            ref="teamBio"
+            @unexpected-error="triggerUnexpectedError"
+            @close="showTeamPanel('main')"
+            :team="team"
+            :fumbblApi="fumbblApi"
+          ></TeamBio>
+        </div>
       </div>
     </div>
     <modal
@@ -925,6 +940,7 @@ import FumbblApi from "../include/FumbblApi";
 import Player from "../include/Player";
 import TeamStats from "./TeamStats.vue";
 import TeamMatches from "./TeamMatches.vue";
+import TeamBio from "./TeamBio.vue";
 
 import {
   EventDataFoldOut,
@@ -946,6 +962,7 @@ import {
     Die,
     TeamStats,
     TeamMatches,
+    TeamBio
   },
 })
 class TeamComponent extends Vue {
@@ -1000,6 +1017,8 @@ class TeamComponent extends Vue {
   private teamStats: TeamStats;
   @Ref
   private teamMatches: TeamMatches;
+  @Ref
+  private teamBio: TeamBio;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
 
@@ -1113,6 +1132,9 @@ class TeamComponent extends Vue {
         break;
       case "teammatches":
         await this.teamMatches.loadMatches();
+        break;
+      case "teambio":
+        await this.teamBio.loadBio();
         break;
     }
 

@@ -37,6 +37,8 @@ export default class Team {
   private maxPlayers: 0;
   public record: any = {};
   private sppLimits: any;
+  private bio: string;
+  private logo: number;
 
   constructor(
     division: string,
@@ -92,6 +94,8 @@ export default class Team {
     team.redrafting.tooltip = rawApiTeam.redrafting.tooltip;
     team.record = rawApiTeam.record;
     team.sppLimits = rawApiTeam.skillLimits.spp;
+    team.bio = rawApiTeam.bio.htmlBio;
+    team.logo = parseInt(rawApiTeam.bio.image);
 
     team.initializePlayers();
 
