@@ -10,14 +10,23 @@ export default class FumbblApi {
   private enableOauth: boolean = false;
   private accessToken: string = "";
   private tokenExpiry: number = 0;
+  private baseApiUrl: string = "";
 
   constructor() {
     this.queue = new PromiseQueue();
     this.enableOauth = import.meta.env.VITE_ENABLE_OAUTH == "true";
+
+    let apiBase = import.meta.env.VITE_API_URL;
+
+    if (!apiBase) {
+      apiBase = window.location.origin;
+    }
+
+    this.baseApiUrl = apiBase;
   }
 
   protected getUrl(apiUrl: string): string {
-    return import.meta.env.VITE_API_URL + apiUrl;
+    return this.baseApiUrl + apiUrl;
   }
 
   protected async getAccessToken(): string {
