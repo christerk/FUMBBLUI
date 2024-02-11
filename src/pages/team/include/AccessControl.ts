@@ -102,7 +102,7 @@ export default class AccessControl {
         grantAccessToList: [
           {
             userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
-            teamStatusValues: ["POST_MATCH_SEQUENCE"],
+            teamStatusValues: ["POST_MATCH_SEQUENCE", "READY_FOR_TOURNAMENT"],
           },
         ],
       },

@@ -10,7 +10,7 @@ export default class FumbblApi {
   private enableOauth: boolean = false;
   private accessToken: string = "";
   private tokenExpiry: number = 0;
-  private baseApiUrl: string = "";
+  public baseApiUrl: string = "";
 
   constructor() {
     this.queue = new PromiseQueue();
@@ -412,6 +412,13 @@ export default class FumbblApi {
     return await this.simplePostWithOnlyTeamIdInBody(
       teamId,
       this.getUrl("/api/team/unready"),
+    );
+  }
+
+  public async skipTournament(teamId: number): Promise<ApiResponse> {
+    return await this.simplePostWithOnlyTeamIdInBody(
+      teamId,
+      this.getUrl("/api/team/skipTournament"),
     );
   }
 

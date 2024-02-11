@@ -44,6 +44,18 @@
             >
               Complete
             </button>
+
+            <button
+              v-if="
+                team.getTeamStatus().isReadyForTournament() &&
+                accessControl.canReadyTeam()
+              "
+              class="menu"
+              @click="interceptSkipTournament"
+            >
+              Play on
+            </button>
+
             <button
               v-else-if="
                 team.getTeamStatus().isNew() &&
@@ -1755,6 +1767,11 @@ class TeamComponent extends Vue {
       this.team.setTeamStatus("ACTIVE");
       this.triggerReadyToPlay();
     }
+  }
+
+  public async interceptSkipTournament() {
+    this.team.setTeamStatus("ACTIVE");
+    await this.fumbblApi.skipTournament(this.team.getId());
   }
 
   public async unreadyTeam() {

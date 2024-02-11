@@ -63,6 +63,10 @@ export default class TeamStatus {
     return this.status === "POST_MATCH_SEQUENCE";
   }
 
+  public isReadyForTournament(): boolean {
+    return this.status === "READY_FOR_TOURNAMENT";
+  }
+
   public isSkill(): boolean {
     return this.status === "SKILL_ROLLS_PENDING";
   }
