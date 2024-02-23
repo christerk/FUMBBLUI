@@ -1,4 +1,8 @@
 <template>
+  <div class="preload">
+    <img v-if="type=='d6'" src="https://fumbbl.com/i/562665" />
+    <img v-if="type=='d8'" src="https://fumbbl.com/i/562717" />
+  </div>
   <div v-show="number > 0" :class="['die', type]" :style="{ 'background-position': bgx+'px ' + bgy + 'px', 'transform': 'rotate('+this.rotate+'deg)' }" />
 </template>
 
