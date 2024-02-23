@@ -34,7 +34,9 @@ class TeamBio extends Vue {
 
   public statistics: any = {};
 
-  async mounted() {}
+  async mounted() {
+    initializeBBCode();
+  }
 
   public async loadBio() {
   }
