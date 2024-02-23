@@ -16,6 +16,7 @@ export default class Player {
 
   public playerNumber: number = 0;
   private playerName: string;
+  private _hasBio: bool;
   private gender: PlayerGender = "NEUTRAL";
   private iconRowVersionPosition: number; // allows selection of icon for display when position has multiple versions in the icon image
   private position: Position;
@@ -45,6 +46,7 @@ export default class Player {
     position: Position,
     iconRowVersionPosition: number,
     gender: PlayerGender,
+    hasBio: boolean,
   ) {
     this.type = type;
     this.id = id;
@@ -55,6 +57,7 @@ export default class Player {
     this.position = position;
     this.iconRowVersionPosition = iconRowVersionPosition;
     this.gender = gender;
+    this._hasBio = hasBio;
 
     this.injuries = [];
     this.skills = [];
@@ -82,6 +85,7 @@ export default class Player {
     iconRowVersionPosition: number,
     isJourneyman: boolean,
     numberOfSkillsForLegend: number,
+    hasBio: boolean
   ): Player {
     const player = new Player(
       "NORMAL",
@@ -91,6 +95,7 @@ export default class Player {
       position,
       iconRowVersionPosition,
       rawApiPlayer.gender ? rawApiPlayer.gender.toUpperCase() : "NONBINARY", // older journeymen have null gender
+      hasBio,
     );
     player.isJourneyman = isJourneyman;
     player.injuries = rawApiPlayer.injuries
@@ -134,7 +139,7 @@ export default class Player {
   }
 
   static emptyPlayer(number: number) {
-    let player = new Player(
+    return new Player(
       "EMPTY",
       ++this.generatedId,
       number,
@@ -142,8 +147,8 @@ export default class Player {
       0,
       null,
       "NEUTRAL",
+      false,
     );
-    return player;
   }
 
   static temporaryPlayer(
@@ -160,6 +165,7 @@ export default class Player {
       position,
       iconRowVersionPosition,
       playerGender,
+      false,
     );
   }
 
@@ -293,6 +299,10 @@ export default class Player {
 
   public getIsRefundable(): boolean {
     return this.isRefundable;
+  }
+
+  public hasBio(): boolean {
+    return this._hasBio;
   }
 
   private calculateStat(

@@ -120,6 +120,7 @@ export default class Team {
           iconRowVersionPosition,
           isJourneyman,
           team.getNumberOfSkillsForLegend(),
+          rawApiPlayer.hasBio,
         ),
       );
     }
