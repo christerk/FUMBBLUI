@@ -18,10 +18,6 @@
   </div>
 </template>
 
-<style scoped>
-@import './sortabletable.less';
-</style>
-
 <script lang="ts">
 import { Component, Vue, toNative, Prop, Emit } from 'vue-facing-decorator'
 import { Sortable } from 'sortablejs-vue3'
