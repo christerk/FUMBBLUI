@@ -50,10 +50,16 @@
     </div>
     <div class="playerdetailssection playerdetailsrecord">
       <a
-        v-if="player"
+        v-if="player && canEdit"
         :href="`https://fumbbl.com/p/player?player_id=${player.id}`"
         style="float: right"
         >Manage player</a
+      >
+      <a
+        v-if="player && !canEdit"
+        :href="`https://fumbbl.com/p/player?player_id=${player.id}`"
+        style="float: right"
+        >Player Details</a
       >
       <div class="title">Details</div>
       <table class="playerstats">
