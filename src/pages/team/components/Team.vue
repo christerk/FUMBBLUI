@@ -210,6 +210,11 @@
                       >Yearbook</a
                     >
                   </li>
+                  <li>
+                    <a href="#" @click.prevent="showTeamPanel('teamdebug')"
+                      >Debug</a
+                    >
+                  </li>
                 </template>
               </ul>
             </li>
@@ -616,6 +621,15 @@
             :fumbblApi="fumbblApi"
           ></TeamBio>
         </div>
+        <div v-show="sidePanel == 'teamdebug'" class="teamdebug">
+          <TeamDebug
+            ref="teamDebug"
+            @unexpected-error="triggerUnexpectedError"
+            @close="showTeamPanel('main')"
+            :team="team"
+            :fumbblApi="fumbblApi"
+          ></TeamDebug>
+        </div>
       </div>
     </div>
     <modal
@@ -962,6 +976,7 @@ import Player from "../include/Player";
 import TeamStats from "./TeamStats.vue";
 import TeamMatches from "./TeamMatches.vue";
 import TeamBio from "./TeamBio.vue";
+import TeamDebug from "./TeamDebug.vue";
 
 import {
   EventDataFoldOut,
@@ -984,6 +999,7 @@ import {
     TeamStats,
     TeamMatches,
     TeamBio,
+    TeamDebug,
     Spinner
   },
 })
@@ -1041,6 +1057,8 @@ class TeamComponent extends Vue {
   private teamMatches: TeamMatches;
   @Ref
   private teamBio: TeamBio;
+  @Ref
+  private teamDebug: TeamDebug;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
 

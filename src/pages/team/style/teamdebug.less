@@ -1,0 +1,37 @@
+@import url("@style/fumbbl");
+
+
+.panelwrapper {
+    display: grid;
+    place-items: center;
+    position: relative;
+
+    .backbutton {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    .debugpanel {
+      
+        background: @OldLace;
+        border-top-left-radius: 9px;
+        border-top-right-radius: 9px;
+        width: 90%;
+        margin-left: 10%;
+
+        .title {
+          background: @Forest;
+          color: white;
+          border-top-left-radius: 9px;
+          border-top-right-radius: 9px;
+          font-size: 20px;
+          text-align: center;
+          padding: 5px;
+        }
+
+        .debugcontent {
+            background: @OldLace;
+            margin: 1rem;
+        }
+    }
+}
