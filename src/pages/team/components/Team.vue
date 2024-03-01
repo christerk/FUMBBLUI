@@ -199,8 +199,10 @@
                   <li>
                     <a
                       :href="`https://fumbbl.com/~${
-                        team.getCoach().name
-                      }/${team.getName()}`"
+                          encodeFumbblUrl(team.getCoach().name)
+                      }/${
+                          encodeFumbblUrl(team.getName())
+                      }`"
                       >View Roster</a
                     >
                   </li>
@@ -2087,6 +2089,10 @@ class TeamComponent extends Vue {
     }
 
     return errors;
+  }
+
+  public encodeFumbblUrl(url: string): string {
+      return encodeURIComponent(url).replaceAll("%20", "+");
   }
 }
 
