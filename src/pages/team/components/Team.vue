@@ -90,10 +90,12 @@
             >
               <a href="#">Admin</a>
               <ul class="submenu" v-show="mainMenuShow === 'admin'">
+                <li v-if="accessControl.canMagicFixTeam()">
+                  <a href="#" @click.prevent="magicFixTeam()">Magic Fix</a>
+                </li>
                 <li v-if="accessControl.canUnreadyTeam()">
                   <a href="#" @click.prevent="unreadyTeam()">Unready</a>
                 </li>
-                <li v-else>Under construction</li>
               </ul>
             </li>
             <div class="spacer"></div>
@@ -196,10 +198,10 @@
                       >Past Players</a
                     >
                   </li>
-                  <li>
+                  <li v-if="team.getCoach() != null">
                     <a
                       :href="`https://fumbbl.com/~${
-                          encodeFumbblUrl(team.getCoach().name)
+                          encodeFumbblUrl(team.getCoach()!.name)
                       }/${
                           encodeFumbblUrl(team.getName())
                       }`"
@@ -437,7 +439,7 @@
         >
           <div class="teammanagementrow">
             <div class="title left">Coach:</div>
-            <div class="info left">
+            <div class="info left" v-if="team.coach != null">
               <a :href="'/~' + team.coach.name">{{ team.coach.name }}</a>
             </div>
             <div class="title right">
@@ -857,7 +859,7 @@
           <img src="https://fumbbl.com/FUMBBL/Images/cross.png" />
         </button>
         <iframe
-          v-if="modals.skillPlayer"
+          v-if="modals.skillPlayer && skillingPlayer != null"
           style="border-radius: 5px; width: 800px; height: 496px"
           :src="
             '/p/selectskill?teamId=' +
@@ -892,7 +894,7 @@
           >
             <div class="paragraph">
               Treasury {{ team.treasury / 1000 }}k is greater than
-              {{ this.teamManagementSettings.expensiveMistakesStart / 1000 }}k
+              {{ teamManagementSettings.expensiveMistakesStart / 1000 }}k
             </div>
             <div class="paragraph">Expensive mistakes will be triggered</div>
           </div>
@@ -1066,7 +1068,7 @@ class TeamComponent extends Vue {
 
   // the following properties (prefixed with data) must be initialized in order to become reactive data properties
   // to avoid warnings we provide getters for each without the data prefix, which also ignore the possibility of them being undefined
-  public team: Team = undefined;
+  public team: Team;
   public dataTeamManagementSettings?: TeamManagementSettings = undefined;
   public dataAccessControl?: AccessControl = undefined;
   public dataRosterIconManager?: RosterIconManager = undefined;
@@ -1083,16 +1085,16 @@ class TeamComponent extends Vue {
   public mainMenuShow: string = "none";
   private showHireRookies: boolean = false;
   public errorModalInfo: { general: string; technical: string } | null = null;
-  private skillingPlayer: Player | null = null;
-  private showEmResult: boolean = false;
-  private emResult: string = "";
-  private emTreasuryLoss: string = "";
-  private readyToPlayTriggered: boolean = false;
+  public skillingPlayer: Player | null = null;
+  public showEmResult: boolean = false;
+  public emResult: string = "";
+  public emTreasuryLoss: string = "";
+  public readyToPlayTriggered: boolean = false;
   private teamSheetHidden: boolean = false;
 
-  private sidePanel: string = "";
-  private showSidePanel: boolean = false;
-  private playerListKey: number = 0;
+  public sidePanel: string = "";
+  public showSidePanel: boolean = false;
+  public playerListKey: number = 0;
 
   public modals: {
     activateTeam: boolean;
@@ -1137,7 +1139,7 @@ class TeamComponent extends Vue {
 
     this.userRoles.push(this.coachName === "" ? "ANONYMOUS" : "LOGGED_IN");
 
-    if (this.team.getCoach().name === this.coachName) {
+    if (this.team.getCoach() != null && this.team.getCoach()!.name === this.coachName) {
       this.userRoles.push("OWNER");
     } else {
       this.userRoles.push("NOT_OWNER");
@@ -1165,7 +1167,7 @@ class TeamComponent extends Vue {
     });
   }
 
-  private async showTeamPanel(panel: string) {
+  public async showTeamPanel(panel: string) {
     this.mainMenuShow = "";
 
     switch (panel) {
@@ -1423,8 +1425,8 @@ class TeamComponent extends Vue {
     return playerDeficit < 0 ? 0 : playerDeficit;
   }
 
-  public async onPlayerRenumbered(evt) {
-    var newNumbers = {};
+  public async onPlayerRenumbered() {
+    var newNumbers: { [key:number]: number } = {};
     this.team.players
       .filter((p) => !p.IsEmpty)
       .forEach((p) => (newNumbers[p.id] = p.playerNumber));
@@ -1795,6 +1797,7 @@ class TeamComponent extends Vue {
   }
 
   public async unreadyTeam() {
+    this.menuHide('admin');
     const originalTeamStatus = this.team.getTeamStatus();
     this.team.setTeamStatus("POST_MATCH_SEQUENCE");
     this.reloadTeamWithDelay();
@@ -1806,6 +1809,16 @@ class TeamComponent extends Vue {
         "An error occurred unreadying the team.",
         apiResponse.getErrorMessage(),
       );
+    }
+  }
+
+  public async magicFixTeam() {
+    const apiResponse = await this.fumbblApi.magicFixTeam(this.team.getId());
+
+
+    if (!apiResponse.isSuccessful()) {
+      this.menuHide('admin');
+      this.reloadTeam();
     }
   }
 
@@ -1831,7 +1844,9 @@ class TeamComponent extends Vue {
     }
 
     const player = this.findPlayer(playerNumber);
-    player.foldOut = playerRowFoldOutMode;
+    if (player != null) {
+      player.foldOut = playerRowFoldOutMode;
+    }
   }
 
   public findPlayer(number: number) {

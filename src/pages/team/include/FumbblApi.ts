@@ -415,6 +415,14 @@ export default class FumbblApi {
     );
   }
 
+  public async magicFixTeam(teamId: number): Promise<ApiResponse> {
+    return await this.simplePostWithOnlyTeamIdInBody(
+      teamId,
+      this.getUrl("/api/team/magicfix"),
+    );
+  }
+
+
   public async skipTournament(teamId: number): Promise<ApiResponse> {
     return await this.simplePostWithOnlyTeamIdInBody(
       teamId,

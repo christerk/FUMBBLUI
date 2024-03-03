@@ -11,6 +11,7 @@
     "experimentalDecorators": true,
     "composite": true,
     "module": "ESNext",
+    "lib": ["ESNext"],
     "moduleResolution": "Bundler",
     "types": ["node", "vite/client"]
   }

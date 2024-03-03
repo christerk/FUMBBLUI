@@ -12,7 +12,7 @@ export default class Team {
   private teamStatus: TeamStatus = new TeamStatus("NEW");
   private name: string = "";
   private division: string = "";
-  private coach: Coach = null;
+  public coach: Coach|null = null;
   public players: Player[] = [];
   public extraPlayers: Player[] = [];
   private teamValue: number = 0;
@@ -25,7 +25,7 @@ export default class Team {
   private assistantCoaches: number = 0;
   private cheerleaders: number = 0;
   private apothecary: boolean = false;
-  private seasonInfo: {
+  public seasonInfo: {
     gamesPlayedInCurrentSeason: number;
     currentSeason: number;
   } = { gamesPlayedInCurrentSeason: 0, currentSeason: 1 };
@@ -34,11 +34,11 @@ export default class Team {
     cappedBudget: number;
     tooltip: string;
   } = { redraftCap: 0, cappedBudget: 0, tooltip: "" };
-  private maxPlayers: 0;
+  private maxPlayers: number;
   public record: any = {};
   private sppLimits: any;
-  private bio: string;
-  private logo: number;
+  private bio: string|null = null;
+  private logo: number|null = null;
 
   constructor(
     division: string,
@@ -163,7 +163,7 @@ export default class Team {
     this.name = teamName;
   }
 
-  public getCoach(): Coach {
+  public getCoach(): Coach|null {
     return this.coach;
   }
 
@@ -288,7 +288,7 @@ export default class Team {
       if (playerCost > 0) {
         this.treasury += playerCost;
       }
-      let emptyPlayers = [];
+      const emptyPlayers = [];
       for (let i = 0; i < this.maxPlayers; i++) {
         emptyPlayers.push(Player.emptyPlayer(i + 1));
       }
