@@ -248,7 +248,7 @@ export default class TeamManagementSettings {
   }
 
   public calculateTeamValue(team: Team): number {
-    let playerCost = team
+    const playerCost = team
       .getPlayers()
       .filter((p) => !p.IsEmpty)
       .reduce(

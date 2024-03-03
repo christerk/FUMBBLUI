@@ -356,8 +356,9 @@ export default class Team {
 
   public getLinemenPlayers(): Player[] {
     return this.getRosteredPlayers().filter((player) => {
+      const position = player.getPosition();
       return (
-        player.getPosition().quantityAllowed >=
+        position != null && position.quantityAllowed >=
         this.QUANTITY_ALLOWED_DENOTING_LINEMEN
       );
     });

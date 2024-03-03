@@ -126,14 +126,14 @@ class TeamMatches extends Vue {
     return result;
   }
 
-  private teamUrl(id: number) {
+  public teamUrl(id: number) {
     return "https://fumbbl.com/p/team?team_id=" + id;
   }
 
-  private matchUrl(id: number) {
+  public matchUrl(id: number) {
     return "https://fumbbl.com/p/match?id=" + id;
   }
-  private coachUrl(coach: string) {
+  public coachUrl(coach: string) {
     return "https://fumbbl.com/~" + encodeURI(coach);
   }
 }

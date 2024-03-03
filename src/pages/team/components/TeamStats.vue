@@ -73,14 +73,19 @@
 <script lang="ts">
 import { Emit, Prop, Component, Vue, toNative } from "vue-facing-decorator";
 import FumbblApi from "../include/FumbblApi";
+import Team from "../include/Team";
 
 @Component
 class TeamStats extends Vue {
-  @Prop
-  public team;
+  @Prop({
+    required: true
+  })
+  public team!: Team;
 
-  @Prop
-  public fumbblApi: FumbblApi;
+  @Prop({
+    required: true
+  })    
+  public fumbblApi!: FumbblApi;
 
   @Emit
   public close() {}
@@ -99,7 +104,7 @@ class TeamStats extends Vue {
     if (apiResponse.isSuccessful()) {
       let stats = apiResponse.getData();
 
-      let list = [];
+      let list: any[] = [];
 
       Object.keys(stats).forEach((roster) => {
         stats[roster].info["roster"] = roster;

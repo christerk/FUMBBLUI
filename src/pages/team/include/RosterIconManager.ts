@@ -14,7 +14,7 @@ export default class RosterIconManager {
 
   private async getIconData(positionIconId: number): Promise<any> {
     const imageDimensions = (
-      imageUrl,
+      imageUrl: string,
     ): Promise<{ width: number; height: number }> =>
       new Promise((resolve, reject) => {
         const img = new Image();

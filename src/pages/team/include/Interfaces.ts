@@ -1,3 +1,5 @@
+import { Ref } from "vue";
+
 export interface DemoTeamSettings {
   existingTeamId: number;
 }
@@ -40,7 +42,8 @@ export type TeamAction =
   | "SHOW_PLAYER_CONTROLS"
   | "EDIT_BIO"
   | "REPORT"
-  | "SHOW_ADMIN_MENU";
+  | "SHOW_ADMIN_MENU"
+  | "MAGIC_FIX";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;
@@ -99,6 +102,7 @@ export interface PlayerRecord {
   completions: number;
   touchdowns: number;
   interceptions: number;
+  deflections: number;
   casualties: number;
   mvps: number;
   spp: {
@@ -110,7 +114,7 @@ export interface PlayerRecord {
 
 export interface JourneymanQuantityChoice {
   positionId: number;
-  quantity: number;
+  quantity: Ref<number>;
 }
 
 export interface JourneymanQuantityInput extends JourneymanQuantityChoice {

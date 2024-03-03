@@ -29,17 +29,17 @@ export default class FumbblApi {
     return this.baseApiUrl + apiUrl;
   }
 
-  protected async getAccessToken(): string {
+  protected async getAccessToken(): Promise<string> {
     if (Date.now() > this.tokenExpiry) {
-      let data = {
+      const data = {
         grant_type: "client_credentials",
         client_id: import.meta.env.VITE_CLIENT_ID,
         client_secret: import.meta.env.VITE_CLIENT_SECRET,
       };
       this.enableOauth = false;
-      let result = await this.post(this.getUrl("/api/oauth/token"), data);
+      const result = await this.post(this.getUrl("/api/oauth/token"), data);
       this.enableOauth = true;
-      let tokenData = result.data;
+      const tokenData = result.data;
 
       this.tokenExpiry = Date.now() + tokenData.expires_in * 1000 - 10;
       this.accessToken = tokenData.access_token;
@@ -50,7 +50,7 @@ export default class FumbblApi {
   protected async getAuthHeaders() {
     let headers = {};
     if (this.enableOauth) {
-      let token = await this.getAccessToken();
+      const token = await this.getAccessToken();
       headers = {
         headers: {
           Authorization: "Bearer " + token,
@@ -63,7 +63,7 @@ export default class FumbblApi {
   protected async post(
     url: string,
     data: any = null,
-    transform: (d: any) => any = null,
+    transform: ((d: any) => any)|null = null,
   ): Promise<ApiResponse> {
     if (this.simulateDelay) {
       await this.delay(1000);
@@ -93,7 +93,7 @@ export default class FumbblApi {
   protected async enqueuePost(
     url: string,
     data: any = null,
-    transform: (d: any) => any = null,
+    transform: ((d: any) => any)|null = null,
   ): Promise<ApiResponse> {
     return await this.queue.add(async () => {
       if (this.simulateDelay) {

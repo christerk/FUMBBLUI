@@ -5,6 +5,7 @@ import {
   PlayerSkillStatus,
   PlayerType,
   Position,
+  PositionStats,
 } from "./Interfaces";
 import UpdatePlayerDetails from "./UpdatePlayerDetails";
 
@@ -16,18 +17,18 @@ export default class Player {
 
   public playerNumber: number = 0;
   private playerName: string;
-  private _hasBio: bool;
+  private _hasBio: boolean = false;
   private gender: PlayerGender = "NEUTRAL";
   private iconRowVersionPosition: number; // allows selection of icon for display when position has multiple versions in the icon image
-  private position: Position;
+  private position: Position|null;
   private injuries: string[] = [];
   private skills: string[] = [];
-  private record: PlayerRecord = null;
+  private record: PlayerRecord;
   private skillStatus: {
     status: PlayerSkillStatus;
     maxLimit: number;
     tier: number;
-  } = null;
+  }|null = null;
   private skillCost: number = 0;
   private isJourneyman: boolean = false;
   private isRefundable: boolean = true;
@@ -43,7 +44,7 @@ export default class Player {
     id: number,
     playerNumber: number,
     playerName: string,
-    position: Position,
+    position: Position|null,
     iconRowVersionPosition: number,
     gender: PlayerGender,
     hasBio: boolean,
@@ -67,6 +68,7 @@ export default class Player {
       completions: 0,
       touchdowns: 0,
       interceptions: 0,
+      deflections: 0,
       casualties: 0,
       mvps: 0,
       spp: { total: 0, extra: 0, spent: 0 },
@@ -100,11 +102,11 @@ export default class Player {
     player.isJourneyman = isJourneyman;
     player.injuries = rawApiPlayer.injuries
       .split(",")
-      .filter((injury) => injury !== "");
+      .filter((injury: string) => injury !== "");
     player.skills = rawApiPlayer.skills;
 
     player.skillCost = rawApiPlayer.skillCosts.reduce(
-      (totalCost, skillCost) => (totalCost += skillCost),
+      (totalCost: number, skillCost: number) => (totalCost += skillCost),
       0,
     );
 
@@ -121,7 +123,7 @@ export default class Player {
       spent: rawApiPlayer.record.spent_spp,
     };
 
-    const skillStatusLookup = {
+    const skillStatusLookup: {[key:string]: PlayerSkillStatus} = {
       none: "NONE",
       canSkill: "CAN_SKILL",
       mustSkill: "MUST_SKILL",
@@ -144,8 +146,8 @@ export default class Player {
       ++this.generatedId,
       number,
       "Empty",
-      0,
       null,
+      0,
       "NEUTRAL",
       false,
     );
@@ -192,11 +194,11 @@ export default class Player {
     return this.playerNumber;
   }
 
-  public get IsEmpty(): bool {
+  public get IsEmpty(): boolean {
     return this.type == "EMPTY";
   }
 
-  public get IsExtraPlayer(): bool {
+  public get IsExtraPlayer(): boolean {
     return this.isJourneyman || this.number > 16;
   }
 
@@ -204,7 +206,7 @@ export default class Player {
     this.playerNumber = value;
   }
 
-  public get IsLegend(): bool {
+  public get IsLegend(): boolean {
     return (
       this.numberOfSkillsForLegend > 0 &&
       this.skills.length === this.numberOfSkillsForLegend
@@ -228,7 +230,7 @@ export default class Player {
     this.version++;
   }
 
-  public getPosition(): Position {
+  public getPosition(): Position|null {
     return this.position;
   }
 
@@ -237,11 +239,11 @@ export default class Player {
   }
 
   public getPositionId(): number {
-    return this.position.id;
+    return this.position?.id ?? 0;
   }
 
   public getPositionName(): string {
-    return this.position.name;
+    return this.position?.name ?? "Empty";
   }
 
   public getDisplayPositionName(): string {
@@ -250,15 +252,15 @@ export default class Player {
   }
 
   public getPositionCost(): number {
-    return this.position.cost;
+    return this.position?.cost ?? 0;
   }
 
-  public getPositionStats(): any {
-    return this.position.stats;
+  public getPositionStats(): PositionStats {
+    return this.position?.stats ?? { Movement: 0, Strength: 0, Agility: 0, Passing: 0, Armour: 0 };
   }
 
   public getPositionSkills(): string[] {
-    return this.position.skills;
+    return this.position?.skills ?? [];
   }
 
   public getSkillCost(): number {
@@ -378,14 +380,17 @@ export default class Player {
   }
 
   public get hasPassingIncrease(): boolean {
+    const positionStats: PositionStats = this.getPositionStats()
     return (
-      this.passingStat && this.passingStat < this.getPositionStats().Passing
+      this.passingStat != null && positionStats != null && positionStats.Passing != null && this.passingStat < positionStats.Passing
     );
   }
 
   public get hasPassingDecrease(): boolean {
+    const positionStats: PositionStats = this.getPositionStats()
+
     return (
-      this.passingStat && this.passingStat > this.getPositionStats().Passing
+      this.passingStat != null && positionStats != null && positionStats.Passing != null && this.passingStat > positionStats.Passing
     );
   }
 
@@ -419,8 +424,8 @@ export default class Player {
     };
   } {
     const numberOfSkills = this.getSkills().length;
-    const randomPrimaryThresholds = { 0: 3, 1: 4, 2: 6, 3: 8, 4: 10, 5: 15 };
-    const randomSecondaryOrChosenPrimaryThresholds = {
+    const randomPrimaryThresholds: { [key: number]: number } = { 0: 3, 1: 4, 2: 6, 3: 8, 4: 10, 5: 15 };
+    const randomSecondaryOrChosenPrimaryThresholds: { [key: number]: number } = {
       0: 6,
       1: 8,
       2: 12,
@@ -428,7 +433,7 @@ export default class Player {
       4: 20,
       5: 30,
     };
-    const chosenSecondaryThresholds = {
+    const chosenSecondaryThresholds: { [key: number]: number } = {
       0: 12,
       1: 14,
       2: 18,
@@ -436,7 +441,7 @@ export default class Player {
       4: 26,
       5: 40,
     };
-    const characteristicThresholds = {
+    const characteristicThresholds: { [key: number]: number } = {
       0: 18,
       1: 20,
       2: 24,
@@ -448,9 +453,9 @@ export default class Player {
     return {
       total: this.record.spp.total,
       spendable: this.record.spp.total - this.record.spp.spent,
-      maxLimit: this.skillStatus.maxLimit,
-      status: this.skillStatus.status,
-      tier: this.skillStatus.tier,
+      maxLimit: this.skillStatus?.maxLimit ?? 0,
+      status: this.skillStatus?.status ?? "NONE",
+      tier: this.skillStatus?.tier ?? 0,
       thresholds: {
         randomPrimary: randomPrimaryThresholds[numberOfSkills] ?? 0,
         randomSecondaryOrChosenPrimary:
@@ -466,12 +471,12 @@ export default class Player {
   }
 
   public get canSkill(): boolean {
-    let info = this.sppDisplayInfo;
+    const info = this.sppDisplayInfo;
     return info.tier > 0;
   }
 
   public get mustSkill(): boolean {
-    let info = this.sppDisplayInfo;
+    const info = this.sppDisplayInfo;
     return info.tier >= 4;
   }
 

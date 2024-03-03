@@ -1,5 +1,5 @@
 export default class ApiResponse {
-  private data: any;
+  public data: any;
   private errorMessage: string | null = null;
 
   public static success(data: any): ApiResponse {
