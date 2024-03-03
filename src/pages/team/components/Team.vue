@@ -86,7 +86,7 @@
               v-if="accessControl.canShowAdminMenu()"
               class="menu"
               @mouseenter="menuShow('admin')"
-              @mouseleave="menuHide('admin')"
+              @mouseleave="menuHide()"
             >
               <a href="#">Admin</a>
               <ul class="submenu" v-show="mainMenuShow === 'admin'">
@@ -103,7 +103,7 @@
               v-if="accessControl.canEditBio()"
               class="menu"
               @mouseenter="menuShow('misc')"
-              @mouseleave="menuHide('misc')"
+              @mouseleave="menuHide()"
             >
               <a @click.prevent="menuToggle('misc')" href="#"
                 >Edit
@@ -129,7 +129,7 @@
               v-else-if="accessControl.canReport()"
               class="menu"
               @mouseenter="menuShow('misc')"
-              @mouseleave="menuHide('misc')"
+              @mouseleave="menuHide()"
             >
               <a @click.prevent="menuToggle('misc')" href="#"
                 >Report
@@ -149,7 +149,7 @@
               v-if="accessControl.canViewHistory() || team.isLeagueDivision()"
               class="menu"
               @mouseenter="menuShow('show')"
-              @mouseleave="menuHide('show')"
+              @mouseleave="menuHide()"
             >
               <a @click.prevent="menuToggle('show')" href="#"
                 >Show
@@ -999,7 +999,7 @@ import {
     retireplayer: RetirePlayerComponent,
     readytoplay: ReadyToPlayComponent,
     SortableTable,
-    Die,
+    die: Die,
     TeamStats,
     TeamMatches,
     TeamBio,
@@ -1047,28 +1047,28 @@ class TeamComponent extends Vue {
   public triggerDeleteTeam() {}
 
   @Ref
-  private emDie: Die;
+  private emDie: InstanceType<typeof Die>|undefined;
 
   @Ref
-  private readyToPlayComponent: ReadyToPlayComponent;
+  private readyToPlayComponent: InstanceType<typeof ReadyToPlayComponent>|undefined;
 
   @Ref
-  private postMatchModal: ModalComponent;
+  private postMatchModal: InstanceType<typeof ModalComponent>|undefined;
 
   @Ref
-  private teamStats: TeamStats;
+  private teamStats: InstanceType<typeof TeamStats>|undefined;
   @Ref
-  private teamMatches: TeamMatches;
+  private teamMatches: InstanceType<typeof TeamMatches>|undefined;
   @Ref
-  private teamBio: TeamBio;
+  private teamBio: InstanceType<typeof TeamBio>|undefined;
   @Ref
-  private teamDebug: TeamDebug;
+  private teamDebug: InstanceType<typeof TeamDebug>|undefined;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
 
   // the following properties (prefixed with data) must be initialized in order to become reactive data properties
   // to avoid warnings we provide getters for each without the data prefix, which also ignore the possibility of them being undefined
-  public team: Team;
+  public team: Team = new Team("C", 0, 0, 16);
   public dataTeamManagementSettings?: TeamManagementSettings = undefined;
   public dataAccessControl?: AccessControl = undefined;
   public dataRosterIconManager?: RosterIconManager = undefined;
@@ -1128,7 +1128,7 @@ class TeamComponent extends Vue {
     this.mainMenuShow = menu == this.mainMenuShow ? "none" : menu;
   }
 
-  public menuHide(menu: string) {
+  public menuHide() {
     this.mainMenuShow = "none";
   }
 
@@ -1172,13 +1172,19 @@ class TeamComponent extends Vue {
 
     switch (panel) {
       case "teamstats":
-        await this.teamStats.loadStats();
+        if (this.teamStats != undefined) {
+          await this.teamStats.loadStats();
+        }
         break;
       case "teammatches":
-        await this.teamMatches.loadMatches();
+        if (this.teamMatches != undefined) {
+          await this.teamMatches.loadMatches();
+        }
         break;
       case "teambio":
-        await this.teamBio.loadBio();
+        if (this.teamBio != undefined) {
+          await this.teamBio.loadBio();
+        }
         break;
     }
 
@@ -1797,7 +1803,7 @@ class TeamComponent extends Vue {
   }
 
   public async unreadyTeam() {
-    this.menuHide('admin');
+    this.menuHide();
     const originalTeamStatus = this.team.getTeamStatus();
     this.team.setTeamStatus("POST_MATCH_SEQUENCE");
     this.reloadTeamWithDelay();
@@ -1817,7 +1823,7 @@ class TeamComponent extends Vue {
 
 
     if (!apiResponse.isSuccessful()) {
-      this.menuHide('admin');
+      this.menuHide();
       this.reloadTeam();
     }
   }
@@ -2021,7 +2027,7 @@ class TeamComponent extends Vue {
 
     if (apiResponse.isSuccessful()) {
       const emResult: any = apiResponse.getData();
-      if (emResult != undefined && emResult.expensiveMistakes != undefined) {
+      if (this.emDie != undefined && emResult != undefined && emResult.expensiveMistakes != undefined) {
         let roll = emResult.expensiveMistakes.roll;
         this.emResult = emResult.expensiveMistakes.effect;
         this.emTreasuryLoss = emResult.expensiveMistakes.treasuryLoss;
