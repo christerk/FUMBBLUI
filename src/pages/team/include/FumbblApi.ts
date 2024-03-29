@@ -315,6 +315,20 @@ export default class FumbblApi {
     return await this.enqueuePost(url, data);
   }
 
+  public async addDedicatedFans(teamId: number): Promise<ApiResponse> {
+    return await this.simplePostWithOnlyTeamIdInBody(
+      teamId,
+      this.getUrl("/api/team/addDedicatedFans"),
+    );
+  }
+
+  public async removeDedicatedFans(teamId: number): Promise<ApiResponse> {
+    return await this.simplePostWithOnlyTeamIdInBody(
+      teamId,
+      this.getUrl("/api/team/removeDedicatedFans"),
+    );
+  }
+
   public async addPlayer(
     teamId: number,
     positionId: number,

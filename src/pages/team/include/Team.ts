@@ -387,6 +387,18 @@ export default class Team {
     }
   }
 
+  public addDedicatedFans(cost: number): void {
+    this.dedicatedFans++;
+    this.treasury -= cost;
+  }
+
+  public removeDedicatedFans(cost: number): void {
+    this.dedicatedFans--;
+    if (this.teamStatus.isNew()) {
+      this.treasury += cost;
+    }
+  }  
+
   public addReroll(cost: number): void {
     this.rerolls++;
     this.treasury -= cost;

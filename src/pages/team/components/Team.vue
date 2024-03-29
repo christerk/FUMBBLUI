@@ -467,29 +467,18 @@
             </div>
             <div class="title right">Dedicated Fans:</div>
             <div class="info right">
-              <template v-if="accessControl.canCreate()">
-                <select v-model.number="dedicatedFansChoice">
-                  <option
-                    v-for="dedicatedFansStartValue in teamManagementSettings.getDedicatedFansAllowedValues(
-                      team.getDedicatedFans(),
-                      team.treasury,
-                    )"
-                    :key="dedicatedFansStartValue"
-                  >
-                    {{ dedicatedFansStartValue }}
-                  </option></select
-                >&nbsp;
-                <button
-                  v-if="dedicatedFansChoice != team.getDedicatedFans()"
-                  @click="updateDedicatedFans()"
-                  class="teambutton"
-                >
-                  Ok
-                </button>
-              </template>
-              <template v-else>
-                {{ team.getDedicatedFans() }}
-              </template>
+              <addremove
+                :current-value="team.getDedicatedFans().toString()"
+                :can-edit="accessControl.canEdit()"
+                :can-remove-immediately="accessControl.canCreate()"
+                :can-add="addRemovePermissions.dedicatedFans.add"
+                :can-remove="addRemovePermissions.dedicatedFans.remove"
+                :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
+                :label-remove="accessControl.canCreate() ? 'Remove' : 'Discard'"
+                @add="addDedicatedFans"
+                @remove-with-confirm="modals.removeDedicatedFans = true"
+                @remove-immediately="removeDedicatedFans"
+              ></addremove>
             </div>
           </div>
           <div class="teammanagementrow">
@@ -1105,6 +1094,7 @@ class TeamComponent extends Vue {
     removeAssistantCoach: boolean;
     removeCheerleader: boolean;
     removeApothecary: boolean;
+    removeDedicatedFans: boolean;
     skillPlayer: boolean;
     readyTeam: boolean;
   } = {
@@ -1116,6 +1106,7 @@ class TeamComponent extends Vue {
     removeAssistantCoach: false,
     removeCheerleader: false,
     removeApothecary: false,
+    removeDedicatedFans: false,
     skillPlayer: false,
     readyTeam: false,
   };
@@ -1528,6 +1519,36 @@ class TeamComponent extends Vue {
         "An error occurred removing a reroll.",
         apiResponse.getErrorMessage(),
       );
+    }
+  }
+
+  public async addDedicatedFans() {
+    this.team.addDedicatedFans(this.teamManagementSettings.dedicatedFansCost);
+    this.reloadTeamWithDelay();
+
+    const apiResponse = await this.fumbblApi.addDedicatedFans(this.team.getId());
+    if (!apiResponse.isSuccessful()) {
+      await this.recoverFromUnexpectedError(
+        "An error occurred adding dedicated fans.",
+        apiResponse.getErrorMessage(),
+      );
+    }
+  }
+
+  public async removeDedicatedFans() {
+    this.team.removeDedicatedFans(this.teamManagementSettings.dedicatedFansCost);
+    this.modals.removeDedicatedFans = false;
+    this.reloadTeamWithDelay();
+
+    let apiResponse = null;
+    if (this.accessControl.canCreate()) {
+      apiResponse = await this.fumbblApi.removeDedicatedFans(this.team.getId());
+      if (!apiResponse.isSuccessful()) {
+        await this.recoverFromUnexpectedError(
+          "An error occurred removing dedicated fans.",
+          apiResponse.getErrorMessage(),
+        );
+      }
     }
   }
 

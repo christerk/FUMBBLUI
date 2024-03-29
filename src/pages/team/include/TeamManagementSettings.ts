@@ -327,6 +327,14 @@ export default class TeamManagementSettings {
           this.settings.sidelineStaff.apothecary.allowed &&
           team.getApothecary() === true,
       },
+      dedicatedFans: {
+        add:
+          team.getDedicatedFans() < this.settings.rerolls.max &&
+          team.canAfford(this.dedicatedFansCost),
+        remove:
+          team.getDedicatedFans() > this.settings.dedicatedFans.minStart &&
+          (team.getTeamStatus().isNew()),
+      },
     };
   }
 
