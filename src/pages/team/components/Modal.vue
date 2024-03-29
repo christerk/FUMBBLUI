@@ -1,6 +1,6 @@
 <template>
   <transition name="modal-fade">
-    <div class="modalbackdrop">
+    <div v-show="show" class="modalbackdrop">
       <div
         class="modal"
         :class="getModalClasses()"
@@ -108,6 +108,8 @@ class ModalComponent extends Vue {
 
   @Emit("confirm")
   public triggerConfirm() {}
+
+  public show: boolean = true;
 
   public getModalClasses(): any {
     return {
