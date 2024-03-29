@@ -506,7 +506,7 @@
                 :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
                 :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
                 @add="addAssistantCoach"
-                @remove-with-confirm="modals.removeAssistantCoach = true"
+                @remove-with-confirm="fireAssistantCoachModal?.show()"
                 @remove-immediately="removeAssistantCoach"
               ></addremove>
             </div>
@@ -647,48 +647,9 @@
       </template>
     </modal>
 
-    <DiscardRerollModal
-      ref="discardRerollModal"
-      @confirm="removeReroll"
-    />
+    <DiscardRerollModal ref="discardRerollModal" @confirm="removeReroll"/>
+    <FireAssistantCoachModal ref="fireAssistantCoachModal" @confirm="removeAssistantCoach"/>
 
-    <modal
-      v-show="modals.removeReroll === true"
-      :button-settings="{
-        cancel: { enabled: true, label: 'Cancel' },
-        confirm: { enabled: true, label: 'Remove' },
-      }"
-      :modal-size="'small'"
-      @cancel="modals.removeReroll = false"
-      @confirm="removeReroll"
-    >
-      <template v-slot:header> Discard reroll </template>
-
-      <template v-slot:body>
-        <p>
-          Are you sure you wish to discard this reroll? This cannot be undone.
-        </p>
-      </template>
-    </modal>
-    <modal
-      v-show="modals.removeAssistantCoach === true"
-      :button-settings="{
-        cancel: { enabled: true, label: 'Cancel' },
-        confirm: { enabled: true, label: 'Remove' },
-      }"
-      :modal-size="'small'"
-      @cancel="modals.removeAssistantCoach = false"
-      @confirm="removeAssistantCoach"
-    >
-      <template v-slot:header> Discard assistant coach </template>
-
-      <template v-slot:body>
-        <p>
-          Are you sure you wish to discard this assistant coach? This cannot be
-          undone.
-        </p>
-      </template>
-    </modal>
     <modal
       v-show="modals.removeCheerleader === true"
       :button-settings="{
@@ -968,6 +929,7 @@ import Team from "../include/Team";
 import PlayerComponent from "./Player.vue";
 import EditTeamNameComponent from "./EditTeamName.vue";
 import DiscardRerollModal from "./modals/DiscardReroll.vue";
+import FireAssistantCoachModal from "./modals/FireAssistantCoach.vue";
 import HireRookiesComponent from "./HireRookies.vue";
 import RosterIconManager from "../include/RosterIconManager";
 import TeamManagementSettings from "../include/TeamManagementSettings";
@@ -1007,7 +969,8 @@ import EditTeamName from "./EditTeamName.vue";
     TeamBio,
     TeamDebug,
     Spinner,
-    DiscardRerollModal
+    DiscardRerollModal,
+    FireAssistantCoachModal
   },
 })
 class TeamComponent extends Vue {
@@ -1071,6 +1034,8 @@ class TeamComponent extends Vue {
 
   @Ref
   public discardRerollModal: InstanceType<typeof DiscardRerollModal>|undefined;
+  @Ref
+  public fireAssistantCoachModal: InstanceType<typeof FireAssistantCoachModal>|undefined;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
 
