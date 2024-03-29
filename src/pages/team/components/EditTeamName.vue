@@ -1,7 +1,7 @@
 <template>
   <div class="teamname">
     <div class="teamnamecontent">
-      <template v-if="editTeamName && canEdit">
+      <template v-if="editTeamName && (canEdit || canAdmin)">
         <input v-model="newTeamName" class="editteamname" />
         <button class="teambutton" @click="save">Save</button>
         <a href="#" @click.prevent="cancel">Cancel</a>
@@ -65,6 +65,12 @@ class EditTeamNameComponent extends Vue {
     required: true,
   })
   public canEdit!: boolean;
+
+  @Prop({
+    type: Boolean,
+    required: true,
+  })
+  public canAdmin!: boolean;
 
   @Emit("begin")
   public triggerBegin() {}

@@ -107,6 +107,23 @@ export default class AccessControl {
         ],
       },
       {
+        action: "RENAME_TEAM",
+        grantAccessToList: [
+          {
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: [
+              "NEW",
+              "ACTIVE",
+              "READY_FOR_TOURNAMENT",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "REDRAFTING",
+              "RETIRED",
+            ],
+          },
+        ],
+      },
+      {
         action: "UNREADY_TEAM",
         grantAccessToList: [
           {
@@ -271,6 +288,10 @@ export default class AccessControl {
 
   public canUnreadyTeam(): boolean {
     return this.isGranted("UNREADY_TEAM");
+  }
+
+  public canRenameTeam(): boolean {
+    return this.isGranted("RENAME_TEAM");
   }
 
   public canMagicFixTeam(): boolean {

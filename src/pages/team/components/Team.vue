@@ -23,9 +23,11 @@
       <div class="teamheadermain">
         <div class="teamheadermaincontent">
           <editteamname
+            ref="nameEdit"
             :fumbbl-api="fumbblApi"
             :team-name="team.getName()"
             :can-edit="accessControl.canCreate()"
+            :can-admin="accessControl.canRenameTeam()"
             @edit="handleEditTeamName"
             @begin="handleBeginEditTeamName"
             @cancel="handleCancelEditTeamName"
@@ -95,6 +97,9 @@
                 </li>
                 <li v-if="accessControl.canUnreadyTeam()">
                   <a href="#" @click.prevent="unreadyTeam()">Unready</a>
+                </li>
+                <li v-if="accessControl.canRenameTeam()">
+                  <a href="#" @click.prevent="renameTeam()">Rename</a>
                 </li>
               </ul>
             </li>
@@ -455,7 +460,7 @@
                 :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
                 :label-remove="accessControl.canCreate() ? 'Remove' : 'Discard'"
                 @add="addReroll"
-                @remove-with-confirm="modals.removeReroll = true"
+                @remove-with-confirm="discardRerollModal?.show()"
                 @remove-immediately="removeReroll"
               ></addremove>
             </div>
@@ -641,6 +646,12 @@
         <p>Technical details: {{ errorModalInfo.technical }}</p>
       </template>
     </modal>
+
+    <DiscardRerollModal
+      ref="discardRerollModal"
+      @confirm="removeReroll"
+    />
+
     <modal
       v-show="modals.removeReroll === true"
       :button-settings="{
@@ -956,6 +967,7 @@ import AccessControl from "../include/AccessControl";
 import Team from "../include/Team";
 import PlayerComponent from "./Player.vue";
 import EditTeamNameComponent from "./EditTeamName.vue";
+import DiscardRerollModal from "./modals/DiscardReroll.vue";
 import HireRookiesComponent from "./HireRookies.vue";
 import RosterIconManager from "../include/RosterIconManager";
 import TeamManagementSettings from "../include/TeamManagementSettings";
@@ -976,6 +988,7 @@ import {
   EventDataRefundPlayer,
   EventDataRemovePlayer,
 } from "../include/EventDataInterfaces";
+import EditTeamName from "./EditTeamName.vue";
 
 @Component({
   components: {
@@ -993,7 +1006,8 @@ import {
     TeamMatches,
     TeamBio,
     TeamDebug,
-    Spinner
+    Spinner,
+    DiscardRerollModal
   },
 })
 class TeamComponent extends Vue {
@@ -1052,6 +1066,11 @@ class TeamComponent extends Vue {
   private teamBio: InstanceType<typeof TeamBio>|undefined;
   @Ref
   private teamDebug: InstanceType<typeof TeamDebug>|undefined;
+  @Ref
+  private nameEdit: InstanceType<typeof EditTeamName>|undefined;
+
+  @Ref
+  public discardRerollModal: InstanceType<typeof DiscardRerollModal>|undefined;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
 
@@ -1837,6 +1856,12 @@ class TeamComponent extends Vue {
         apiResponse.getErrorMessage(),
       );
     }
+  }
+
+  public async renameTeam() {
+    this.menuHide();
+    
+    this.nameEdit?.begin();
   }
 
   public async magicFixTeam() {

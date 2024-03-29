@@ -41,7 +41,8 @@ export type TeamAction =
   | "EDIT_BIO"
   | "REPORT"
   | "SHOW_ADMIN_MENU"
-  | "MAGIC_FIX";
+  | "MAGIC_FIX"
+  | "RENAME_TEAM";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;

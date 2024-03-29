@@ -10,7 +10,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@style/*": ["src/style/*"],
-      "@components/*": ["src/components/*"]
+      "@components/*": ["src/components/*"],
     },
     "verbatimModuleSyntax": false
   }
