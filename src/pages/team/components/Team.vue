@@ -568,13 +568,13 @@
         </div>
         <div v-if="accessControl.canCreate()" class="createteam">
           <div class="deleteteam">
-            <button @click="modals.deleteTeam = true" class="teambutton">
+            <button @click="deleteTeamModal?.show()" class="teambutton">
               Delete Team
             </button>
           </div>
         </div>
         <div v-if="accessControl.canRetireTeam()" class="retireteam">
-          <button @click="modals.retireTeam = true" class="teambutton">
+          <button @click="retireTeamModal?.show()" class="teambutton">
             Retire Team
           </button>
         </div>
@@ -626,51 +626,9 @@
     <FireCheerleaderModal ref="fireCheerleaderModal" @confirm="removeCheerleader"/>
     <FireApothecaryModal ref="fireApothecaryModal" @confirm="removeApothecary"/>
     <ActivateTeamModal ref="activateTeamModal" @confirm="handleActivateTeam"/>
+    <DeleteTeamModal ref="deleteTeamModal" @confirm="handleDeleteTeam" :teamManagementSettings="teamManagementSettings" :team="team"/>
+    <RetireTeamModal ref="retireTeamModal" @confirm="handleRetireTeam" :teamManagementSettings="teamManagementSettings" :team="team"/>
 
-    <modal
-      v-show="modals.deleteTeam === true"
-      :button-settings="{
-        cancel: { enabled: true, label: 'Cancel' },
-        confirm: { enabled: true, label: 'Delete Team' },
-      }"
-      :modal-size="'small'"
-      @cancel="modals.deleteTeam = false"
-      @confirm="handleDeleteTeam"
-    >
-      <template v-slot:header> Delete team? </template>
-
-      <template v-slot:body>
-        <p>Are you sure you want to delete the following team?</p>
-        <p>
-          Team: <strong>{{ team.getName() }}</strong>
-          {{ team.getTeamValue() / 1000 }}k ({{
-            teamManagementSettings.rosterName
-          }})
-        </p>
-      </template>
-    </modal>
-    <modal
-      v-show="modals.retireTeam === true"
-      :button-settings="{
-        cancel: { enabled: true, label: 'Cancel' },
-        confirm: { enabled: true, label: 'Retire Team' },
-      }"
-      :modal-size="'small'"
-      @cancel="modals.retireTeam = false"
-      @confirm="handleRetireTeam"
-    >
-      <template v-slot:header> Retire team? </template>
-
-      <template v-slot:body>
-        <p>Are you sure you want to retire the following team?</p>
-        <p>
-          Team: <strong>{{ team.getName() }}</strong>
-          {{ team.getTeamValue() / 1000 }}k ({{
-            teamManagementSettings.rosterName
-          }})
-        </p>
-      </template>
-    </modal>
     <modal
       v-show="modals.skillPlayer === true"
       :modal-size="'skill'"
@@ -814,6 +772,8 @@ import {
   ErrorModal,
   ActivateTeamModal,
   CreateErrorModal,
+  DeleteTeamModal,
+  RetireTeamModal,
 } from "./modals/Modals"
 
 import {
@@ -847,6 +807,8 @@ import EditTeamName from "./EditTeamName.vue";
     ErrorModal,
     ActivateTeamModal,
     CreateErrorModal,
+    DeleteTeamModal,
+    RetireTeamModal,
   },
 })
 class TeamComponent extends Vue {
@@ -922,6 +884,10 @@ class TeamComponent extends Vue {
   public activateTeamModal: InstanceType<typeof ActivateTeamModal>|undefined;
   @Ref
   public createErrorModal: InstanceType<typeof CreateErrorModal>|undefined;
+  @Ref
+  public deleteTeamModal: InstanceType<typeof DeleteTeamModal>|undefined;
+  @Ref
+  public retireTeamModal: InstanceType<typeof RetireTeamModal>|undefined;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
 

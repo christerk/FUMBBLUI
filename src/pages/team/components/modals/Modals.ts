@@ -5,5 +5,7 @@ import FireApothecaryModal from "./FireApothecary.vue";
 import ErrorModal from "./Error.vue";
 import ActivateTeamModal from "./ActivateTeam.vue";
 import CreateErrorModal from "./CreateError.vue";
+import DeleteTeamModal from "./DeleteTeam.vue";
+import RetireTeamModal from "./RetireTeam.vue";
 
-export { DiscardRerollModal, FireAssistantCoachModal, FireCheerleaderModal, FireApothecaryModal, ErrorModal, ActivateTeamModal, CreateErrorModal };
+export { DiscardRerollModal, FireAssistantCoachModal, FireCheerleaderModal, FireApothecaryModal, ErrorModal, ActivateTeamModal, CreateErrorModal, DeleteTeamModal, RetireTeamModal };
