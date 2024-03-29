@@ -29,7 +29,7 @@ import { Sortable } from 'sortablejs-vue3'
 })
 class SortableTable extends Vue {
   @Prop
-  Items: {empty: boolean, number: number}[] = []
+  Items: {empty: boolean, number: number, id: number}[] = []
 
   @Prop
   FootItems:  {empty: boolean, number: number}[] = []
@@ -49,7 +49,7 @@ class SortableTable extends Vue {
   }
 
   @Emit
-  public onChange(evt) {
+  public onChange(evt: any) {
     let oldIndex = evt.oldDraggableIndex;
     let newIndex = evt.newDraggableIndex;
 
@@ -73,13 +73,14 @@ class SortableTable extends Vue {
   }
 
   @Emit
-  public onEnd(evt) {
+  public onEnd(evt: any) {
     if (evt.oldDraggableIndex > evt.newDraggableIndex) {
       let item = this.Items.splice(evt.oldDraggableIndex, 1);
       this.Items.splice(evt.newDraggableIndex, 0, item[0]);
     } else {
       let items = this.Items.splice(evt.oldDraggableIndex+1, evt.newDraggableIndex-evt.oldDraggableIndex);
-      Array.prototype.splice.apply(this.Items, [evt.oldDraggableIndex, 0].concat(items));
+      const args:any = [evt.oldDraggableIndex, 0].concat(items);
+      Array.prototype.splice.apply(this.Items, args);
     }
   }
 }

@@ -3,17 +3,17 @@
       v-show="isVisible"
       :button-settings="{
         cancel: { enabled: true, label: 'Cancel' },
-        confirm: { enabled: true, label: 'Remove' },
+        confirm: { enabled: true, label: 'Fire' },
       }"
       :modal-size="'small'"
       @cancel="cancel"
       @confirm="confirm"
     >
-      <template v-slot:header> Discard assistant coach </template>
+      <template v-slot:header>Fire assistant coach</template>
 
       <template v-slot:body>
         <p>
-          Are you sure you wish to discard this assistant coach? This cannot be undone.
+          Are you sure you wish to fire this assistant coach? This cannot be undone.
         </p>
       </template>
     </modal>    
@@ -32,19 +32,13 @@ class FireAssistantCoachModal extends Vue {
     public isVisible: boolean = false;
 
     @Emit("cancelled")
-    public cancelled() {}
-
-    @Emit("confirmed")
-    public confirmed() {}
-
     public cancel() {
-        this.hide();
-        this.cancelled();
+      this.hide();
     }
-
+    
+    @Emit("confirmed")
     public confirm() {
         this.hide();
-        this.confirmed();
     }
 
     public show() {

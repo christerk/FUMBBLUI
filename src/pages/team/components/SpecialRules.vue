@@ -89,8 +89,8 @@
       <template v-slot:header> Error </template>
 
       <template v-slot:body>
-        <p>{{ errorModalInfo.general }}</p>
-        <p>Technical details: {{ errorModalInfo.technical }}</p>
+        <p>{{ errorModalInfo }}</p>
+        <p>Technical details: {{ errorModalInfo }}</p>
       </template>
     </modal>
   </div>

@@ -126,7 +126,7 @@ class TournamentSquads extends Vue {
     }
   }
 
-  public toggleSettings(squad) {
+  public toggleSettings(squad: any) {
     squad.settingsVisible = !squad.settingsVisible;
   }
 

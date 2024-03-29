@@ -9,11 +9,11 @@
 </style>
 
 <script lang="ts">
-import { Emit, Prop, Component, Vue, toNative } from 'vue-facing-decorator'
+import { Component, Vue, toNative } from 'vue-facing-decorator'
 
 @Component
 class Spinner extends Vue {
-  private show: boolean = false;
+  public show: boolean = false;
 
   public mounted() {
     this.show = true;

@@ -59,23 +59,12 @@
             </button>
 
             <button
-              v-else-if="
-                team.getTeamStatus().isNew() &&
-                teamManagementSettings.isValidForCreate(team) &&
-                specialRuleErrors.length === 0
-              "
-              class="menu"
-              @click="modals.activateTeam = true"
-            >
-              Activate
-            </button>
-            <button
               v-else-if="team.getTeamStatus().isNew()"
-              @click="modals.errorsForCreate = true"
+              @click="activateTeam"
               class="menu"
-            >
-              Activate
-            </button>
+            >Create</button>
+
+
             <li class="menu">
               <a
                 href="#"
@@ -481,7 +470,6 @@
                 :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
                 :label-remove="accessControl.canCreate() ? 'Remove' : 'Discard'"
                 @add="addDedicatedFans"
-                @remove-with-confirm="modals.removeDedicatedFans = true"
                 @remove-immediately="removeDedicatedFans"
               ></addremove>
             </div>
@@ -525,7 +513,7 @@
                 :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
                 :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
                 @add="addCheerleader"
-                @remove-with-confirm="modals.removeCheerleader = true"
+                @remove-with-confirm="fireCheerleaderModal?.show()"
                 @remove-immediately="removeCheerleader"
               ></addremove>
             </div>
@@ -547,7 +535,7 @@
                 :label-add="accessControl.canCreate() ? 'Add' : 'Hire'"
                 :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
                 @add="addApothecary"
-                @remove-with-confirm="modals.removeApothecary = true"
+                @remove-with-confirm="fireApothecaryModal?.show()"
                 @remove-immediately="removeApothecary"
               ></addremove>
             </div>
@@ -630,139 +618,15 @@
         </div>
       </div>
     </div>
-    <modal
-      v-if="errorModalInfo !== null"
-      :button-settings="{
-        cancel: { enabled: true, label: 'Close' },
-        confirm: { enabled: false, label: '' },
-      }"
-      :modal-size="'small'"
-      @cancel="errorModalInfo = null"
-    >
-      <template v-slot:header> Error </template>
 
-      <template v-slot:body>
-        <p>{{ errorModalInfo.general }}</p>
-        <p>Technical details: {{ errorModalInfo.technical }}</p>
-      </template>
-    </modal>
-
+    <ErrorModal ref="errorModal"/>
+    <CreateErrorModal ref="createErrorModal" :teamManagementSettings="teamManagementSettings" :team="team"/>
     <DiscardRerollModal ref="discardRerollModal" @confirm="removeReroll"/>
     <FireAssistantCoachModal ref="fireAssistantCoachModal" @confirm="removeAssistantCoach"/>
+    <FireCheerleaderModal ref="fireCheerleaderModal" @confirm="removeCheerleader"/>
+    <FireApothecaryModal ref="fireApothecaryModal" @confirm="removeApothecary"/>
+    <ActivateTeamModal ref="activateTeamModal" @confirm="handleActivateTeam"/>
 
-    <modal
-      v-show="modals.removeCheerleader === true"
-      :button-settings="{
-        cancel: { enabled: true, label: 'Cancel' },
-        confirm: { enabled: true, label: 'Remove' },
-      }"
-      :modal-size="'small'"
-      @cancel="modals.removeCheerleader = false"
-      @confirm="removeCheerleader"
-    >
-      <template v-slot:header> Discard cheerleader </template>
-
-      <template v-slot:body>
-        <p>
-          Are you sure you wish to discard this cheerleader? This cannot be
-          undone.
-        </p>
-      </template>
-    </modal>
-    <modal
-      v-show="modals.removeApothecary === true"
-      :button-settings="{
-        cancel: { enabled: true, label: 'Cancel' },
-        confirm: { enabled: true, label: 'Remove' },
-      }"
-      :modal-size="'small'"
-      @cancel="modals.removeApothecary = false"
-      @confirm="removeApothecary"
-    >
-      <template v-slot:header> Fire apothecary </template>
-
-      <template v-slot:body>
-        <p>
-          Are you sure you wish to fire this apothecary? This cannot be undone.
-        </p>
-      </template>
-    </modal>
-    <modal
-      v-show="modals.activateTeam === true"
-      :button-settings="{
-        cancel: { enabled: true, label: 'Oops, let me go back and check!' },
-        confirm: { enabled: true, label: 'Yes, my team complies' },
-      }"
-      :modal-size="'medium'"
-      @cancel="modals.activateTeam = false"
-      @confirm="handleActivateTeam"
-    >
-      <template v-slot:header> * * * Important Notice * * * </template>
-
-      <template v-slot:body>
-        <p>
-          Before you activate your team, please make sure your team complies
-          with our
-          <a
-            href="https://fumbbl.com/note/Christer/NamesAndImages"
-            target="_blank"
-            >Team Naming Policy</a
-          >.
-        </p>
-        <p>
-          Failure to follow these rules may result in your account being
-          suspended for some time, depending on the severity of the
-          transgression. The staff and the community are constantly monitoring
-          teams and we do take this seriously. So, please make sure your team is
-          in accordance with the rules before activating it.
-        </p>
-      </template>
-    </modal>
-    <modal
-      v-show="modals.errorsForCreate === true"
-      :button-settings="{
-        cancel: { enabled: true, label: 'Close' },
-        confirm: { enabled: false, label: '' },
-      }"
-      :modal-size="'small'"
-      @cancel="modals.errorsForCreate = false"
-    >
-      <template v-slot:header> Unable to create team. </template>
-
-      <template v-slot:body>
-        <p>
-          Sorry we are unable to create your team, please review the errors
-          listed below.
-        </p>
-        <ul>
-          <li
-            v-for="error in teamManagementSettings.getErrorsForCreate(team)"
-            :key="error"
-          >
-            <template v-if="error === 'teamNameBlank'"
-              >Team name is blank.</template
-            >
-            <template v-if="error === 'insufficientTreasury'"
-              >Insufficient treasury for chosen players and sideline
-              staff.</template
-            >
-            <template v-if="error === 'insufficientPlayers'"
-              >Less than minimum required starting players selected.</template
-            >
-          </li>
-          <li v-for="error in specialRuleErrors" :key="error">
-            <template v-if="error === 'oneOfNotChosen'"
-              >Special rules: team requires a choice from the "one of"
-              options.</template
-            >
-            <template v-if="error === 'specialRuleNotChosen'"
-              >Special rules: team requires a choice from the list of special
-              rule options.</template
-            >
-          </li>
-        </ul>
-      </template>
-    </modal>
     <modal
       v-show="modals.deleteTeam === true"
       :button-settings="{
@@ -928,8 +792,6 @@ import AccessControl from "../include/AccessControl";
 import Team from "../include/Team";
 import PlayerComponent from "./Player.vue";
 import EditTeamNameComponent from "./EditTeamName.vue";
-import DiscardRerollModal from "./modals/DiscardReroll.vue";
-import FireAssistantCoachModal from "./modals/FireAssistantCoach.vue";
 import HireRookiesComponent from "./HireRookies.vue";
 import RosterIconManager from "../include/RosterIconManager";
 import TeamManagementSettings from "../include/TeamManagementSettings";
@@ -944,6 +806,15 @@ import TeamStats from "./TeamStats.vue";
 import TeamMatches from "./TeamMatches.vue";
 import TeamBio from "./TeamBio.vue";
 import TeamDebug from "./TeamDebug.vue";
+import {
+  DiscardRerollModal, 
+  FireAssistantCoachModal,
+  FireCheerleaderModal,
+  FireApothecaryModal,
+  ErrorModal,
+  ActivateTeamModal,
+  CreateErrorModal,
+} from "./modals/Modals"
 
 import {
   EventDataFoldOut,
@@ -970,7 +841,12 @@ import EditTeamName from "./EditTeamName.vue";
     TeamDebug,
     Spinner,
     DiscardRerollModal,
-    FireAssistantCoachModal
+    FireAssistantCoachModal,
+    FireCheerleaderModal,
+    FireApothecaryModal,
+    ErrorModal,
+    ActivateTeamModal,
+    CreateErrorModal,
   },
 })
 class TeamComponent extends Vue {
@@ -1036,6 +912,16 @@ class TeamComponent extends Vue {
   public discardRerollModal: InstanceType<typeof DiscardRerollModal>|undefined;
   @Ref
   public fireAssistantCoachModal: InstanceType<typeof FireAssistantCoachModal>|undefined;
+  @Ref
+  public fireCheerleaderModal: InstanceType<typeof FireCheerleaderModal>|undefined;
+  @Ref
+  public fireApothecaryModal: InstanceType<typeof FireApothecaryModal>|undefined;
+  @Ref
+  public errorModal: InstanceType<typeof ErrorModal>|undefined;
+  @Ref
+  public activateTeamModal: InstanceType<typeof ActivateTeamModal>|undefined;
+  @Ref
+  public createErrorModal: InstanceType<typeof CreateErrorModal>|undefined;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
 
@@ -1057,7 +943,6 @@ class TeamComponent extends Vue {
   };
   public mainMenuShow: string = "none";
   private showHireRookies: boolean = false;
-  public errorModalInfo: { general: string; technical: string } | null = null;
   public skillingPlayer: Player | null = null;
   public showEmResult: boolean = false;
   public emResult: string = "";
@@ -1070,27 +955,15 @@ class TeamComponent extends Vue {
   public playerListKey: number = 0;
 
   public modals: {
-    activateTeam: boolean;
-    errorsForCreate: boolean;
     deleteTeam: boolean;
     retireTeam: boolean;
     removeReroll: boolean;
-    removeAssistantCoach: boolean;
-    removeCheerleader: boolean;
-    removeApothecary: boolean;
-    removeDedicatedFans: boolean;
     skillPlayer: boolean;
     readyTeam: boolean;
   } = {
-    activateTeam: false,
-    errorsForCreate: false,
     deleteTeam: false,
     retireTeam: false,
     removeReroll: false,
-    removeAssistantCoach: false,
-    removeCheerleader: false,
-    removeApothecary: false,
-    removeDedicatedFans: false,
     skillPlayer: false,
     readyTeam: false,
   };
@@ -1246,10 +1119,10 @@ class TeamComponent extends Vue {
     generalErrorMessage: string,
     technicalErrorMessage: string,
   ) {
-    this.errorModalInfo = {
+    this.errorModal?.show({
       general: generalErrorMessage,
       technical: technicalErrorMessage,
-    };
+    });
     await this.reloadTeam();
   }
 
@@ -1521,7 +1394,6 @@ class TeamComponent extends Vue {
 
   public async removeDedicatedFans() {
     this.team.removeDedicatedFans(this.teamManagementSettings.dedicatedFansCost);
-    this.modals.removeDedicatedFans = false;
     this.reloadTeamWithDelay();
 
     let apiResponse = null;
@@ -1555,7 +1427,6 @@ class TeamComponent extends Vue {
     this.team.removeAssistantCoach(
       this.teamManagementSettings.assistantCoachCost,
     );
-    this.modals.removeAssistantCoach = false;
     this.reloadTeamWithDelay();
 
     let apiResponse = null;
@@ -1589,7 +1460,6 @@ class TeamComponent extends Vue {
 
   public async removeCheerleader() {
     this.team.removeCheerleader(this.teamManagementSettings.cheerleaderCost);
-    this.modals.removeCheerleader = false;
     this.reloadTeamWithDelay();
 
     let apiResponse = null;
@@ -1621,7 +1491,6 @@ class TeamComponent extends Vue {
 
   public async removeApothecary() {
     this.team.removeApothecary(this.teamManagementSettings.apothecaryCost);
-    this.modals.removeApothecary = false;
     this.reloadTeamWithDelay();
 
     let apiResponse = null;
@@ -1807,6 +1676,66 @@ class TeamComponent extends Vue {
     await this.fumbblApi.skipTournament(this.team.getId());
   }
 
+  public getSpecialRuleErrors(teamSpecialRules: any): string[] {
+    const errors: string[] = [];
+
+    let oneOfChoiceRequired: boolean = false;
+    let oneOfChoice: string | null = null;
+
+    // Find out if a one of choice is required
+    // Also find the choice made for the one of
+    for (const specialRuleLabel of Object.keys(teamSpecialRules)) {
+      const teamSpecialRule = teamSpecialRules[specialRuleLabel];
+      const teamSpecialRuleChoice = teamSpecialRule[1];
+      const teamSpecialRuleSettings = teamSpecialRule[2];
+      if (
+        typeof teamSpecialRuleSettings === "object" &&
+        teamSpecialRuleSettings !== null
+      ) {
+        if (teamSpecialRuleSettings.oneOf === true) {
+          oneOfChoiceRequired = true;
+          oneOfChoice = teamSpecialRuleChoice;
+          if (!teamSpecialRuleChoice) {
+            errors.push("oneOfNotChosen");
+          }
+        }
+      }
+    }
+
+    // For any multiple choice special rules, if they are a one of choice make sure the choice has been made, otherwise always make sure the choice has been made.
+    for (const specialRuleLabel of Object.keys(teamSpecialRules)) {
+      const teamSpecialRule = teamSpecialRules[specialRuleLabel];
+      const teamSpecialRuleOptions = teamSpecialRule[0];
+      const teamSpecialRuleChoice = teamSpecialRule[1];
+      if (Array.isArray(teamSpecialRuleOptions)) {
+        if (!teamSpecialRuleChoice) {
+          if (!oneOfChoiceRequired || oneOfChoice === specialRuleLabel) {
+            errors.push("specialRuleNotChosen");
+          }
+        }
+      }
+    }
+
+    return errors;
+  }    
+
+  public activateTeam() {
+      if (!this.team.getTeamStatus().isNew()) {
+        return;
+      }
+      let specialRuleErrors = this.getSpecialRuleErrors(this.rawApiSpecialRules.fromTeam);
+
+      let hasErrors: boolean = false;
+      hasErrors ||= !this.teamManagementSettings.isValidForCreate(this.team);
+      hasErrors ||= specialRuleErrors.length > 0;
+
+      if (hasErrors) {
+        this.createErrorModal?.show(specialRuleErrors);
+      } else {
+        this.activateTeamModal?.show();
+      }
+  }
+
   public async unreadyTeam() {
     this.menuHide();
     const originalTeamStatus = this.team.getTeamStatus();
@@ -1988,10 +1917,8 @@ class TeamComponent extends Vue {
     const apiResponse = await this.fumbblApi.activateTeam(this.team.id);
     if (apiResponse.isSuccessful()) {
       await this.reloadTeam();
-      this.modals.activateTeam = false;
       setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 500);
     } else {
-      this.modals.activateTeam = false;
       await this.recoverFromUnexpectedError(
         "An error occurred activating your team.",
         apiResponse.getErrorMessage(),
@@ -2079,49 +2006,7 @@ class TeamComponent extends Vue {
     );
   }
 
-  public get specialRuleErrors(): string[] {
-    const errors: string[] = [];
 
-    const teamSpecialRules = this.rawApiSpecialRules.fromTeam;
-    let oneOfChoiceRequired: boolean = false;
-    let oneOfChoice: string | null = null;
-
-    // Find out if a one of choice is required
-    // Also find the choice made for the one of
-    for (const specialRuleLabel of Object.keys(teamSpecialRules)) {
-      const teamSpecialRule = teamSpecialRules[specialRuleLabel];
-      const teamSpecialRuleChoice = teamSpecialRule[1];
-      const teamSpecialRuleSettings = teamSpecialRule[2];
-      if (
-        typeof teamSpecialRuleSettings === "object" &&
-        teamSpecialRuleSettings !== null
-      ) {
-        if (teamSpecialRuleSettings.oneOf === true) {
-          oneOfChoiceRequired = true;
-          oneOfChoice = teamSpecialRuleChoice;
-          if (!teamSpecialRuleChoice) {
-            errors.push("oneOfNotChosen");
-          }
-        }
-      }
-    }
-
-    // For any multiple choice special rules, if they are a one of choice make sure the choice has been made, otherwise always make sure the choice has been made.
-    for (const specialRuleLabel of Object.keys(teamSpecialRules)) {
-      const teamSpecialRule = teamSpecialRules[specialRuleLabel];
-      const teamSpecialRuleOptions = teamSpecialRule[0];
-      const teamSpecialRuleChoice = teamSpecialRule[1];
-      if (Array.isArray(teamSpecialRuleOptions)) {
-        if (!teamSpecialRuleChoice) {
-          if (!oneOfChoiceRequired || oneOfChoice === specialRuleLabel) {
-            errors.push("specialRuleNotChosen");
-          }
-        }
-      }
-    }
-
-    return errors;
-  }
 
   public encodeFumbblUrl(url: string): string {
       return encodeURIComponent(url).replaceAll("%20", "+");

@@ -3,20 +3,20 @@
       v-show="isVisible"
       :button-settings="{
         cancel: { enabled: true, label: 'Cancel' },
-        confirm: { enabled: true, label: 'Discard' },
+        confirm: { enabled: true, label: 'Fire' },
       }"
       :modal-size="'small'"
       @cancel="cancel"
       @confirm="confirm"
     >
-      <template v-slot:header>Discard reroll</template>
+    <template v-slot:header>Fire apothecary</template>
 
-      <template v-slot:body>
-        <p>
-          Are you sure you wish to discard this reroll? This cannot be undone.
-        </p>
-      </template>
-    </modal>
+    <template v-slot:body>
+    <p>
+        Are you sure you wish to fire this apothecary? This cannot be undone.
+    </p>
+    </template>
+    </modal>    
 </template>
 
 <script lang="ts">
@@ -28,14 +28,14 @@ import ModalComponent from "../Modal.vue";
     modal: ModalComponent
   }
 })
-class DiscardRerollModal extends Vue {
+class FireApothecaryModal extends Vue {
     public isVisible: boolean = false;
 
     @Emit("cancelled")
     public cancel() {
-      this.hide();
+        this.hide();
     }
-    
+
     @Emit("confirmed")
     public confirm() {
         this.hide();
@@ -50,6 +50,6 @@ class DiscardRerollModal extends Vue {
     }
 
 }
-export default toNative(DiscardRerollModal);
+export default toNative(FireApothecaryModal);
 
 </script>

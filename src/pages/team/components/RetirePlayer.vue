@@ -123,7 +123,7 @@ class RetirePlayerComponent extends Vue {
     // api data includes miss next game injuries twice, for this purpose we can ignore any containing '(MNG)'
     const rawApiPlayerInjuryCountWithoutDuplicates =
       rawApiPlayer.injuries.filter(
-        (injury) => !injury.includes("(MNG)"),
+        (injury: any) => !injury.includes("(MNG)"),
       ).length;
     if (
       this.player.getInjuries().length !==
