@@ -8,7 +8,7 @@
         <die
           type="d6"
           ref="debugDie"
-          @complete="completeExpensiveMistakes"
+          @complete="() => {}"
         ></die>
       </div>
     </div>
@@ -21,6 +21,7 @@
 
 <script lang="ts">
 import { Emit, Prop, Component, Vue, toNative, Ref } from "vue-facing-decorator";
+import Team from "../include/Team";
 import FumbblApi from "../include/FumbblApi";
 import { Die } from "@components/fumbblcomponents";
 
@@ -31,11 +32,11 @@ import { Die } from "@components/fumbblcomponents";
 })
 class TeamDebug extends Vue {
 
-  @Prop
-  public team;
+  @Prop({ required: true })
+  public team!: Team;
 
-  @Prop
-  public fumbblApi: FumbblApi;
+  @Prop({ required: true })
+  public fumbblApi!: FumbblApi;
 
   @Emit
   public close() {}
@@ -46,12 +47,12 @@ class TeamDebug extends Vue {
   }
 
   @Ref
-  private debugDie: Die;
+  public debugDie: InstanceType<typeof Die>|undefined;
 
   async mounted() {}
 
-  private roll() {
-    this.debugDie.roll(Math.floor(Math.random() * 6)+1);
+  public roll() {
+    this.debugDie?.roll(Math.floor(Math.random() * 6)+1);
   }
 }
 

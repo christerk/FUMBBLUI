@@ -1,5 +1,3 @@
-import { Ref } from "vue";
-
 export interface DemoTeamSettings {
   existingTeamId: number;
 }
@@ -114,7 +112,7 @@ export interface PlayerRecord {
 
 export interface JourneymanQuantityChoice {
   positionId: number;
-  quantity: Ref<number>;
+  quantity: number;
 }
 
 export interface JourneymanQuantityInput extends JourneymanQuantityChoice {

@@ -3,7 +3,7 @@
     <img v-if="type=='d6'" src="https://fumbbl.com/i/562665" />
     <img v-if="type=='d8'" src="https://fumbbl.com/i/562717" />
   </div>
-  <div v-show="number > 0" :class="['die', type]" :style="{ 'background-position': bgx+'px ' + bgy + 'px', 'transform': 'rotate('+this.rotate+'deg)' }" />
+  <div v-show="number > 0" :class="['die', type]" :style="{ 'background-position': bgx+'px ' + bgy + 'px', 'transform': 'rotate('+rotate+'deg)' }" />
 </template>
 
 <style scoped>
@@ -18,17 +18,18 @@ class Die extends Vue {
   @Prop
   type: string = "d6"
 
-  private d6Targets: number[][][];
-  private bgx: number = 0;
-  private bgy: number = 0;
+  private d6Targets: number[][][] = [];
+  private d8Targets: number[][][] = [];
+  public bgx: number = 0;
+  public bgy: number = 0;
   private targetX: number = 0;
   private targetY: number = 0;
-  private number: number;
+  public number: number = 0;
   private animationTime: number = 1500;
   private time: number = 0;
   private startX: number = 0;
   private startY: number = 0;
-  private rotate: 0;
+  public rotate: number = 0;
 
   public mounted() {
     this.d6Targets = [
@@ -55,13 +56,17 @@ class Die extends Vue {
   }
 
   public roll(result: number) {
-    let t: number;
+    let t: number[][];
 
     if (this.type == 'd6') {
       t = this.d6Targets[result];
     } else if (this.type == 'd8') {
       t = this.d8Targets[result];
     }
+    else {
+      return;
+    }
+
     let targetCoordinate = t[Math.floor(Math.random()*t.length)];
 
     this.rotate = targetCoordinate[2];
@@ -72,7 +77,7 @@ class Die extends Vue {
     this.targetY = -50 * targetCoordinate[1];
 
     let radius = 5000;
-    let angle = Math.random(2 * Math.PI);
+    let angle = 2 * Math.PI * Math.random();
     this.startX = this.targetX + radius * Math.cos(angle);
     this.startY = this.targetY + radius * Math.sin(angle);
 
@@ -107,7 +112,7 @@ class Die extends Vue {
     this.bgy = ((1900 + currentY)%19) * 50;
   }
 
-  public ease(t) {
+  public ease(t: number) {
     return t * ( 2 - t );
   }
 }

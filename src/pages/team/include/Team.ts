@@ -37,8 +37,8 @@ export default class Team {
   private maxPlayers: number;
   public record: any = {};
   private sppLimits: any;
-  private bio: string|null = null;
-  private logo: number|null = null;
+  public bio: string|null = null;
+  public logo: number|null = null;
 
   constructor(
     division: string,

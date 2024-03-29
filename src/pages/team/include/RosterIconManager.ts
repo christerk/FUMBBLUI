@@ -62,7 +62,7 @@ export default class RosterIconManager {
     const nextAvailableIconRowVersionPosition = this.positionsIconData[
       positionId
     ].iconData.iconRowVersionPositions.findIndex(
-      (iconRowVersionPosition, index) => {
+      (iconRowVersionPosition: any, index: number) => {
         return !takenIconRowVersionPositions.includes(index);
       },
     );

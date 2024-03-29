@@ -63,17 +63,18 @@
 <script lang="ts">
 import { Emit, Prop, Component, Vue, toNative } from "vue-facing-decorator";
 import FumbblApi from "../include/FumbblApi";
+import Team from "../include/Team";
 
 @Component
 class TeamMatches extends Vue {
-  private matches: any = [];
-  private showMoreButton: boolean = true;
+  public matches: any = [];
+  public showMoreButton: boolean = true;
+
+  @Prop({ required: true })
+  public team!: Team;
 
   @Prop
-  public team;
-
-  @Prop
-  public fumbblApi: FumbblApi;
+  public fumbblApi!: FumbblApi;
 
   @Emit
   public close() {}
@@ -113,7 +114,7 @@ class TeamMatches extends Vue {
   }
 
   private flipMatches(matches: any[]) {
-    let result = [];
+    let result:any[] = [];
 
     matches.forEach((match) => {
       if (match.team1.id != this.team.id) {

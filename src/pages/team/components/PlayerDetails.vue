@@ -164,7 +164,6 @@ class PlayerDetailsComponent extends Vue {
   @Watch("player.foldOut")
   playerFoldOutWatcher(
     newValue: PlayerRowFoldOutMode,
-    oldValue: PlayerRowFoldOutMode,
   ) {
     if (newValue === "CLOSED") {
       this.refreshUpdatePlayerDetails();

@@ -65,7 +65,7 @@
 </template>
 
 <script lang="ts">
-import { PropType, ref } from "vue";
+import { PropType } from "vue";
 import { Prop, Component, Vue, toNative, Emit } from "vue-facing-decorator";
 import {
   JourneymanQuantityChoice,
@@ -101,7 +101,7 @@ class ReadyToPlayComponent extends Vue {
           return {
             positionId: position.id,
             positionName: position.name,
-            quantity: ref(0),
+            quantity: 0,
           };
         },
       );
@@ -127,12 +127,13 @@ class ReadyToPlayComponent extends Vue {
 
   public get journeymanQuantityChoices(): JourneymanQuantityChoice[] {
     if (this.journeymanPositions.length === 1) {
-      return [
+      let pos: JourneymanQuantityChoice[] = [
         {
           positionId: this.journeymanPositions[0].id,
           quantity: this.journeymanQuantityForNextGame,
         },
       ];
+      return pos;
     }
 
     return this.journeymanQuantityInputs;

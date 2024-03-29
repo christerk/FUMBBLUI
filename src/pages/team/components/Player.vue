@@ -175,7 +175,7 @@
           >Legend
           <div class="legendspptotal">{{ sppDisplayInfo.total }}</div>
         </template>
-        <template v-else-if="player.getPosition().isPeaked">
+        <template v-else-if="player.getPosition() != null && player.getPosition()!.isPeaked">
           <div>Peak-{{ sppDisplayInfo.spendable }}</div>
         </template>
         <template v-else>

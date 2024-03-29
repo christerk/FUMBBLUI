@@ -15,14 +15,19 @@
 <script lang="ts">
 import { Emit, Prop, Component, Vue, toNative } from "vue-facing-decorator";
 import FumbblApi from "../include/FumbblApi";
+import Team from "../include/Team";
+
+declare global {
+  function initializeBBCode(): void;
+}
 
 @Component
 class TeamBio extends Vue {
-  @Prop
-  public team;
+  @Prop({ required: true })
+  public team!: Team;
 
-  @Prop
-  public fumbblApi: FumbblApi;
+  @Prop({ required: true })
+  public fumbblApi!: FumbblApi;
 
   @Emit
   public close() {}
@@ -35,7 +40,9 @@ class TeamBio extends Vue {
   public statistics: any = {};
 
   async mounted() {
-    initializeBBCode();
+    if (typeof initializeBBCode === "function") {
+      initializeBBCode();
+    }
   }
 
   public async loadBio() {
