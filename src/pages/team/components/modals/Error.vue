@@ -2,8 +2,8 @@
     <modal
       v-show="isVisible && errorModalInfo != null"
       :button-settings="{
-        cancel: { enabled: true, label: 'Cancel' },
-        confirm: { enabled: true, label: 'Fire' },
+        cancel: { enabled: true, label: 'Close' },
+        confirm: { enabled: false },
       }"
       :modal-size="'small'"
       @cancel="cancel"

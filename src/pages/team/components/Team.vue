@@ -90,6 +90,15 @@
                 <li v-if="accessControl.canRenameTeam()">
                   <a href="#" @click.prevent="renameTeam()">Rename</a>
                 </li>
+                <li v-if="accessControl.canSetTreasury()">
+                  <a href="#" @click.prevent="setTreasury()">Set Treasury</a>
+                </li>
+                <li v-if="accessControl.canSetDedicatedFans()">
+                  <a href="#" @click.prevent="setDedicatedFans()">Set Fans</a>
+                </li>
+                <li v-if="accessControl.canRenameAllPlayers()">
+                  <a href="#" @click.prevent="renameAllPlayers()">Rename Players</a>
+                </li>
               </ul>
             </li>
             <div class="spacer"></div>
@@ -465,7 +474,7 @@
             <div class="info right">
               <addremove
                 :current-value="team.getDedicatedFans().toString()"
-                :can-edit="accessControl.canEdit()"
+                :can-edit="accessControl.canCreate()"
                 :can-remove-immediately="accessControl.canCreate()"
                 :can-add="addRemovePermissions.dedicatedFans.add"
                 :can-remove="addRemovePermissions.dedicatedFans.remove"
@@ -630,6 +639,9 @@
     <ActivateTeamModal ref="activateTeamModal" @confirm="handleActivateTeam"/>
     <DeleteTeamModal ref="deleteTeamModal" @confirm="handleDeleteTeam" :teamManagementSettings="teamManagementSettings" :team="team"/>
     <RetireTeamModal ref="retireTeamModal" @confirm="handleRetireTeam" :teamManagementSettings="teamManagementSettings" :team="team"/>
+    <SetTreasuryModal ref="setTreasuryModal" @confirm="handleSetTreasury" :teamManagementSettings="teamManagementSettings" :team="team"/>
+    <SetDedicatedFansModal ref="setDedicatedFansModal" @confirm="handleSetDedicatedFans" :teamManagementSettings="teamManagementSettings" :team="team"/>
+    <RenameAllPlayersModal ref="renameAllPlayersModal" @confirm="handleRenameAllPlayers" :teamManagementSettings="teamManagementSettings" :team="team"/> 
 
     <modal
       v-show="modals.skillPlayer === true"
@@ -776,6 +788,9 @@ import {
   CreateErrorModal,
   DeleteTeamModal,
   RetireTeamModal,
+  SetTreasuryModal,
+  SetDedicatedFansModal,
+  RenameAllPlayersModal,
 } from "./modals/Modals"
 
 import {
@@ -811,6 +826,9 @@ import EditTeamName from "./EditTeamName.vue";
     CreateErrorModal,
     DeleteTeamModal,
     RetireTeamModal,
+    SetTreasuryModal,
+    SetDedicatedFansModal,
+    RenameAllPlayersModal,
   },
 })
 class TeamComponent extends Vue {
@@ -890,6 +908,12 @@ class TeamComponent extends Vue {
   public deleteTeamModal: InstanceType<typeof DeleteTeamModal>|undefined;
   @Ref
   public retireTeamModal: InstanceType<typeof RetireTeamModal>|undefined;
+  @Ref
+  public setTreasuryModal: InstanceType<typeof SetTreasuryModal>|undefined;
+  @Ref
+  public setDedicatedFansModal: InstanceType<typeof SetDedicatedFansModal>|undefined;
+  @Ref
+  public renameAllPlayersModal: InstanceType<typeof RenameAllPlayersModal>|undefined;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
 
@@ -1722,8 +1746,22 @@ class TeamComponent extends Vue {
 
   public async renameTeam() {
     this.menuHide();
-    
     this.nameEdit?.begin();
+  }
+
+  public async setTreasury() {
+    this.menuHide();
+    this.setTreasuryModal?.show();
+  }
+
+  public async setDedicatedFans() {
+    this.menuHide();
+    this.setDedicatedFansModal?.show();
+  }
+
+  public async renameAllPlayers() {
+    this.menuHide();
+    this.renameAllPlayersModal?.show();
   }
 
   public async magicFixTeam() {
@@ -1918,6 +1956,45 @@ class TeamComponent extends Vue {
       this.modals.retireTeam = false;
       await this.recoverFromUnexpectedError(
         "An error occurred retiring your team.",
+        apiResponse.getErrorMessage(),
+      );
+    }
+  }
+
+  public async handleSetTreasury(newTreasury: number) {
+    const apiResponse = await this.fumbblApi.setTreasury(this.team.getId(), newTreasury);
+    if (apiResponse.isSuccessful()) {
+      await this.reloadTeam();
+      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 500);
+    } else {
+      await this.recoverFromUnexpectedError(
+        "An error occurred setting team treasury.",
+        apiResponse.getErrorMessage(),
+      );
+    }    
+  }
+
+  public async handleSetDedicatedFans(dedicatedFans: number) {
+    const apiResponse = await this.fumbblApi.setDedicatedFans(this.team.getId(), dedicatedFans);
+    if (apiResponse.isSuccessful()) {
+      await this.reloadTeam();
+      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 500);
+    } else {
+      await this.recoverFromUnexpectedError(
+        "An error occurred setting team treasury.",
+        apiResponse.getErrorMessage(),
+      );
+    }   
+  }
+
+  public async handleRenameAllPlayers() {
+    const apiResponse = await this.fumbblApi.renameAllPlayers(this.team.getId());
+    if (apiResponse.isSuccessful()) {
+      await this.reloadTeam();
+      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 500);
+    } else {
+      await this.recoverFromUnexpectedError(
+        "An error occurred renaming all players.",
         apiResponse.getErrorMessage(),
       );
     }

@@ -124,6 +124,57 @@ export default class AccessControl {
         ],
       },
       {
+        action: "SET_TREASURY",
+        grantAccessToList: [
+          {
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: [
+              "NEW",
+              "ACTIVE",
+              "READY_FOR_TOURNAMENT",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "REDRAFTING",
+              "RETIRED",
+            ],
+          },
+        ],
+      },
+      {
+        action: "SET_DEDICATED_FANS",
+        grantAccessToList: [
+          {
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: [
+              "NEW",
+              "ACTIVE",
+              "READY_FOR_TOURNAMENT",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "REDRAFTING",
+              "RETIRED",
+            ],
+          },
+        ],
+      },
+      {
+        action: "RENAME_ALL_PLAYERS",
+        grantAccessToList: [
+          {
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: [
+              "NEW",
+              "ACTIVE",
+              "READY_FOR_TOURNAMENT",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "REDRAFTING",
+              "RETIRED",
+            ],
+          },
+        ],
+      },
+      {
         action: "UNREADY_TEAM",
         grantAccessToList: [
           {
@@ -292,6 +343,18 @@ export default class AccessControl {
 
   public canRenameTeam(): boolean {
     return this.isGranted("RENAME_TEAM");
+  }
+
+  public canSetTreasury(): boolean {
+    return this.isGranted("SET_TREASURY");
+  }
+
+  public canSetDedicatedFans(): boolean {
+    return this.isGranted("SET_DEDICATED_FANS");
+  }
+
+  public canRenameAllPlayers(): boolean {
+    return this.isGranted("RENAME_ALL_PLAYERS");
   }
 
   public canMagicFixTeam(): boolean {

@@ -42,7 +42,11 @@ export type TeamAction =
   | "REPORT"
   | "SHOW_ADMIN_MENU"
   | "MAGIC_FIX"
-  | "RENAME_TEAM";
+  | "RENAME_TEAM"
+  | "SET_TREASURY"
+  | "SET_DEDICATED_FANS"
+  | "RENAME_ALL_PLAYERS"
+  ;
 
 export type ActionGrantAccessTo = {
   action: TeamAction;

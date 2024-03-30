@@ -306,11 +306,20 @@ export default class FumbblApi {
     );
   }
 
+  public async setTreasury(
+    teamId: number,
+    newTreasury: number
+  ): Promise<ApiResponse> {
+    const url = this.getUrl("/api/team/setTreasury");
+    const data = { teamId: teamId, newTreasury: newTreasury };
+    return await this.enqueuePost(url, data);    
+  }
+
   public async setDedicatedFans(
     teamId: number,
     newDedicatedFans: number,
   ): Promise<ApiResponse> {
-    const url = this.getUrl("/api/team/setDedicatedFans");
+    const url = this.getUrl("/api/team/changeDedicatedFans");
     const data = { teamId: teamId, newDf: newDedicatedFans };
     return await this.enqueuePost(url, data);
   }
@@ -327,6 +336,13 @@ export default class FumbblApi {
       teamId,
       this.getUrl("/api/team/removeDedicatedFans"),
     );
+  }
+
+  public async renameAllPlayers(teamId: number): Promise<ApiResponse> {
+    return await this.simplePostWithOnlyTeamIdInBody(
+      teamId,
+      this.getUrl("/api/team/renameAllPlayers"),
+    );    
   }
 
   public async addPlayer(
