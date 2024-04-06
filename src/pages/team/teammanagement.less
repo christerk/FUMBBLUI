@@ -15,6 +15,21 @@
     position: relative;
     overflow: hidden;
 
+    .biowrapper {
+      padding: 5px;
+      background: @OldLace;
+
+      .bio {
+        position: relative;
+        max-height: 128px;
+        overflow: hidden;
+
+        &.expand {
+          max-height: none;
+        }
+      }
+    }
+
     .container {
       display: grid;
       grid-template-columns: 100% 100%;

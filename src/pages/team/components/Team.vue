@@ -126,6 +126,12 @@
                     >Edit Bio</a
                   >
                 </li>
+                <li v-if="accessControl.canRetireTeam()">
+                  <a href="#" @click.prevent="retireTeamModal?.show()">Retire Team</a>
+                </li>
+                <li v-if="accessControl.canCreate()">
+                  <a href="#" @click.prevent="deleteTeamModal?.show()">Delete Team</a>
+                </li>
               </ul>
             </li>
             <li
@@ -279,8 +285,17 @@
       </div>
     </div>
 
+    <div class="biowrapper" v-if="team.bio != null && team.bio.length > 0">
+      <div id="bio" :class="{bio: true, expand: bioExpanded}" v-html="team.bio"></div>
+    </div>
 
-    <div class="center"><a :href="'/p/team?id='+team.id">Back to legacy team page</a></div>
+    <div class="center">
+      <div style="float: right" v-if="showBioSizeToggle" :key="bioKey">
+        <a href="#" v-if="bioExpanded" :key="bioKey" @click.prevent="toggleBio()">Collapse</a>
+        <a href="#" v-else @click.prevent="toggleBio()">Show More</a>
+      </div>
+      <a :href="'/p/team?id='+team.id">Back to legacy team page</a>
+    </div>
     <div class="container" :class="{ showsidepanel: showSidePanel }">
       <div class="panel teamsheet" :class="{ hidden: showSidePanel }">
         <div v-if="accessControl.canCreate()" class="createteamstats">
@@ -577,18 +592,6 @@
             </div>
           </div>
         </div>
-        <div v-if="accessControl.canCreate()" class="createteam">
-          <div class="deleteteam">
-            <button @click="deleteTeamModal?.show()" class="teambutton">
-              Delete Team
-            </button>
-          </div>
-        </div>
-        <div v-if="accessControl.canRetireTeam()" class="retireteam">
-          <button @click="retireTeamModal?.show()" class="teambutton">
-            Retire Team
-          </button>
-        </div>
       </div>
       <div class="panel sidepanel" :class="{ hidden: !showSidePanel }">
         <div v-show="sidePanel == 'teamstats'" class="teamstats">
@@ -741,7 +744,7 @@
 </template>
 
 <script lang="ts">
-import { PropType } from "vue";
+import { PropType, nextTick } from "vue";
 import {
   Prop,
   Component,
@@ -946,6 +949,10 @@ class TeamComponent extends Vue {
   public showSidePanel: boolean = false;
   public playerListKey: number = 0;
 
+  public showBioSizeToggle: boolean = false;
+  public bioExpanded: boolean = false;
+  public bioKey: number = 0;
+
   public modals: {
     deleteTeam: boolean;
     retireTeam: boolean;
@@ -1005,6 +1012,23 @@ class TeamComponent extends Vue {
         this.reloadTeam();
       }
     });
+    await this.refreshBioToggle();
+  }
+
+  public async toggleBio() {
+
+    this.bioExpanded = !this.bioExpanded;
+    this.bioKey++;
+    await this.refreshBioToggle();
+  }
+
+  public async refreshBioToggle() {
+    await nextTick();
+    const bioPanel = document.getElementById('bio');
+    if (bioPanel == null) {
+      return;
+    }
+    this.showBioSizeToggle = this.bioExpanded || bioPanel.scrollHeight > bioPanel.offsetHeight;
   }
 
   public async showTeamPanel(panel: string) {
