@@ -12,7 +12,7 @@ export default class Team {
   private teamStatus: TeamStatus = new TeamStatus("NEW");
   private name: string = "";
   private division: string = "";
-  public coach: Coach|null = null;
+  public coach: Coach | null = null;
   public players: Player[] = [];
   public extraPlayers: Player[] = [];
   private teamValue: number = 0;
@@ -37,8 +37,8 @@ export default class Team {
   private maxPlayers: number;
   public record: any = {};
   private sppLimits: any;
-  public bio: string|null = null;
-  public logo: number|null = null;
+  public bio: string | null = null;
+  public logo: number | null = null;
 
   constructor(
     division: string,
@@ -163,7 +163,7 @@ export default class Team {
     this.name = teamName;
   }
 
-  public getCoach(): Coach|null {
+  public getCoach(): Coach | null {
     return this.coach;
   }
 
@@ -358,8 +358,8 @@ export default class Team {
     return this.getRosteredPlayers().filter((player) => {
       const position = player.getPosition();
       return (
-        position != null && position.quantityAllowed >=
-        this.QUANTITY_ALLOWED_DENOTING_LINEMEN
+        position != null &&
+        position.quantityAllowed >= this.QUANTITY_ALLOWED_DENOTING_LINEMEN
       );
     });
   }
@@ -397,7 +397,7 @@ export default class Team {
     if (this.teamStatus.isNew()) {
       this.treasury += cost;
     }
-  }  
+  }
 
   public addReroll(cost: number): void {
     this.rerolls++;

@@ -182,7 +182,8 @@ export default class AccessControl {
             teamStatusValues: ["ACTIVE"],
           },
         ],
-      },      {
+      },
+      {
         action: "MAGIC_FIX",
         grantAccessToList: [
           {

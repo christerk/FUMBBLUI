@@ -12,7 +12,8 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "team-format-check": "prettier src/pages/team --check",
-    "team-format": "prettier src/pages/team --write"
+    "team-format": "prettier src/pages/team --write",
+    "format-all": "prettier --write \"src/**/*.{js,ts,vue}\""
   },
   "dependencies": {
     "@observablehq/plot": "^0.6.14",

@@ -78,13 +78,13 @@ import Team from "../include/Team";
 @Component
 class TeamStats extends Vue {
   @Prop({
-    required: true
+    required: true,
   })
   public team!: Team;
 
   @Prop({
-    required: true
-  })    
+    required: true,
+  })
   public fumbblApi!: FumbblApi;
 
   @Emit

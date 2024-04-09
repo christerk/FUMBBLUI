@@ -45,8 +45,7 @@ export type TeamAction =
   | "RENAME_TEAM"
   | "SET_TREASURY"
   | "SET_DEDICATED_FANS"
-  | "RENAME_ALL_PLAYERS"
-  ;
+  | "RENAME_ALL_PLAYERS";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;

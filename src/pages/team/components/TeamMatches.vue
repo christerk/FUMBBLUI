@@ -114,7 +114,7 @@ class TeamMatches extends Vue {
   }
 
   private flipMatches(matches: any[]) {
-    let result:any[] = [];
+    let result: any[] = [];
 
     matches.forEach((match) => {
       if (match.team1.id != this.team.id) {

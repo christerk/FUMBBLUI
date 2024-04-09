@@ -63,7 +63,7 @@ export default class FumbblApi {
   protected async post(
     url: string,
     data: any = null,
-    transform: ((d: any) => any)|null = null,
+    transform: ((d: any) => any) | null = null,
   ): Promise<ApiResponse> {
     if (this.simulateDelay) {
       await this.delay(1000);
@@ -93,7 +93,7 @@ export default class FumbblApi {
   protected async enqueuePost(
     url: string,
     data: any = null,
-    transform: ((d: any) => any)|null = null,
+    transform: ((d: any) => any) | null = null,
   ): Promise<ApiResponse> {
     return await this.queue.add(async () => {
       if (this.simulateDelay) {
@@ -308,11 +308,11 @@ export default class FumbblApi {
 
   public async setTreasury(
     teamId: number,
-    newTreasury: number
+    newTreasury: number,
   ): Promise<ApiResponse> {
     const url = this.getUrl("/api/team/setTreasury");
     const data = { teamId: teamId, newTreasury: newTreasury };
-    return await this.enqueuePost(url, data);    
+    return await this.enqueuePost(url, data);
   }
 
   public async setDedicatedFans(
@@ -342,7 +342,7 @@ export default class FumbblApi {
     return await this.simplePostWithOnlyTeamIdInBody(
       teamId,
       this.getUrl("/api/team/renameAllPlayers"),
-    );    
+    );
   }
 
   public async addPlayer(
@@ -451,7 +451,6 @@ export default class FumbblApi {
       this.getUrl("/api/team/magicfix"),
     );
   }
-
 
   public async skipTournament(teamId: number): Promise<ApiResponse> {
     return await this.simplePostWithOnlyTeamIdInBody(

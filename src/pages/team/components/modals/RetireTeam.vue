@@ -1,26 +1,26 @@
 <template>
-    <modal
-      v-show="isVisible"
-      :button-settings="{
-        cancel: { enabled: true, label: 'Cancel' },
-        confirm: { enabled: true, label: 'Retire Team' },
-      }"
-      :modal-size="'small'"
-      @cancel="cancel"
-      @confirm="confirm"
-    >
+  <modal
+    v-show="isVisible"
+    :button-settings="{
+      cancel: { enabled: true, label: 'Cancel' },
+      confirm: { enabled: true, label: 'Retire Team' },
+    }"
+    :modal-size="'small'"
+    @cancel="cancel"
+    @confirm="confirm"
+  >
     <template v-slot:header> Retire team? </template>
 
     <template v-slot:body>
-    <p>Are you sure you want to retire the following team?</p>
-    <p>
+      <p>Are you sure you want to retire the following team?</p>
+      <p>
         Team: <strong>{{ team.getName() }}</strong>
         {{ team.getTeamValue() / 1000 }}k ({{
-        teamManagementSettings.rosterName
+          teamManagementSettings.rosterName
         }})
-    </p>
+      </p>
     </template>
-</modal>
+  </modal>
 </template>
 
 <script lang="ts">
@@ -31,37 +31,35 @@ import TeamManagementSettings from "../../include/TeamManagementSettings";
 
 @Component({
   components: {
-    modal: ModalComponent
-  }
+    modal: ModalComponent,
+  },
 })
 class RetireTeamModal extends Vue {
-    public isVisible: boolean = false;
+  public isVisible: boolean = false;
 
-    @Prop({ required: true })
-    public teamManagementSettings!: TeamManagementSettings;
+  @Prop({ required: true })
+  public teamManagementSettings!: TeamManagementSettings;
 
-    @Prop({ required: true })
-    public team!: Team;
+  @Prop({ required: true })
+  public team!: Team;
 
-    @Emit("cancelled")
-    public cancel() {
-        this.hide();
-    }
+  @Emit("cancelled")
+  public cancel() {
+    this.hide();
+  }
 
-    @Emit("confirmed")
-    public confirm() {
-        this.hide();
-    }
+  @Emit("confirmed")
+  public confirm() {
+    this.hide();
+  }
 
-    public show() {
-      this.isVisible = true;
-    }
+  public show() {
+    this.isVisible = true;
+  }
 
-    public hide() {
-      this.isVisible = false;
-    }
-
+  public hide() {
+    this.isVisible = false;
+  }
 }
 export default toNative(RetireTeamModal);
-
 </script>

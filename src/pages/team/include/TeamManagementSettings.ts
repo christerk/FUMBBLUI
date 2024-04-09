@@ -333,7 +333,7 @@ export default class TeamManagementSettings {
           team.canAfford(this.dedicatedFansCost),
         remove:
           team.getDedicatedFans() > this.settings.dedicatedFans.minStart &&
-          (team.getTeamStatus().isNew()),
+          team.getTeamStatus().isNew(),
       },
     };
   }

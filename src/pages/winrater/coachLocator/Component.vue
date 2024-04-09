@@ -1,43 +1,43 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { load } from './service'
-import { useMatchStore } from '../pinia/store'
-import { storeToRefs } from 'pinia'
-import { Store } from '../rating/store'
-import IconButton from '../iconButton/IconButton.vue'
-import addIcon from '../icons/addIcon.png'
+import { ref } from "vue";
+import { load } from "./service";
+import { useMatchStore } from "../pinia/store";
+import { storeToRefs } from "pinia";
+import { Store } from "../rating/store";
+import IconButton from "../iconButton/IconButton.vue";
+import addIcon from "../icons/addIcon.png";
 
-const matchStore = useMatchStore()
-const { currentCoachName, stores, errorMessage } = storeToRefs(matchStore)
-const { setStore } = matchStore
-const loading = ref(false)
+const matchStore = useMatchStore();
+const { currentCoachName, stores, errorMessage } = storeToRefs(matchStore);
+const { setStore } = matchStore;
+const loading = ref(false);
 
 async function loadData() {
-  loading.value = true
+  loading.value = true;
   if (stores.value.has(currentCoachName.value)) {
-    loading.value = false
-    return
+    loading.value = false;
+    return;
   }
-  const coachName = currentCoachName.value
+  const coachName = currentCoachName.value;
 
-  currentCoachName.value = ''
+  currentCoachName.value = "";
 
-  const store = new Store(coachName)
+  const store = new Store(coachName);
 
-  loading.value = false
+  loading.value = false;
 
   try {
     await load(store, errorMessage, (store: Store) => {
-      setStore(store.coachName, store)
-    })
+      setStore(store.coachName, store);
+    });
   } catch (error: any) {
-    errorMessage.value = error.message
+    errorMessage.value = error.message;
   }
 }
 </script>
 
 <style scoped>
-@import './coachLocator.less';
+@import "./coachLocator.less";
 </style>
 
 <template>

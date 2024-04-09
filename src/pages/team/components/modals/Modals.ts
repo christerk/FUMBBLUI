@@ -12,16 +12,16 @@ import SetDedicatedFansModal from "./SetDedicatedFans.vue";
 import RenameAllPlayersModal from "./RenameAllPlayers.vue";
 
 export {
-    DiscardRerollModal, 
-    FireAssistantCoachModal, 
-    FireCheerleaderModal, 
-    FireApothecaryModal, 
-    ErrorModal, 
-    ActivateTeamModal, 
-    CreateErrorModal, 
-    DeleteTeamModal, 
-    RetireTeamModal, 
-    SetTreasuryModal,
-    SetDedicatedFansModal,
-    RenameAllPlayersModal,
+  DiscardRerollModal,
+  FireAssistantCoachModal,
+  FireCheerleaderModal,
+  FireApothecaryModal,
+  ErrorModal,
+  ActivateTeamModal,
+  CreateErrorModal,
+  DeleteTeamModal,
+  RetireTeamModal,
+  SetTreasuryModal,
+  SetDedicatedFansModal,
+  RenameAllPlayersModal,
 };

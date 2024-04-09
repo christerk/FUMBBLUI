@@ -5,11 +5,11 @@
 </template>
 
 <style scoped>
-@import './spinner.less';
+@import "./spinner.less";
 </style>
 
 <script lang="ts">
-import { Component, Vue, toNative } from 'vue-facing-decorator'
+import { Component, Vue, toNative } from "vue-facing-decorator";
 
 @Component
 class Spinner extends Vue {
@@ -20,5 +20,5 @@ class Spinner extends Vue {
   }
 }
 
-export default toNative(Spinner)
+export default toNative(Spinner);
 </script>

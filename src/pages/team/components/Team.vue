@@ -62,8 +62,9 @@
               v-else-if="team.getTeamStatus().isNew()"
               @click="activateTeam"
               class="menu"
-            >Create</button>
-
+            >
+              Create
+            </button>
 
             <li class="menu">
               <a
@@ -97,7 +98,9 @@
                   <a href="#" @click.prevent="setDedicatedFans()">Set Fans</a>
                 </li>
                 <li v-if="accessControl.canRenameAllPlayers()">
-                  <a href="#" @click.prevent="renameAllPlayers()">Rename Players</a>
+                  <a href="#" @click.prevent="renameAllPlayers()"
+                    >Rename Players</a
+                  >
                 </li>
               </ul>
             </li>
@@ -127,10 +130,14 @@
                   >
                 </li>
                 <li v-if="accessControl.canRetireTeam()">
-                  <a href="#" @click.prevent="retireTeamModal?.show()">Retire Team</a>
+                  <a href="#" @click.prevent="retireTeamModal?.show()"
+                    >Retire Team</a
+                  >
                 </li>
                 <li v-if="accessControl.canCreate()">
-                  <a href="#" @click.prevent="deleteTeamModal?.show()">Delete Team</a>
+                  <a href="#" @click.prevent="deleteTeamModal?.show()"
+                    >Delete Team</a
+                  >
                 </li>
               </ul>
             </li>
@@ -166,13 +173,10 @@
                   src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"
               /></a>
               <ul class="submenu" v-show="mainMenuShow === 'show'">
-                  <li>
-                    <a
-                      href="#" @click.prevent="showTeamPanel('teambio')"
-                      >Bio</a
-                    >
-                  </li>
-                  <li v-if="team.isLeagueDivision()" class="menu">
+                <li>
+                  <a href="#" @click.prevent="showTeamPanel('teambio')">Bio</a>
+                </li>
+                <li v-if="team.isLeagueDivision()" class="menu">
                   <a
                     :href="`https://fumbbl.com/p/teamoptions?id=${team.getId()}`"
                     >Team options</a
@@ -209,11 +213,9 @@
                   </li>
                   <li v-if="team.getCoach() != null">
                     <a
-                      :href="`https://fumbbl.com/~${
-                          encodeFumbblUrl(team.getCoach()!.name)
-                      }/${
-                          encodeFumbblUrl(team.getName())
-                      }`"
+                      :href="`https://fumbbl.com/~${encodeFumbblUrl(
+                        team.getCoach()!.name,
+                      )}/${encodeFumbblUrl(team.getName())}`"
                       >View Roster</a
                     >
                   </li>
@@ -286,15 +288,25 @@
     </div>
 
     <div class="biowrapper" v-if="team.bio != null && team.bio.length > 0">
-      <div id="bio" :class="{bio: true, expand: bioExpanded}" v-html="team.bio"></div>
+      <div
+        id="bio"
+        :class="{ bio: true, expand: bioExpanded }"
+        v-html="team.bio"
+      ></div>
     </div>
 
     <div class="center">
       <div style="float: right" v-if="showBioSizeToggle" :key="bioKey">
-        <a href="#" v-if="bioExpanded" :key="bioKey" @click.prevent="toggleBio()">Collapse</a>
+        <a
+          href="#"
+          v-if="bioExpanded"
+          :key="bioKey"
+          @click.prevent="toggleBio()"
+          >Collapse</a
+        >
         <a href="#" v-else @click.prevent="toggleBio()">Show More</a>
       </div>
-      <a :href="'/p/team?id='+team.id">Back to legacy team page</a>
+      <a :href="'/p/team?id=' + team.id">Back to legacy team page</a>
     </div>
     <div class="container" :class="{ showsidepanel: showSidePanel }">
       <div class="panel teamsheet" :class="{ hidden: showSidePanel }">
@@ -633,18 +645,56 @@
       </div>
     </div>
 
-    <ErrorModal ref="errorModal"/>
-    <CreateErrorModal ref="createErrorModal" :teamManagementSettings="teamManagementSettings" :team="team"/>
-    <DiscardRerollModal ref="discardRerollModal" @confirm="removeReroll"/>
-    <FireAssistantCoachModal ref="fireAssistantCoachModal" @confirm="removeAssistantCoach"/>
-    <FireCheerleaderModal ref="fireCheerleaderModal" @confirm="removeCheerleader"/>
-    <FireApothecaryModal ref="fireApothecaryModal" @confirm="removeApothecary"/>
-    <ActivateTeamModal ref="activateTeamModal" @confirm="handleActivateTeam"/>
-    <DeleteTeamModal ref="deleteTeamModal" @confirm="handleDeleteTeam" :teamManagementSettings="teamManagementSettings" :team="team"/>
-    <RetireTeamModal ref="retireTeamModal" @confirm="handleRetireTeam" :teamManagementSettings="teamManagementSettings" :team="team"/>
-    <SetTreasuryModal ref="setTreasuryModal" @confirm="handleSetTreasury" :teamManagementSettings="teamManagementSettings" :team="team"/>
-    <SetDedicatedFansModal ref="setDedicatedFansModal" @confirm="handleSetDedicatedFans" :teamManagementSettings="teamManagementSettings" :team="team"/>
-    <RenameAllPlayersModal ref="renameAllPlayersModal" @confirm="handleRenameAllPlayers" :teamManagementSettings="teamManagementSettings" :team="team"/> 
+    <ErrorModal ref="errorModal" />
+    <CreateErrorModal
+      ref="createErrorModal"
+      :teamManagementSettings="teamManagementSettings"
+      :team="team"
+    />
+    <DiscardRerollModal ref="discardRerollModal" @confirm="removeReroll" />
+    <FireAssistantCoachModal
+      ref="fireAssistantCoachModal"
+      @confirm="removeAssistantCoach"
+    />
+    <FireCheerleaderModal
+      ref="fireCheerleaderModal"
+      @confirm="removeCheerleader"
+    />
+    <FireApothecaryModal
+      ref="fireApothecaryModal"
+      @confirm="removeApothecary"
+    />
+    <ActivateTeamModal ref="activateTeamModal" @confirm="handleActivateTeam" />
+    <DeleteTeamModal
+      ref="deleteTeamModal"
+      @confirm="handleDeleteTeam"
+      :teamManagementSettings="teamManagementSettings"
+      :team="team"
+    />
+    <RetireTeamModal
+      ref="retireTeamModal"
+      @confirm="handleRetireTeam"
+      :teamManagementSettings="teamManagementSettings"
+      :team="team"
+    />
+    <SetTreasuryModal
+      ref="setTreasuryModal"
+      @confirm="handleSetTreasury"
+      :teamManagementSettings="teamManagementSettings"
+      :team="team"
+    />
+    <SetDedicatedFansModal
+      ref="setDedicatedFansModal"
+      @confirm="handleSetDedicatedFans"
+      :teamManagementSettings="teamManagementSettings"
+      :team="team"
+    />
+    <RenameAllPlayersModal
+      ref="renameAllPlayersModal"
+      @confirm="handleRenameAllPlayers"
+      :teamManagementSettings="teamManagementSettings"
+      :team="team"
+    />
 
     <modal
       v-show="modals.skillPlayer === true"
@@ -737,8 +787,7 @@
       <Spinner></Spinner>
     </div>
     <div class="container">
-      <div class="panel loadersheet">
-      </div>
+      <div class="panel loadersheet"></div>
     </div>
   </div>
 </template>
@@ -782,7 +831,7 @@ import TeamMatches from "./TeamMatches.vue";
 import TeamBio from "./TeamBio.vue";
 import TeamDebug from "./TeamDebug.vue";
 import {
-  DiscardRerollModal, 
+  DiscardRerollModal,
   FireAssistantCoachModal,
   FireCheerleaderModal,
   FireApothecaryModal,
@@ -794,7 +843,7 @@ import {
   SetTreasuryModal,
   SetDedicatedFansModal,
   RenameAllPlayersModal,
-} from "./modals/Modals"
+} from "./modals/Modals";
 
 import {
   EventDataFoldOut,
@@ -874,49 +923,63 @@ class TeamComponent extends Vue {
   public triggerDeleteTeam() {}
 
   @Ref
-  private emDie: InstanceType<typeof Die>|undefined;
+  private emDie: InstanceType<typeof Die> | undefined;
 
   @Ref
-  private readyToPlayComponent: InstanceType<typeof ReadyToPlayComponent>|undefined;
+  private readyToPlayComponent:
+    | InstanceType<typeof ReadyToPlayComponent>
+    | undefined;
 
   @Ref
-  private postMatchModal: InstanceType<typeof ModalComponent>|undefined;
+  private postMatchModal: InstanceType<typeof ModalComponent> | undefined;
 
   @Ref
-  private teamStats: InstanceType<typeof TeamStats>|undefined;
+  private teamStats: InstanceType<typeof TeamStats> | undefined;
   @Ref
-  private teamMatches: InstanceType<typeof TeamMatches>|undefined;
+  private teamMatches: InstanceType<typeof TeamMatches> | undefined;
   @Ref
-  private teamBio: InstanceType<typeof TeamBio>|undefined;
+  private teamBio: InstanceType<typeof TeamBio> | undefined;
   @Ref
-  private teamDebug: InstanceType<typeof TeamDebug>|undefined;
+  private teamDebug: InstanceType<typeof TeamDebug> | undefined;
   @Ref
-  private nameEdit: InstanceType<typeof EditTeamName>|undefined;
+  private nameEdit: InstanceType<typeof EditTeamName> | undefined;
 
   @Ref
-  public discardRerollModal: InstanceType<typeof DiscardRerollModal>|undefined;
+  public discardRerollModal:
+    | InstanceType<typeof DiscardRerollModal>
+    | undefined;
   @Ref
-  public fireAssistantCoachModal: InstanceType<typeof FireAssistantCoachModal>|undefined;
+  public fireAssistantCoachModal:
+    | InstanceType<typeof FireAssistantCoachModal>
+    | undefined;
   @Ref
-  public fireCheerleaderModal: InstanceType<typeof FireCheerleaderModal>|undefined;
+  public fireCheerleaderModal:
+    | InstanceType<typeof FireCheerleaderModal>
+    | undefined;
   @Ref
-  public fireApothecaryModal: InstanceType<typeof FireApothecaryModal>|undefined;
+  public fireApothecaryModal:
+    | InstanceType<typeof FireApothecaryModal>
+    | undefined;
   @Ref
-  public errorModal: InstanceType<typeof ErrorModal>|undefined;
+  public errorModal: InstanceType<typeof ErrorModal> | undefined;
   @Ref
-  public activateTeamModal: InstanceType<typeof ActivateTeamModal>|undefined;
+  public activateTeamModal: InstanceType<typeof ActivateTeamModal> | undefined;
   @Ref
-  public createErrorModal: InstanceType<typeof CreateErrorModal>|undefined;
+  public createErrorModal: InstanceType<typeof CreateErrorModal> | undefined;
   @Ref
-  public deleteTeamModal: InstanceType<typeof DeleteTeamModal>|undefined;
+  public deleteTeamModal: InstanceType<typeof DeleteTeamModal> | undefined;
   @Ref
-  public retireTeamModal: InstanceType<typeof RetireTeamModal>|undefined;
+  public retireTeamModal: InstanceType<typeof RetireTeamModal> | undefined;
   @Ref
-  public setTreasuryModal: InstanceType<typeof SetTreasuryModal>|undefined;
+  public setTreasuryModal: InstanceType<typeof SetTreasuryModal> | undefined;
   @Ref
-  public setDedicatedFansModal: InstanceType<typeof SetDedicatedFansModal>|undefined;
+  public setDedicatedFansModal:
+    | InstanceType<typeof SetDedicatedFansModal>
+    | undefined;
   @Ref
-  public renameAllPlayersModal: InstanceType<typeof RenameAllPlayersModal>|undefined;
+  public renameAllPlayersModal:
+    | InstanceType<typeof RenameAllPlayersModal>
+    | undefined;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
 
@@ -986,7 +1049,10 @@ class TeamComponent extends Vue {
 
     this.userRoles.push(this.coachName === "" ? "ANONYMOUS" : "LOGGED_IN");
 
-    if (this.team.getCoach() != null && this.team.getCoach()!.name === this.coachName) {
+    if (
+      this.team.getCoach() != null &&
+      this.team.getCoach()!.name === this.coachName
+    ) {
       this.userRoles.push("OWNER");
     } else {
       this.userRoles.push("NOT_OWNER");
@@ -1016,7 +1082,6 @@ class TeamComponent extends Vue {
   }
 
   public async toggleBio() {
-
     this.bioExpanded = !this.bioExpanded;
     this.bioKey++;
     await this.refreshBioToggle();
@@ -1024,11 +1089,12 @@ class TeamComponent extends Vue {
 
   public async refreshBioToggle() {
     await nextTick();
-    const bioPanel = document.getElementById('bio');
+    const bioPanel = document.getElementById("bio");
     if (bioPanel == null) {
       return;
     }
-    this.showBioSizeToggle = this.bioExpanded || bioPanel.scrollHeight > bioPanel.offsetHeight;
+    this.showBioSizeToggle =
+      this.bioExpanded || bioPanel.scrollHeight > bioPanel.offsetHeight;
   }
 
   public async showTeamPanel(panel: string) {
@@ -1296,7 +1362,7 @@ class TeamComponent extends Vue {
   }
 
   public async onPlayerRenumbered() {
-    var newNumbers: { [key:number]: number } = {};
+    var newNumbers: { [key: number]: number } = {};
     this.team.players
       .filter((p) => !p.IsEmpty)
       .forEach((p) => (newNumbers[p.id] = p.playerNumber));
@@ -1399,7 +1465,9 @@ class TeamComponent extends Vue {
     this.team.addDedicatedFans(this.teamManagementSettings.dedicatedFansCost);
     this.reloadTeamWithDelay();
 
-    const apiResponse = await this.fumbblApi.addDedicatedFans(this.team.getId());
+    const apiResponse = await this.fumbblApi.addDedicatedFans(
+      this.team.getId(),
+    );
     if (!apiResponse.isSuccessful()) {
       await this.recoverFromUnexpectedError(
         "An error occurred adding dedicated fans.",
@@ -1409,7 +1477,9 @@ class TeamComponent extends Vue {
   }
 
   public async removeDedicatedFans() {
-    this.team.removeDedicatedFans(this.teamManagementSettings.dedicatedFansCost);
+    this.team.removeDedicatedFans(
+      this.teamManagementSettings.dedicatedFansCost,
+    );
     this.reloadTeamWithDelay();
 
     let apiResponse = null;
@@ -1733,23 +1803,25 @@ class TeamComponent extends Vue {
     }
 
     return errors;
-  }    
+  }
 
   public activateTeam() {
-      if (!this.team.getTeamStatus().isNew()) {
-        return;
-      }
-      let specialRuleErrors = this.getSpecialRuleErrors(this.rawApiSpecialRules.fromTeam);
+    if (!this.team.getTeamStatus().isNew()) {
+      return;
+    }
+    let specialRuleErrors = this.getSpecialRuleErrors(
+      this.rawApiSpecialRules.fromTeam,
+    );
 
-      let hasErrors: boolean = false;
-      hasErrors ||= !this.teamManagementSettings.isValidForCreate(this.team);
-      hasErrors ||= specialRuleErrors.length > 0;
+    let hasErrors: boolean = false;
+    hasErrors ||= !this.teamManagementSettings.isValidForCreate(this.team);
+    hasErrors ||= specialRuleErrors.length > 0;
 
-      if (hasErrors) {
-        this.createErrorModal?.show(specialRuleErrors);
-      } else {
-        this.activateTeamModal?.show();
-      }
+    if (hasErrors) {
+      this.createErrorModal?.show(specialRuleErrors);
+    } else {
+      this.activateTeamModal?.show();
+    }
   }
 
   public async unreadyTeam() {
@@ -1790,7 +1862,6 @@ class TeamComponent extends Vue {
 
   public async magicFixTeam() {
     const apiResponse = await this.fumbblApi.magicFixTeam(this.team.getId());
-
 
     if (!apiResponse.isSuccessful()) {
       this.menuHide();
@@ -1986,7 +2057,10 @@ class TeamComponent extends Vue {
   }
 
   public async handleSetTreasury(newTreasury: number) {
-    const apiResponse = await this.fumbblApi.setTreasury(this.team.getId(), newTreasury);
+    const apiResponse = await this.fumbblApi.setTreasury(
+      this.team.getId(),
+      newTreasury,
+    );
     if (apiResponse.isSuccessful()) {
       await this.reloadTeam();
       setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 500);
@@ -1995,11 +2069,14 @@ class TeamComponent extends Vue {
         "An error occurred setting team treasury.",
         apiResponse.getErrorMessage(),
       );
-    }    
+    }
   }
 
   public async handleSetDedicatedFans(dedicatedFans: number) {
-    const apiResponse = await this.fumbblApi.setDedicatedFans(this.team.getId(), dedicatedFans);
+    const apiResponse = await this.fumbblApi.setDedicatedFans(
+      this.team.getId(),
+      dedicatedFans,
+    );
     if (apiResponse.isSuccessful()) {
       await this.reloadTeam();
       setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 500);
@@ -2008,11 +2085,13 @@ class TeamComponent extends Vue {
         "An error occurred setting team treasury.",
         apiResponse.getErrorMessage(),
       );
-    }   
+    }
   }
 
   public async handleRenameAllPlayers() {
-    const apiResponse = await this.fumbblApi.renameAllPlayers(this.team.getId());
+    const apiResponse = await this.fumbblApi.renameAllPlayers(
+      this.team.getId(),
+    );
     if (apiResponse.isSuccessful()) {
       await this.reloadTeam();
       setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 500);
@@ -2034,7 +2113,11 @@ class TeamComponent extends Vue {
 
     if (apiResponse.isSuccessful()) {
       const emResult: any = apiResponse.getData();
-      if (this.emDie != undefined && emResult != undefined && emResult.expensiveMistakes != undefined) {
+      if (
+        this.emDie != undefined &&
+        emResult != undefined &&
+        emResult.expensiveMistakes != undefined
+      ) {
         let roll = emResult.expensiveMistakes.roll;
         this.emResult = emResult.expensiveMistakes.effect;
         this.emTreasuryLoss = emResult.expensiveMistakes.treasuryLoss;
@@ -2075,10 +2158,8 @@ class TeamComponent extends Vue {
     );
   }
 
-
-
   public encodeFumbblUrl(url: string): string {
-      return encodeURIComponent(url).replaceAll("%20", "+");
+    return encodeURIComponent(url).replaceAll("%20", "+");
   }
 }
 

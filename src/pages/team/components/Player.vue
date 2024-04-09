@@ -89,7 +89,9 @@
             @click.exact.prevent="toggleFoldOutMore(false)"
             @click.ctrl.prevent="toggleFoldOutMore(true)"
             :title="`Player: ${player.getPlayerName()}, ID: ${player.id}`"
-            ><span class="bioicon" v-if="player.hasBio()"><img src="https://fumbbl.com/images/bio.png" /> </span>{{ player.getPlayerName() }}</a
+            ><span class="bioicon" v-if="player.hasBio()"
+              ><img src="https://fumbbl.com/images/bio.png" /> </span
+            >{{ player.getPlayerName() }}</a
           >
         </div>
         <div
@@ -175,7 +177,11 @@
           >Legend
           <div class="legendspptotal">{{ sppDisplayInfo.total }}</div>
         </template>
-        <template v-else-if="player.getPosition() != null && player.getPosition()!.isPeaked">
+        <template
+          v-else-if="
+            player.getPosition() != null && player.getPosition()!.isPeaked
+          "
+        >
           <div>Peak-{{ sppDisplayInfo.spendable }}</div>
         </template>
         <template v-else>

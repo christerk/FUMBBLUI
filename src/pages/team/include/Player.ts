@@ -20,7 +20,7 @@ export default class Player {
   private _hasBio: boolean = false;
   private gender: PlayerGender = "NEUTRAL";
   private iconRowVersionPosition: number; // allows selection of icon for display when position has multiple versions in the icon image
-  private position: Position|null;
+  private position: Position | null;
   private injuries: string[] = [];
   private skills: string[] = [];
   private record: PlayerRecord;
@@ -28,7 +28,7 @@ export default class Player {
     status: PlayerSkillStatus;
     maxLimit: number;
     tier: number;
-  }|null = null;
+  } | null = null;
   private skillCost: number = 0;
   private isJourneyman: boolean = false;
   private isRefundable: boolean = true;
@@ -44,7 +44,7 @@ export default class Player {
     id: number,
     playerNumber: number,
     playerName: string,
-    position: Position|null,
+    position: Position | null,
     iconRowVersionPosition: number,
     gender: PlayerGender,
     hasBio: boolean,
@@ -87,7 +87,7 @@ export default class Player {
     iconRowVersionPosition: number,
     isJourneyman: boolean,
     numberOfSkillsForLegend: number,
-    hasBio: boolean
+    hasBio: boolean,
   ): Player {
     const player = new Player(
       "NORMAL",
@@ -123,7 +123,7 @@ export default class Player {
       spent: rawApiPlayer.record.spent_spp,
     };
 
-    const skillStatusLookup: {[key:string]: PlayerSkillStatus} = {
+    const skillStatusLookup: { [key: string]: PlayerSkillStatus } = {
       none: "NONE",
       canSkill: "CAN_SKILL",
       mustSkill: "MUST_SKILL",
@@ -230,7 +230,7 @@ export default class Player {
     this.version++;
   }
 
-  public getPosition(): Position|null {
+  public getPosition(): Position | null {
     return this.position;
   }
 
@@ -256,7 +256,15 @@ export default class Player {
   }
 
   public getPositionStats(): PositionStats {
-    return this.position?.stats ?? { Movement: 0, Strength: 0, Agility: 0, Passing: 0, Armour: 0 };
+    return (
+      this.position?.stats ?? {
+        Movement: 0,
+        Strength: 0,
+        Agility: 0,
+        Passing: 0,
+        Armour: 0,
+      }
+    );
   }
 
   public getPositionSkills(): string[] {
@@ -380,17 +388,23 @@ export default class Player {
   }
 
   public get hasPassingIncrease(): boolean {
-    const positionStats: PositionStats = this.getPositionStats()
+    const positionStats: PositionStats = this.getPositionStats();
     return (
-      this.passingStat != null && positionStats != null && positionStats.Passing != null && this.passingStat < positionStats.Passing
+      this.passingStat != null &&
+      positionStats != null &&
+      positionStats.Passing != null &&
+      this.passingStat < positionStats.Passing
     );
   }
 
   public get hasPassingDecrease(): boolean {
-    const positionStats: PositionStats = this.getPositionStats()
+    const positionStats: PositionStats = this.getPositionStats();
 
     return (
-      this.passingStat != null && positionStats != null && positionStats.Passing != null && this.passingStat > positionStats.Passing
+      this.passingStat != null &&
+      positionStats != null &&
+      positionStats.Passing != null &&
+      this.passingStat > positionStats.Passing
     );
   }
 
@@ -424,15 +438,23 @@ export default class Player {
     };
   } {
     const numberOfSkills = this.getSkills().length;
-    const randomPrimaryThresholds: { [key: number]: number } = { 0: 3, 1: 4, 2: 6, 3: 8, 4: 10, 5: 15 };
-    const randomSecondaryOrChosenPrimaryThresholds: { [key: number]: number } = {
-      0: 6,
-      1: 8,
-      2: 12,
-      3: 16,
-      4: 20,
-      5: 30,
+    const randomPrimaryThresholds: { [key: number]: number } = {
+      0: 3,
+      1: 4,
+      2: 6,
+      3: 8,
+      4: 10,
+      5: 15,
     };
+    const randomSecondaryOrChosenPrimaryThresholds: { [key: number]: number } =
+      {
+        0: 6,
+        1: 8,
+        2: 12,
+        3: 16,
+        4: 20,
+        5: 30,
+      };
     const chosenSecondaryThresholds: { [key: number]: number } = {
       0: 12,
       1: 14,

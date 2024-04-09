@@ -1,22 +1,22 @@
 <template>
-    <modal
-      v-show="isVisible"
-      :button-settings="{
-        cancel: { enabled: true, label: 'Cancel' },
-        confirm: { enabled: true, label: 'Discard' },
-      }"
-      :modal-size="'small'"
-      @cancel="cancel"
-      @confirm="confirm"
-    >
-      <template v-slot:header>Discard reroll</template>
+  <modal
+    v-show="isVisible"
+    :button-settings="{
+      cancel: { enabled: true, label: 'Cancel' },
+      confirm: { enabled: true, label: 'Discard' },
+    }"
+    :modal-size="'small'"
+    @cancel="cancel"
+    @confirm="confirm"
+  >
+    <template v-slot:header>Discard reroll</template>
 
-      <template v-slot:body>
-        <p>
-          Are you sure you wish to discard this reroll? This cannot be undone.
-        </p>
-      </template>
-    </modal>
+    <template v-slot:body>
+      <p>
+        Are you sure you wish to discard this reroll? This cannot be undone.
+      </p>
+    </template>
+  </modal>
 </template>
 
 <script lang="ts">
@@ -25,31 +25,29 @@ import ModalComponent from "../Modal.vue";
 
 @Component({
   components: {
-    modal: ModalComponent
-  }
+    modal: ModalComponent,
+  },
 })
 class DiscardRerollModal extends Vue {
-    public isVisible: boolean = false;
+  public isVisible: boolean = false;
 
-    @Emit("cancelled")
-    public cancel() {
-      this.hide();
-    }
-    
-    @Emit("confirmed")
-    public confirm() {
-        this.hide();
-    }
+  @Emit("cancelled")
+  public cancel() {
+    this.hide();
+  }
 
-    public show() {
-      this.isVisible = true;
-    }
+  @Emit("confirmed")
+  public confirm() {
+    this.hide();
+  }
 
-    public hide() {
-      this.isVisible = false;
-    }
+  public show() {
+    this.isVisible = true;
+  }
 
+  public hide() {
+    this.isVisible = false;
+  }
 }
 export default toNative(DiscardRerollModal);
-
 </script>

@@ -5,33 +5,33 @@
 </template>
 
 <script setup lang="ts">
-import { useLoading } from 'vue-loading-overlay'
+import { useLoading } from "vue-loading-overlay";
 
 const props = defineProps({
   callback: Function,
   src: String,
   alt: String,
-  showIndicator: Boolean
-})
+  showIndicator: Boolean,
+});
 
-const loading = useLoading()
+const loading = useLoading();
 function passedCallback() {
   if (props.callback) {
     if (props.showIndicator) {
-      const loader = loading.show()
+      const loader = loading.show();
       setTimeout(() => {
         if (props.callback) {
-          props.callback()
+          props.callback();
         }
-        loader.hide()
-      }, 1)
+        loader.hide();
+      }, 1);
     } else {
-      props.callback()
+      props.callback();
     }
   }
 }
 </script>
 
 <style scoped>
-@import './iconButton.less';
+@import "./iconButton.less";
 </style>

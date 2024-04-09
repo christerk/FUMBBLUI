@@ -4,12 +4,8 @@
     <div class="debugpanel">
       <div class="title">Debug</div>
       <div class="debugcontent">
-        <button @click="roll" >Roll Dice</button>
-        <die
-          type="d6"
-          ref="debugDie"
-          @complete="() => {}"
-        ></die>
+        <button @click="roll">Roll Dice</button>
+        <die type="d6" ref="debugDie" @complete="() => {}"></die>
       </div>
     </div>
   </div>
@@ -20,18 +16,24 @@
 </style>
 
 <script lang="ts">
-import { Emit, Prop, Component, Vue, toNative, Ref } from "vue-facing-decorator";
+import {
+  Emit,
+  Prop,
+  Component,
+  Vue,
+  toNative,
+  Ref,
+} from "vue-facing-decorator";
 import Team from "../include/Team";
 import FumbblApi from "../include/FumbblApi";
 import { Die } from "@components/fumbblcomponents";
 
 @Component({
   components: {
-    Die
-  }
+    Die,
+  },
 })
 class TeamDebug extends Vue {
-
   @Prop({ required: true })
   public team!: Team;
 
@@ -47,12 +49,12 @@ class TeamDebug extends Vue {
   }
 
   @Ref
-  public debugDie: InstanceType<typeof Die>|undefined;
+  public debugDie: InstanceType<typeof Die> | undefined;
 
   async mounted() {}
 
   public roll() {
-    this.debugDie?.roll(Math.floor(Math.random() * 6)+1);
+    this.debugDie?.roll(Math.floor(Math.random() * 6) + 1);
   }
 }
 
