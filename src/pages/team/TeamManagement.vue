@@ -9,6 +9,7 @@
       :isLeagueStaff="isLeagueStaff"
       @unexpected-error="handleUnexpectedError"
       @delete-team="handleDeleteTeam"
+      @supported="handleSupportedTeam"
     ></team>
 
     <modal
@@ -32,6 +33,22 @@
     </modal>
 
     <modal
+      v-if="!supported"
+      :button-settings="{
+        cancel: { enabled: false },
+        confirm: { enabled: true, label: 'Ok' },
+      }"
+      :modal-size="'small'"
+      @confirm="redirectToLegacy"
+    >
+      <template v-slot:header>Unsupported League Configuration</template>
+
+      <template v-slot:body>
+        <p>This team's league uses an unsupported configuration. You will be redirected to the legacy team page.</p>
+      </template>
+    </modal>
+
+    <modal
       v-if="teamDeleted"
       :modal-size="'small'"
       :exclude-close-top-right="true"
@@ -50,7 +67,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-facing-decorator";
+import { Vue, Component, Ref } from "vue-facing-decorator";
 import TeamComponent from "./components/Team.vue";
 import FumbblApi from "./include/FumbblApi";
 import ModalComponent from "./components/Modal.vue";
@@ -66,6 +83,7 @@ export default class TeamManagement extends Vue {
   public coachName: string = "";
   public fumbblApi?: FumbblApi = undefined;
   public unexpectedErrorMessage?: string = undefined;
+  public supported = true;
   public teamDeleted: boolean = false;
   public isLeagueStaff: boolean = false;
   public isSiteStaff: boolean = false;
@@ -90,7 +108,8 @@ export default class TeamManagement extends Vue {
     return (
       this.fumbblApi !== undefined &&
       this.unexpectedErrorMessage === undefined &&
-      !this.teamDeleted
+      !this.teamDeleted &&
+      this.supported
     );
   }
 
@@ -101,6 +120,14 @@ export default class TeamManagement extends Vue {
   public handleDeleteTeam() {
     this.teamDeleted = false;
     setTimeout(() => (window.location.href = `https://fumbbl.com/~`), 1000);
+  }
+
+  public handleSupportedTeam(supported: boolean) {
+    this.supported = supported;
+  }
+
+  public redirectToLegacy(): void {
+    window.location.assign("https://fumbbl.com/p/team?id=" + this.teamId);
   }
 }
 </script>
