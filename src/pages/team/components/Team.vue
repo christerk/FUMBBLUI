@@ -1253,10 +1253,7 @@ class TeamComponent extends Vue {
         rulesetVersion !== "2020" ||
         !["bb2020", "predetermined"].includes(skillProgressionType)
       ) {
-        this.supportedTeam()
-        /*this.triggerUnexpectedError(
-          "Unsupported team type. Currently this page only supports Teams using the 2020 ruleset (must be using 2020 skill progression as well.)",
-        );*/
+        this.supportedTeam();
       }
     } else {
       let currentAction = "";
