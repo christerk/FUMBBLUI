@@ -67,7 +67,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Ref } from "vue-facing-decorator";
+import { Vue, Component } from "vue-facing-decorator";
 import TeamComponent from "./components/Team.vue";
 import FumbblApi from "./include/FumbblApi";
 import ModalComponent from "./components/Modal.vue";
