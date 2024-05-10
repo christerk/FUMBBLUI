@@ -56,9 +56,9 @@
           </div>
 
           <div>
-            {{ stats.tv.for }}
+            {{ Math.round(stats.tv.for/1000) }}k
             /
-            {{ stats.tv.for }}
+            {{ Math.round(stats.tv.against/1000) }}k
           </div>
         </div>
       </template>
@@ -100,6 +100,14 @@ class TeamStats extends Vue {
   async mounted() {}
 
   public async loadStats() {
+    let summaryRow = {
+        info: { roster: "Summary", logo: 735926 },
+        record: { games: 0, wins: 0, ties: 0, losses: 0 },
+        td: { for: 0, against: 0 },
+        cas: { for: {bh: 0, si: 0, kill: 0}, against: {bh: 0, si: 0, kill: 0} },
+        tv: {for: 0, against: 0 },
+      };
+
     const apiResponse = await this.fumbblApi.getTeamStats(this.team.id);
     if (apiResponse.isSuccessful()) {
       let stats = apiResponse.getData();
@@ -109,7 +117,29 @@ class TeamStats extends Vue {
       Object.keys(stats).forEach((roster) => {
         stats[roster].info["roster"] = roster;
         list.push(stats[roster]);
+        summaryRow["record"]["games"] += stats[roster]["record"]["games"];
+        summaryRow["record"]["wins"] += stats[roster]["record"]["wins"];
+        summaryRow["record"]["ties"] += stats[roster]["record"]["ties"];
+        summaryRow["record"]["losses"] += stats[roster]["record"]["losses"];
+
+        summaryRow["td"]["for"] += stats[roster]["td"]["for"];
+        summaryRow["td"]["against"] += stats[roster]["td"]["against"];
+
+        summaryRow["cas"]["for"]["bh"] += stats[roster]["cas"]["for"]["bh"];
+        summaryRow["cas"]["for"]["si"] += stats[roster]["cas"]["for"]["si"];
+        summaryRow["cas"]["for"]["kill"] += stats[roster]["cas"]["for"]["kill"];
+        summaryRow["cas"]["against"]["bh"] += stats[roster]["cas"]["against"]["bh"];
+        summaryRow["cas"]["against"]["si"] += stats[roster]["cas"]["against"]["si"];
+        summaryRow["cas"]["against"]["kill"] += stats[roster]["cas"]["against"]["kill"];
+
+        summaryRow["tv"]["for"] += stats[roster]["tv"]["for"] * stats[roster]["record"]["games"];
+        summaryRow["tv"]["against"] += stats[roster]["tv"]["against"] * stats[roster]["record"]["games"];
       });
+
+      if (summaryRow["record"]["games"] > 0) {
+        summaryRow["tv"]["for"] /= summaryRow["record"]["games"];
+        summaryRow["tv"]["against"] /= summaryRow["record"]["games"];
+      }
 
       list.sort((a, b) => {
         let d = b.record.games - a.record.games;
@@ -126,6 +156,8 @@ class TeamStats extends Vue {
 
         return 0;
       });
+
+      list.push(summaryRow);
 
       this.statistics = list;
     } else {
