@@ -14,6 +14,7 @@ export default class Team {
   private division: string = "";
   public coach: Coach | null = null;
   public players: Player[] = [];
+  public firedPlayers: Player[] = [];
   public extraPlayers: Player[] = [];
   private teamValue: number = 0;
   private tvLimit: number = 0;
@@ -39,6 +40,7 @@ export default class Team {
   private sppLimits: any;
   public bio: string | null = null;
   public logo: number | null = null;
+  private settings: TeamManagementSettings | null = null;
 
   constructor(
     division: string,
@@ -71,6 +73,7 @@ export default class Team {
       rawApiTeam.treasury,
       teamManagementSettings.maxPlayers,
     );
+    team.settings = teamManagementSettings;
     team.id = rawApiTeam.id;
     team.teamStatus = TeamStatus.fromApi(rawApiTeam.status);
     team.name = rawApiTeam.name;
@@ -100,31 +103,58 @@ export default class Team {
     team.initializePlayers();
 
     for (const rawApiPlayer of rawApiTeam.players) {
-      let iconRowVersionPosition =
-        rosterIconManager.getNextAvailableIconRowVersionPosition(
-          rawApiPlayer.positionId,
-          team.getTakenIconRowVersionPositionsOfPositionId(
-            rawApiPlayer.positionId,
-          ),
-        );
-      if (playerIconRowVersionPositions[rawApiPlayer.id] !== undefined) {
-        iconRowVersionPosition = playerIconRowVersionPositions[rawApiPlayer.id];
-      }
-      const isJourneyman =
-        rawApiPlayer.number > teamManagementSettings.maxPlayers;
-
-      team.addPlayer(
-        Player.fromApi(
-          rawApiPlayer,
-          teamManagementSettings.getPosition(rawApiPlayer.positionId),
-          iconRowVersionPosition,
-          isJourneyman,
-          team.getNumberOfSkillsForLegend(),
-          rawApiPlayer.hasBio,
-        ),
+      Team.processPlayer(
+        rosterIconManager,
+        rawApiPlayer,
+        team,
+        playerIconRowVersionPositions,
+        teamManagementSettings,
       );
     }
+    for (const rawApiPlayer of rawApiTeam.firedPlayers) {
+      Team.processPlayer(
+        rosterIconManager,
+        rawApiPlayer,
+        team,
+        playerIconRowVersionPositions,
+        teamManagementSettings,
+      );
+    }
+
     return team;
+  }
+
+  private static processPlayer(
+    rosterIconManager: RosterIconManager,
+    rawApiPlayer: any,
+    team: Team,
+    playerIconRowVersionPositions: any,
+    teamManagementSettings: TeamManagementSettings,
+  ) {
+    let iconRowVersionPosition =
+      rosterIconManager.getNextAvailableIconRowVersionPosition(
+        rawApiPlayer.positionId,
+        team.getTakenIconRowVersionPositionsOfPositionId(
+          rawApiPlayer.positionId,
+        ),
+      );
+    if (playerIconRowVersionPositions[rawApiPlayer.id] !== undefined) {
+      iconRowVersionPosition = playerIconRowVersionPositions[rawApiPlayer.id];
+    }
+    const isJourneyman =
+      rawApiPlayer.number > teamManagementSettings.maxPlayers;
+
+    team.addPlayer(
+      Player.fromApi(
+        rawApiPlayer,
+        teamManagementSettings.getPosition(rawApiPlayer.positionId),
+        iconRowVersionPosition,
+        isJourneyman,
+        team.getNumberOfSkillsForLegend(),
+        rawApiPlayer.hasBio,
+        rawApiPlayer.status,
+      ),
+    );
   }
 
   public getId(): number {
@@ -201,6 +231,8 @@ export default class Team {
   public addPlayer(player: Player): void {
     if (player.IsExtraPlayer) {
       this.extraPlayers.push(player);
+    } else if (player.IsFired) {
+      this.firedPlayers.push(player);
     } else {
       this.players[player.number - 1] = player;
     }
@@ -240,6 +272,29 @@ export default class Team {
 
   public findPlayerByNumber(playerNumber: number): Player | null {
     return this.players[playerNumber - 1];
+  }
+  public firePlayer(player: Player): void {
+    if (this.teamStatus.isRedrafting()) {
+      this.treasury += player.getPositionCost();
+    }
+    const index = this.players.findIndex(
+      (playerToMatch) => playerToMatch.id === player.id,
+    );
+    if (index !== -1) {
+      this.players[index] = Player.emptyPlayer(player.playerNumber);
+    }
+  }
+
+  public rehirePlayer(player: Player): void {
+    if (this.teamStatus.isRedrafting()) {
+      this.treasury -= player.getPlayerCost();
+    }
+
+    const number = this.findFirstEmptyNumber();
+
+    if (number != null) {
+      this.players[number - 1] = player;
+    }
   }
 
   public removePlayer(player: Player): void {
@@ -326,6 +381,26 @@ export default class Team {
 
   public getRedraftCappedBudget(): number {
     return this.redrafting.cappedBudget;
+  }
+
+  public getTotalStaffCost(): number {
+    if (this.settings == null) {
+      return 0;
+    }
+
+    return (
+      this.getRerolls() * this.settings?.rerollCostOnCreate +
+      (this.getDedicatedFans() - this.settings?.minStartFans) * 10000 +
+      (this.getApothecary() ? 50000 : 0) +
+      this.getCheerleaders() * 10000 +
+      this.getAssistantCoaches() * 10000
+    );
+  }
+
+  public getTotalPlayerCost(): number {
+    return this.getPlayers()
+      .map((player) => player.getPlayerCost())
+      .reduce((prev, curr) => curr + prev);
   }
 
   public getRedraftTooltip(): string {

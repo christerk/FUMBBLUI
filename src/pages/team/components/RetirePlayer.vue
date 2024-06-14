@@ -26,7 +26,7 @@
             Earned skills: <strong>{{ player.getSkills().join(", ") }}</strong>
           </p>
         </template>
-        <p>Unspent SPP: {{ player.sppDisplayInfo.spendable }}</p>
+        <p>Unspent SPP: {{ player.sppDisplayInfo().spendable }}</p>
         <p>
           Injuries:
           {{

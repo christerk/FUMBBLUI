@@ -60,7 +60,7 @@ import TeamManagementSettings from "../../include/TeamManagementSettings";
 })
 class ActivateTeamModal extends Vue {
   public isVisible: boolean = false;
-  public specialRuleErrors: string[] | undefined;
+  public specialRuleErrors: string[] = [];
 
   @Prop
   public teamManagementSettings!: TeamManagementSettings;

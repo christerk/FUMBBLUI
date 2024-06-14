@@ -379,6 +379,24 @@ export default class FumbblApi {
     return await this.enqueuePost(url, data);
   }
 
+  public async firePlayer(
+    teamId: number,
+    playerId: number,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl("/api/team/firePlayer");
+    const data = { teamId: teamId, playerId: playerId };
+    return await this.enqueuePost(url, data);
+  }
+
+  public async rehirePlayer(
+    teamId: number,
+    playerId: number,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl("/api/team/rehirePlayer");
+    const data = { teamId: teamId, playerId: playerId };
+    return await this.enqueuePost(url, data);
+  }
+
   public async retirePlayer(
     teamId: number,
     playerId: number,

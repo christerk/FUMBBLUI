@@ -216,6 +216,9 @@
           <template v-if="player.getIsRefundable()">
             (<a href="#" @click.prevent="triggerRefundPlayer">Refund</a>)
           </template>
+          <template v-else-if="teamStatus.isRedrafting()">
+            (<a href="#" @click.prevent="triggerFirePlayer">Fire</a>)
+          </template>
           <template v-else>
             (<a href="#" @click.prevent="triggerNominateRetirePlayer">Retire</a
             >)
@@ -228,7 +231,7 @@
         >
           (<a href="#" @click.prevent="triggerHireJourneyman">Hire</a>)
         </template>
-        <template v-if="player.canSkill">
+        <template v-if="player.canSkill && accessControl.canSkill()">
           <a
             :class="{ mustskill: player.mustSkill }"
             href="#"
@@ -344,6 +347,10 @@ class PlayerComponent extends Vue {
     return this.player!;
   }
 
+  @Emit("fire-player")
+  public triggerFirePlayer(): Player {
+    return this.player!;
+  }
   @Emit("hire-journeyman")
   public triggerHireJourneyman(): Player {
     return this.player!;
@@ -475,7 +482,7 @@ class PlayerComponent extends Vue {
   }
 
   public get sppDisplayInfo(): any {
-    return this.player.sppDisplayInfo;
+    return this.player.sppDisplayInfo();
   }
 
   public get sppSummaryText(): string {

@@ -31,6 +31,7 @@ export default class AccessControl {
                 "NEW",
                 "POST_MATCH_SEQUENCE",
                 "SKILL_ROLLS_PENDING",
+                "REDRAFTING",
               ],
             },
           ],
@@ -40,6 +41,20 @@ export default class AccessControl {
           grantAccessToList: [
             {
               userRoles: ["OWNER"],
+              teamStatusValues: [
+                "NEW",
+                "POST_MATCH_SEQUENCE",
+                "SKILL_ROLLS_PENDING",
+                "REDRAFTING",
+              ],
+            },
+          ],
+        },
+        {
+          action: "SKILL",
+          grantAccessToList: [
+            {
+              userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
               teamStatusValues: [
                 "NEW",
                 "POST_MATCH_SEQUENCE",
@@ -93,6 +108,7 @@ export default class AccessControl {
               "POST_MATCH_SEQUENCE",
               "SKILL_ROLLS_PENDING",
               "READY_FOR_TOURNAMENT",
+              "REDRAFTING",
             ],
           },
         ],
@@ -328,6 +344,10 @@ export default class AccessControl {
 
   public canEdit(): boolean {
     return this.isGrantedAny(["CREATE", "EDIT"]);
+  }
+
+  public canSkill(): boolean {
+    return this.isGrantedAny(["SKILL"]);
   }
 
   public canRetireTeam(): boolean {

@@ -70,4 +70,8 @@ export default class TeamStatus {
   public isSkill(): boolean {
     return this.status === "SKILL_ROLLS_PENDING";
   }
+
+  public isRedrafting(): boolean {
+    return this.status === "REDRAFTING";
+  }
 }

@@ -45,7 +45,8 @@ export type TeamAction =
   | "RENAME_TEAM"
   | "SET_TREASURY"
   | "SET_DEDICATED_FANS"
-  | "RENAME_ALL_PLAYERS";
+  | "RENAME_ALL_PLAYERS"
+  | "SKILL";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;
@@ -100,6 +101,7 @@ export interface PositionStats {
 }
 
 export interface PlayerRecord {
+  seasons: number;
   games: number;
   completions: number;
   touchdowns: number;

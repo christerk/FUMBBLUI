@@ -18,6 +18,7 @@ export default class Player {
   public playerNumber: number = 0;
   private playerName: string;
   private _hasBio: boolean = false;
+  public playerStatus: number = 0;
   private gender: PlayerGender = "NEUTRAL";
   private iconRowVersionPosition: number; // allows selection of icon for display when position has multiple versions in the icon image
   private position: Position | null;
@@ -48,6 +49,7 @@ export default class Player {
     iconRowVersionPosition: number,
     gender: PlayerGender,
     hasBio: boolean,
+    playerStatus: number,
   ) {
     this.type = type;
     this.id = id;
@@ -59,11 +61,13 @@ export default class Player {
     this.iconRowVersionPosition = iconRowVersionPosition;
     this.gender = gender;
     this._hasBio = hasBio;
+    this.playerStatus = playerStatus;
 
     this.injuries = [];
     this.skills = [];
 
     this.record = {
+      seasons: 0,
       games: 0,
       completions: 0,
       touchdowns: 0,
@@ -88,6 +92,7 @@ export default class Player {
     isJourneyman: boolean,
     numberOfSkillsForLegend: number,
     hasBio: boolean,
+    playerStatus: number,
   ): Player {
     const player = new Player(
       "NORMAL",
@@ -98,6 +103,7 @@ export default class Player {
       iconRowVersionPosition,
       rawApiPlayer.gender ? rawApiPlayer.gender.toUpperCase() : "NONBINARY", // older journeymen have null gender
       hasBio,
+      playerStatus,
     );
     player.isJourneyman = isJourneyman;
     player.injuries = rawApiPlayer.injuries
@@ -110,6 +116,7 @@ export default class Player {
       0,
     );
 
+    player.record.seasons = rawApiPlayer.record.seasons;
     player.record.games = rawApiPlayer.record.games;
     player.record.completions = rawApiPlayer.record.completions;
     player.record.touchdowns = rawApiPlayer.record.touchdowns;
@@ -150,6 +157,7 @@ export default class Player {
       0,
       "NEUTRAL",
       false,
+      0,
     );
   }
 
@@ -168,6 +176,7 @@ export default class Player {
       iconRowVersionPosition,
       playerGender,
       false,
+      0,
     );
   }
 
@@ -200,6 +209,10 @@ export default class Player {
 
   public get IsExtraPlayer(): boolean {
     return this.isJourneyman || this.number > 16;
+  }
+
+  public get IsFired(): boolean {
+    return this.playerStatus == 11;
   }
 
   public set number(value) {
@@ -424,7 +437,7 @@ export default class Player {
     return this.record;
   }
 
-  public get sppDisplayInfo(): {
+  public sppDisplayInfo(): {
     total: number;
     spendable: number;
     maxLimit: number;
@@ -493,12 +506,12 @@ export default class Player {
   }
 
   public get canSkill(): boolean {
-    const info = this.sppDisplayInfo;
+    const info = this.sppDisplayInfo();
     return info.tier > 0;
   }
 
   public get mustSkill(): boolean {
-    const info = this.sppDisplayInfo;
+    const info = this.sppDisplayInfo();
     return info.tier >= 4;
   }
 

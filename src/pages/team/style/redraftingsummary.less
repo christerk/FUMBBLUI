@@ -1,0 +1,39 @@
+@import url("@style/fumbbl");
+
+.wrapper {
+  background: @OldLace;
+  border-radius: 5px;
+  height: 128px;
+  position: sticky;
+  top: 0px;
+  z-index: 10;
+  border: solid @Forest 2px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr auto) 1fr;
+  grid-template-rows: 75% 25%;
+
+  .section {
+    text-align: center;
+    height: 100%;
+    place-content: center;
+
+    .title {
+    }
+
+    .value {
+      font-size: 200%;
+    }
+
+    &.op {
+      margin-top: 0.5rem;
+      font-size: 200%;
+    }
+  }
+
+  .message {
+    grid-column: e("1 / 8");
+    text-align: center;
+    color: @Carmine;
+  }
+}

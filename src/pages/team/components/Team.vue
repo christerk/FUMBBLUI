@@ -1,5 +1,11 @@
 <template>
-  <div class="team" v-if="dataPropertiesInitialized">
+  <div
+    :class="[
+      'team',
+      { [team.getTeamStatus().getStatus().toLowerCase()!]: true },
+    ]"
+    v-if="dataPropertiesInitialized"
+  >
     <div class="teamheader">
       <div class="rosterlogo quickstats">
         <div class="division">{{ teamManagementSettings.rosterName }}</div>
@@ -43,6 +49,19 @@
               "
               class="menu"
               @click="interceptReadyToPlay"
+            >
+              Complete
+            </button>
+
+            <button
+              v-if="
+                team.getTeamStatus().isRedrafting() &&
+                redraftingSummary != undefined &&
+                redraftingSummary.isValid() &&
+                accessControl.canEdit()
+              "
+              class="menu"
+              @click="interceptCompleteRedrafting"
             >
               Complete
             </button>
@@ -287,6 +306,14 @@
       </div>
     </div>
 
+    <redraftingsummary
+      v-if="team.getTeamStatus().isRedrafting() && accessControl.canEdit()"
+      ref="redraftingSummary"
+      :team="team"
+      :settings="dataTeamManagementSettings"
+      :fumbblApi="fumbblApi"
+    ></redraftingsummary>
+
     <div class="biowrapper" v-if="team.bio != null && team.bio.length > 0">
       <div
         id="bio"
@@ -366,17 +393,29 @@
         </div>
 
         <div :class="{ showhirerookies: showHireRookiesWithPermissionsCheck }">
-          <hirerookies
-            v-if="showHireRookiesWithPermissionsCheck"
-            :roster-position-data-for-buying-player="
-              rosterPositionDataForBuyingPlayer
-            "
-            :roster-icon-manager="rosterIconManager"
-            :has-empty-team-sheet-entry="team.hasEmptyNumbers()"
-            :max-big-guys="teamManagementSettings.maxBigGuys"
-            @hire-rookie="handleHireRookie"
-            @hide-panel="enableShowHireRookies"
-          ></hirerookies>
+          <div>
+            <hirerookies
+              v-if="showHireRookiesWithPermissionsCheck"
+              :roster-position-data-for-buying-player="
+                rosterPositionDataForBuyingPlayer
+              "
+              :roster-icon-manager="rosterIconManager"
+              :has-empty-team-sheet-entry="team.hasEmptyNumbers()"
+              :max-big-guys="teamManagementSettings.maxBigGuys"
+              @hire-rookie="handleHireRookie"
+              @hide-panel="enableShowHireRookies"
+            ></hirerookies>
+            <redraftplayers
+              ref="redraftPlayers"
+              :roster-position-data-for-buying-player="
+                rosterPositionDataForBuyingPlayer
+              "
+              :rosterIconManager="rosterIconManager"
+              :has-empty-team-sheet-entry="team.hasEmptyNumbers()"
+              :max-big-guys="teamManagementSettings.maxBigGuys"
+              @rehire-player="handleRehirePlayer"
+            ></redraftplayers>
+          </div>
           <div class="playerrowsouter">
             <div
               :class="{
@@ -433,6 +472,7 @@
                       @remove-player="handleRemovePlayer"
                       @refund-player="handleRefundPlayer"
                       @nominate-retire-player="handleNominateRetirePlayer"
+                      @fire-player="handleFirePlayer"
                       @hire-journeyman="handleHireJourneyman"
                       @skill-player="showSkillPlayer"
                       @fold-out="handleFoldOut"
@@ -830,6 +870,9 @@ import TeamStats from "./TeamStats.vue";
 import TeamMatches from "./TeamMatches.vue";
 import TeamBio from "./TeamBio.vue";
 import TeamDebug from "./TeamDebug.vue";
+import RedraftingSummary from "./RedraftingSummary.vue";
+import RedraftPlayers from "./RedraftPlayers.vue";
+
 import {
   DiscardRerollModal,
   FireAssistantCoachModal,
@@ -862,6 +905,8 @@ import EditTeamName from "./EditTeamName.vue";
     modal: ModalComponent,
     retireplayer: RetirePlayerComponent,
     readytoplay: ReadyToPlayComponent,
+    redraftingsummary: RedraftingSummary,
+    redraftplayers: RedraftPlayers,
     SortableTable,
     die: Die,
     TeamStats,
@@ -921,7 +966,7 @@ class TeamComponent extends Vue {
 
   @Emit("supported")
   public supportedTeam(): boolean {
-    console.log("Trigger unsupported")
+    console.log("Trigger unsupported");
     return false;
   }
 
@@ -949,6 +994,10 @@ class TeamComponent extends Vue {
   private teamDebug: InstanceType<typeof TeamDebug> | undefined;
   @Ref
   private nameEdit: InstanceType<typeof EditTeamName> | undefined;
+  @Ref
+  private redraftPlayers: InstanceType<typeof RedraftPlayers> | undefined;
+  @Ref
+  public redraftingSummary: InstanceType<typeof RedraftingSummary> | undefined;
 
   @Ref
   public discardRerollModal:
@@ -1072,7 +1121,10 @@ class TeamComponent extends Vue {
       this.userRoles.push("LEAGUE_STAFF");
     }
 
-    if (this.team.getTeamStatus().isNew()) {
+    if (
+      this.team.getTeamStatus().isNew() ||
+      this.team.getTeamStatus().isRedrafting()
+    ) {
       this.showHireRookies = true;
     }
 
@@ -1085,6 +1137,8 @@ class TeamComponent extends Vue {
       }
     });
     await this.refreshBioToggle();
+
+    this.redraftPlayers?.reset(this.team);
   }
 
   public async toggleBio() {
@@ -1159,6 +1213,7 @@ class TeamComponent extends Vue {
       );
 
       this.team = newTeam;
+      this.redraftPlayers?.reset(this.team);
 
       this.dataAccessControl = new AccessControl(
         this.userRoles,
@@ -1351,7 +1406,10 @@ class TeamComponent extends Vue {
   }
 
   public get rerollCostForMode(): number {
-    if (this.team.getTeamStatus().isNew()) {
+    if (
+      this.team.getTeamStatus().isNew() ||
+      this.team.getTeamStatus().isRedrafting()
+    ) {
       return this.teamManagementSettings.rerollCostOnCreate;
     } else {
       return this.teamManagementSettings.rerollCostFull;
@@ -1679,7 +1737,10 @@ class TeamComponent extends Vue {
 
       // Refunded journeyman must be added back into the team
       // number property of response data is journeyman number
-      if (refundPlayerResponseData.number !== null) {
+      if (
+        refundPlayerResponseData.number !== null &&
+        refundPlayerResponseData.number !== 0
+      ) {
         player.setPlayerNumber(refundPlayerResponseData.number);
         player.setIsJourneyman(true);
         this.team.addPlayer(player);
@@ -1698,6 +1759,27 @@ class TeamComponent extends Vue {
     // automatically confirm the retirement if the player is refundable
     if (player.getIsRefundable()) {
       this.handleNominateRetirePlayerConfirm();
+    }
+  }
+
+  public async handleFirePlayer(player: Player) {
+    this.team.firePlayer(player);
+    this.redraftPlayers?.add(player);
+
+    this.reloadTeamWithDelay();
+
+    const playerToFireId = player.id;
+
+    const apiResponse = await this.fumbblApi.firePlayer(
+      this.team.id,
+      playerToFireId,
+    );
+
+    if (!apiResponse.isSuccessful()) {
+      await this.recoverFromUnexpectedError(
+        "An error occurred firing a player.",
+        apiResponse.getErrorMessage(),
+      );
     }
   }
 
@@ -1745,6 +1827,8 @@ class TeamComponent extends Vue {
       );
     }
   }
+
+  public async interceptCompleteRedrafting() {}
 
   public async interceptReadyToPlay() {
     if (
@@ -1902,6 +1986,32 @@ class TeamComponent extends Vue {
 
   public findPlayer(number: number) {
     return this.team.players.find((p) => p.playerNumber === number);
+  }
+
+  public async handleRehirePlayer(player: Player) {
+    const firstEmptyNumber = this.team.findFirstEmptyNumber();
+    if (!firstEmptyNumber) {
+      return;
+    }
+
+    this.team.rehirePlayer(player);
+    this.redraftPlayers?.remove(player);
+
+    this.reloadTeamWithDelay();
+
+    const playerToRehireId = player.id;
+
+    const apiResponse = await this.fumbblApi.rehirePlayer(
+      this.team.id,
+      playerToRehireId,
+    );
+
+    if (!apiResponse.isSuccessful()) {
+      await this.recoverFromUnexpectedError(
+        "An error occurred firing a player.",
+        apiResponse.getErrorMessage(),
+      );
+    }
   }
 
   public async handleHireRookie(positionId: number) {
