@@ -100,7 +100,10 @@
               @mouseenter="menuShow('admin')"
               @mouseleave="menuHide()"
             >
-              <a href="#">Admin</a>
+              <a @click.prevent="menuToggle('admin')" href="#"
+                >Admin<img
+                  src="https://fumbbl.com/FUMBBL/Images/Icons/disclosure.png"
+              /></a>
               <ul class="submenu" v-show="mainMenuShow === 'admin'">
                 <li v-if="accessControl.canMagicFixTeam()">
                   <a href="#" @click.prevent="magicFixTeam()">Magic Fix</a>
@@ -122,7 +125,12 @@
                     >Rename Players</a
                   >
                 </li>
-                <li v-if="accessControl.canRedraft()">
+                <li
+                  v-if="
+                    accessControl.canRedraft() &&
+                    teamManagementSettings.seasonsEnabled
+                  "
+                >
                   <a href="#" @click.prevent="redraft()">Redraft</a>
                 </li>
               </ul>
