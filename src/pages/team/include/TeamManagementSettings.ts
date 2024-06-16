@@ -93,6 +93,13 @@ export default class TeamManagementSettings {
           rawApiRuleset.options.rulesetOptions.seasons === true ||
           rawApiRuleset.options.rulesetOptions.seasons === "true",
         seasonLength: rawApiRuleset.options.rulesetOptions.seasonLength,
+        agentFee: {
+          base: rawApiRuleset.options.rulesetOptions.seasonAgentFeeBase,
+          perSeason:
+            rawApiRuleset.options.rulesetOptions.seasonAgentFeePerSeason,
+          seasonModifier:
+            rawApiRuleset.options.rulesetOptions.seasonAgentFeeSeasonModifier,
+        },
       },
       ruleset: {
         expensiveMistakes: {
@@ -238,6 +245,15 @@ export default class TeamManagementSettings {
     );
   }
 
+  public getAgentFee(seasons: number): number {
+    return (
+      this.settings.seasons.agentFee.base +
+      this.settings.seasons.agentFee.perSeason *
+        1000 *
+        Math.max(0, seasons - this.settings.seasons.agentFee.seasonModifier)
+    );
+  }
+
   public getPosition(positionId: number): Position {
     for (const position of this.settings.players.positions) {
       if (position.id === positionId) {
@@ -292,9 +308,10 @@ export default class TeamManagementSettings {
   }
 
   public getAddRemovePermissions(team: Team): AddRemovePermissions {
-    const rerollCost = team.getTeamStatus().isNew()
-      ? this.rerollCostOnCreate
-      : this.rerollCostFull;
+    const rerollCost =
+      team.getTeamStatus().isNew() || team.getTeamStatus().isRedrafting()
+        ? this.rerollCostOnCreate
+        : this.rerollCostFull;
     return {
       rerolls: {
         add:
@@ -302,7 +319,9 @@ export default class TeamManagementSettings {
           team.canAfford(rerollCost),
         remove:
           team.getRerolls() > 0 &&
-          (this.ALLOW_DISCARD_REROLL || team.getTeamStatus().isNew()),
+          (this.ALLOW_DISCARD_REROLL ||
+            team.getTeamStatus().isNew() ||
+            team.getTeamStatus().isRedrafting()),
       },
       assistantCoaches: {
         add:
@@ -394,5 +413,19 @@ export default class TeamManagementSettings {
 
   public isValidForCreate(team: Team): boolean {
     return this.getErrorsForCreate(team).length === 0;
+  }
+
+  public applyLimits(limits: {
+    budget: number;
+    rerolls: number;
+    fans: number;
+    coaches: number;
+    cheerleaders: number;
+    apothecary: number;
+  }) {
+    this.settings.rerolls.max = limits.rerolls;
+    this.settings.sidelineStaff.apothecary.allowed = limits.apothecary > 0;
+    this.settings.sidelineStaff.assistantCoaches.max = limits.coaches;
+    this.settings.sidelineStaff.cheerleaders.max = limits.cheerleaders;
   }
 }

@@ -14,17 +14,27 @@
   .team {
     position: relative;
 
-    &.redrafting {
-      .playerrows.showplayercontrols {
-        .main {
-          grid-template-columns: 15px 25px 48px 1fr repeat(5, 35px) 1fr 60px 40px 60px 60px;
-          &.compact {
-            grid-template-columns: 15px 25px 48px 1fr 1fr 60px 40px 60px 60px;
-          }
+    .playerrows {
+      .playerrowsheader {
+        grid-template-columns: 88px 1fr repeat(5, 35px) 1fr 60px 40px 60px 85px;
+      }
+      .main {
+        grid-template-columns: 15px 25px 48px 1fr repeat(5, 35px) 1fr 60px 40px 60px 85px;
+        &.compact {
+          grid-template-columns: 15px 25px 48px 1fr 1fr 60px 40px 60px 85px;
         }
       }
-      .playerrows.showplayercontrols .playerrowsheader {
-        grid-template-columns: 86px 1fr repeat(5, 35px) 1fr 60px 40px 60px 60px;
+    }
+
+    &.redrafting .playerrows {
+      .main {
+        grid-template-columns: 15px 25px 48px 1fr repeat(5, 35px) 1fr 60px 40px 30px 60px 60px;
+        &.compact {
+          grid-template-columns: 15px 25px 48px 1fr 1fr 60px 40px 30px 60px 60px;
+        }
+      }
+      .playerrowsheader {
+        grid-template-columns: 88px 1fr repeat(5, 35px) 1fr 60px 40px 30px 60px 60px;
       }
     }
 
@@ -678,25 +688,6 @@
         border-top-right-radius: 5px;
       }
 
-      &.showplayercontrols {
-        .playerrowsheader {
-          grid-template-columns: 86px 1fr repeat(5, 35px) 1fr 60px 40px 60px 85px;
-        }
-        .main {
-          grid-template-columns: 15px 25px 48px 1fr repeat(5, 35px) 1fr 60px 40px 60px 85px;
-          &.compact {
-            grid-template-columns: 15px 25px 48px 1fr 1fr 60px 40px 60px 85px;
-          }
-        }
-      }
-
-      .playerrowsheader {
-        grid-template-columns: 88px 1fr repeat(5, 35px) 1fr 60px 40px 60px;
-      }
-      .main {
-        grid-template-columns: 15px 25px 48px 1fr repeat(5, 35px) 1fr 60px 40px 60px;
-      }
-
       .playerrow {
         background-color: @OldLace;
         &.empty {
@@ -1207,4 +1198,8 @@
 }
 .center {
   text-align: center;
+}
+
+.right {
+  text-align: right;
 }

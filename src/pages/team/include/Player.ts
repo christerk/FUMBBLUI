@@ -7,6 +7,7 @@ import {
   Position,
   PositionStats,
 } from "./Interfaces";
+import Team from "./Team";
 import UpdatePlayerDetails from "./UpdatePlayerDetails";
 
 export default class Player {
@@ -39,8 +40,10 @@ export default class Player {
   public id: number = 0;
   private version: number = 0;
   private numberOfSkillsForLegend: number = 9999;
+  team: Team;
 
   constructor(
+    team: Team,
     type: PlayerType,
     id: number,
     playerNumber: number,
@@ -51,6 +54,7 @@ export default class Player {
     hasBio: boolean,
     playerStatus: number,
   ) {
+    this.team = team;
     this.type = type;
     this.id = id;
     this.version = 0;
@@ -86,6 +90,7 @@ export default class Player {
   }
 
   static fromApi(
+    team: Team,
     rawApiPlayer: any,
     position: Position,
     iconRowVersionPosition: number,
@@ -95,6 +100,7 @@ export default class Player {
     playerStatus: number,
   ): Player {
     const player = new Player(
+      team,
       "NORMAL",
       rawApiPlayer.id,
       rawApiPlayer.number,
@@ -147,8 +153,9 @@ export default class Player {
     return player;
   }
 
-  static emptyPlayer(number: number) {
+  static emptyPlayer(team: Team, number: number) {
     return new Player(
+      team,
       "EMPTY",
       ++this.generatedId,
       number,
@@ -162,12 +169,14 @@ export default class Player {
   }
 
   static temporaryPlayer(
+    team: Team,
     playerNumber: number,
     position: Position,
     iconRowVersionPosition: number,
     playerGender: PlayerGender,
   ): Player {
     return new Player(
+      team,
       "TEMP",
       ++this.generatedId,
       playerNumber,
@@ -286,6 +295,17 @@ export default class Player {
 
   public getSkillCost(): number {
     return this.skillCost;
+  }
+
+  public getAgentFee(): number {
+    return this.team.getAgentFee(this);
+  }
+  public getRedraftingCost(): number {
+    const baseCost = this.getPlayerCost();
+
+    const agentFee = this.team.getAgentFee(this);
+
+    return baseCost + agentFee;
   }
 
   public getPlayerCost(): number {

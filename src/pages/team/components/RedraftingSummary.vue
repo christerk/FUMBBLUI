@@ -2,17 +2,17 @@
   <div class="wrapper">
     <div class="section">
       <div class="title">Re-drafting budget</div>
-      <div class="value">{{ team.getRedraftCappedBudget() / 1000 }}k</div>
+      <div class="value">{{ team.getRedraftLimits().budget / 1000 }}k</div>
     </div>
     <div class="section op">-</div>
     <div class="section">
       <div class="title">Player (re-)hiring cost</div>
-      <div class="value">{{ team.getTotalPlayerCost() / 1000 }}k</div>
+      <div class="value">{{ team.getTotalPlayerRedraftingCost() / 1000 }}k</div>
     </div>
     <div class="section op">-</div>
     <div class="section">
       <div class="title">Team staff cost</div>
-      <div class="value">{{ team.getTotalStaffCost() / 1000 }}k</div>
+      <div class="value">{{ team.getTotalStaffCost(false) / 1000 }}k</div>
     </div>
     <div class="section op">=</div>
     <div class="section">
@@ -46,15 +46,15 @@ class RedraftingSummary extends Vue {
 
   async mounted() {}
 
-  getRemainingBudget() {
+  public getRemainingBudget() {
     return (
-      this.team.getRedraftCappedBudget() -
-      this.team.getTotalStaffCost() -
-      this.team.getTotalPlayerCost()
+      this.team.getRedraftLimits().budget -
+      this.team.getTotalStaffCost(false) -
+      this.team.getTotalPlayerRedraftingCost()
     );
   }
 
-  getMessage() {
+  public getMessage() {
     if (this.getRemainingBudget() < 0) {
       return "Team is too expensive";
     }
@@ -66,7 +66,7 @@ class RedraftingSummary extends Vue {
     return "";
   }
 
-  isValid() {
+  public isValid() {
     return this.getMessage().length == 0;
   }
 }

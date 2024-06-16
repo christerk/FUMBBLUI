@@ -463,6 +463,19 @@ export default class FumbblApi {
     );
   }
 
+  public async redraftTeam(teamId: number): Promise<ApiResponse> {
+    return await this.simplePostWithOnlyTeamIdInBody(
+      teamId,
+      this.getUrl("/api/team/redraft"),
+    );
+  }
+
+  public async completeRedrafting(teamId: number): Promise<ApiResponse> {
+    return await this.simplePostWithOnlyTeamIdInBody(
+      teamId,
+      this.getUrl("/api/team/completeRedraft"),
+    );
+  }
   public async magicFixTeam(teamId: number): Promise<ApiResponse> {
     return await this.simplePostWithOnlyTeamIdInBody(
       teamId,

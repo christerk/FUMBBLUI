@@ -98,6 +98,42 @@ export default class AccessControl {
         ],
       },
       {
+        action: "REMOVE_REROLL",
+        grantAccessToList: [
+          {
+            userRoles: ["OWNER"],
+            teamStatusValues: ["NEW", "REDRAFTING"],
+          },
+        ],
+      },
+      {
+        action: "REMOVE_COACH",
+        grantAccessToList: [
+          {
+            userRoles: ["OWNER"],
+            teamStatusValues: ["NEW", "REDRAFTING"],
+          },
+        ],
+      },
+      {
+        action: "REMOVE_CHEERLEADER",
+        grantAccessToList: [
+          {
+            userRoles: ["OWNER"],
+            teamStatusValues: ["NEW", "REDRAFTING"],
+          },
+        ],
+      },
+      {
+        action: "REMOVE_APOTHECARY",
+        grantAccessToList: [
+          {
+            userRoles: ["OWNER"],
+            teamStatusValues: ["NEW", "REDRAFTING"],
+          },
+        ],
+      },
+      {
         action: "RENUMBER_PLAYERS",
         grantAccessToList: [
           {
@@ -192,6 +228,15 @@ export default class AccessControl {
       },
       {
         action: "UNREADY_TEAM",
+        grantAccessToList: [
+          {
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["ACTIVE"],
+          },
+        ],
+      },
+      {
+        action: "REDRAFT_TEAM",
         grantAccessToList: [
           {
             userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
@@ -362,6 +407,10 @@ export default class AccessControl {
     return this.isGranted("UNREADY_TEAM");
   }
 
+  public canRedraft(): boolean {
+    return this.isGranted("REDRAFT_TEAM");
+  }
+
   public canRenameTeam(): boolean {
     return this.isGranted("RENAME_TEAM");
   }
@@ -384,6 +433,21 @@ export default class AccessControl {
 
   public canCreate(): boolean {
     return this.isGranted("CREATE");
+  }
+
+  public canRemoveReroll(): boolean {
+    return this.isGranted("REMOVE_REROLL");
+  }
+
+  public canRemoveCoach(): boolean {
+    return this.isGranted("REMOVE_COACH");
+  }
+
+  public canRemoveCheerleader(): boolean {
+    return this.isGranted("REMOVE_CHEERLEADER");
+  }
+  public canRemoveApothecary(): boolean {
+    return this.isGranted("REMOVE_APOTHECARY");
   }
 
   public canViewHistory(): boolean {

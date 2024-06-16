@@ -6,7 +6,7 @@
     ]"
     v-if="dataPropertiesInitialized"
   >
-    <div class="teamheader">
+    <div class="teamheader" :lid="loadCount">
       <div class="rosterlogo quickstats">
         <div class="division">{{ teamManagementSettings.rosterName }}</div>
         <div class="infobox logo">
@@ -60,6 +60,7 @@
                 redraftingSummary.isValid() &&
                 accessControl.canEdit()
               "
+              :key="loadCount"
               class="menu"
               @click="interceptCompleteRedrafting"
             >
@@ -120,6 +121,9 @@
                   <a href="#" @click.prevent="renameAllPlayers()"
                     >Rename Players</a
                   >
+                </li>
+                <li v-if="accessControl.canRedraft()">
+                  <a href="#" @click.prevent="redraft()">Redraft</a>
                 </li>
               </ul>
             </li>
@@ -314,7 +318,14 @@
       :fumbblApi="fumbblApi"
     ></redraftingsummary>
 
-    <div class="biowrapper" v-if="team.bio != null && team.bio.length > 0">
+    <div
+      class="biowrapper"
+      v-if="
+        !team.getTeamStatus().isRedrafting() &&
+        team.bio != null &&
+        team.bio.length > 0
+      "
+    >
       <div
         id="bio"
         :class="{ bio: true, expand: bioExpanded }"
@@ -362,35 +373,6 @@
             <div class="currentteamcost">{{ teamCreationCost / 1000 }}k</div>
           </div>
         </div>
-        <div v-if="false" class="redraft">
-          <div class="redraftcalculation">
-            <div class="budgetlabel">Re-drafting Budget</div>
-            <div class="playercostlabel">Player (re-)hiring cost</div>
-            <div class="othercostlabel">Team staff cost</div>
-            <div class="remainingbudgetlabel">Remaining budget</div>
-            <div class="budget">1145k</div>
-            <div class="subtract1">-</div>
-            <div class="playercost">1470k</div>
-            <div class="subtract2">-</div>
-            <div class="othercost">210k</div>
-            <div class="equals">=</div>
-            <div class="remainingbudget">-535k</div>
-            <div class="errormessage">
-              <template v-if="true"
-                >⚠ Not enough money to cover team cost.</template
-              >
-            </div>
-          </div>
-
-          <div class="redraftactions">
-            <div class="restartredraft">
-              <a href="#">Restart redraft</a> (clears all changes)
-            </div>
-            <div class="finishredraft" v-if="true">
-              <a href="#">Finish redraft</a> (saves your changes)
-            </div>
-          </div>
-        </div>
 
         <div :class="{ showhirerookies: showHireRookiesWithPermissionsCheck }">
           <div>
@@ -406,6 +388,7 @@
               @hide-panel="enableShowHireRookies"
             ></hirerookies>
             <redraftplayers
+              v-show="showHireRookiesWithPermissionsCheck"
               ref="redraftPlayers"
               :roster-position-data-for-buying-player="
                 rosterPositionDataForBuyingPlayer
@@ -423,7 +406,12 @@
                 showplayercontrols: accessControl.canShowPlayerControls(),
               }"
             >
-              <div class="playerrowsheader">
+              <div
+                class="playerrowsheader"
+                :class="{
+                  compact: showHireRookiesWithPermissionsCheck,
+                }"
+              >
                 <template v-if="!showHireRookiesWithPermissionsCheck">
                   <div class="cell"></div>
                   <div class="cell"></div>
@@ -435,6 +423,12 @@
                   <div class="cell skills">Skills</div>
                   <div class="cell injuries">Inj</div>
                   <div class="cell spp">SPP</div>
+                  <div
+                    v-if="team.getTeamStatus().isRedrafting()"
+                    class="cell right"
+                  >
+                    Ssn
+                  </div>
                   <div class="cell cost">Cost</div>
                   <div
                     v-if="accessControl.canCreate()"
@@ -521,11 +515,13 @@
               <addremove
                 :current-value="team.getRerolls().toString()"
                 :can-edit="accessControl.canEdit()"
-                :can-remove-immediately="accessControl.canCreate()"
+                :can-remove-immediately="accessControl.canRemoveReroll()"
                 :can-add="addRemovePermissions.rerolls.add"
                 :can-remove="addRemovePermissions.rerolls.remove"
                 :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
-                :label-remove="accessControl.canCreate() ? 'Remove' : 'Discard'"
+                :label-remove="
+                  accessControl.canRemoveReroll() ? 'Remove' : 'Discard'
+                "
                 @add="addReroll"
                 @remove-with-confirm="discardRerollModal?.show()"
                 @remove-immediately="removeReroll"
@@ -566,11 +562,13 @@
               <addremove
                 :current-value="team.getAssistantCoaches().toString()"
                 :can-edit="accessControl.canEdit()"
-                :can-remove-immediately="accessControl.canCreate()"
+                :can-remove-immediately="accessControl.canRemoveCoach()"
                 :can-add="addRemovePermissions.assistantCoaches.add"
                 :can-remove="addRemovePermissions.assistantCoaches.remove"
                 :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
-                :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
+                :label-remove="
+                  accessControl.canRemoveCoach() ? 'Remove' : 'Fire'
+                "
                 @add="addAssistantCoach"
                 @remove-with-confirm="fireAssistantCoachModal?.show()"
                 @remove-immediately="removeAssistantCoach"
@@ -585,11 +583,13 @@
               <addremove
                 :current-value="team.getCheerleaders().toString()"
                 :can-edit="accessControl.canEdit()"
-                :can-remove-immediately="accessControl.canCreate()"
+                :can-remove-immediately="accessControl.canRemoveCheerleader()"
                 :can-add="addRemovePermissions.cheerleaders.add"
                 :can-remove="addRemovePermissions.cheerleaders.remove"
                 :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
-                :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
+                :label-remove="
+                  accessControl.canRemoveCheerleader() ? 'Remove' : 'Fire'
+                "
                 @add="addCheerleader"
                 @remove-with-confirm="fireCheerleaderModal?.show()"
                 @remove-immediately="removeCheerleader"
@@ -607,11 +607,13 @@
                   accessControl.canEdit() &&
                   teamManagementSettings.apothecaryAllowed
                 "
-                :can-remove-immediately="accessControl.canCreate()"
+                :can-remove-immediately="accessControl.canRemoveApothecary()"
                 :can-add="addRemovePermissions.apothecary.add"
                 :can-remove="addRemovePermissions.apothecary.remove"
                 :label-add="accessControl.canCreate() ? 'Add' : 'Hire'"
-                :label-remove="accessControl.canCreate() ? 'Remove' : 'Fire'"
+                :label-remove="
+                  accessControl.canRemoveApothecary() ? 'Remove' : 'Fire'
+                "
                 @add="addApothecary"
                 @remove-with-confirm="fireApothecaryModal?.show()"
                 @remove-immediately="removeApothecary"
@@ -636,7 +638,7 @@
             <div class="title right">Current Re-draft Budget:</div>
             <div class="info right">
               <div class="data" :title="team.getRedraftTooltip()">
-                {{ team.getRedraftCappedBudget() / 1000 }}k
+                {{ team.getRedraftLimits().budget / 1000 }}k
               </div>
               <div v-if="accessControl.canEdit()" class="editteamcontrols">
                 <!-- deliberately empty -->
@@ -1037,6 +1039,7 @@ class TeamComponent extends Vue {
     | undefined;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
+  public loadCount: number = 0;
 
   // the following properties (prefixed with data) must be initialized in order to become reactive data properties
   // to avoid warnings we provide getters for each without the data prefix, which also ignore the possibility of them being undefined
@@ -1139,6 +1142,7 @@ class TeamComponent extends Vue {
     await this.refreshBioToggle();
 
     this.redraftPlayers?.reset(this.team);
+    this.loadCount++;
   }
 
   public async toggleBio() {
@@ -1215,11 +1219,16 @@ class TeamComponent extends Vue {
       this.team = newTeam;
       this.redraftPlayers?.reset(this.team);
 
+      if (this.team.getTeamStatus().isRedrafting()) {
+        this.teamManagementSettings.applyLimits(this.team.getRedraftLimits());
+      }
+
       this.dataAccessControl = new AccessControl(
         this.userRoles,
         this.team.getTeamStatus().getStatus(),
         this.teamManagementSettings.isProgression,
       );
+      this.loadCount++;
     } else {
       this.triggerUnexpectedError(
         "Loading team information: " + apiResponse.getErrorMessage(),
@@ -1489,7 +1498,8 @@ class TeamComponent extends Vue {
 
   public async addReroll() {
     this.team.addReroll(
-      this.team.getTeamStatus().isNew()
+      this.team.getTeamStatus().isNew() ||
+        this.team.getTeamStatus().isRedrafting()
         ? this.teamManagementSettings.rerollCostOnCreate
         : this.teamManagementSettings.rerollCostFull,
     );
@@ -1510,7 +1520,7 @@ class TeamComponent extends Vue {
     this.reloadTeamWithDelay();
 
     let apiResponse = null;
-    if (this.accessControl.canCreate()) {
+    if (this.accessControl.canRemoveReroll()) {
       apiResponse = await this.fumbblApi.removeReroll(this.team.getId());
     } else {
       apiResponse = await this.fumbblApi.discardReroll(this.team.getId());
@@ -1578,7 +1588,7 @@ class TeamComponent extends Vue {
     this.reloadTeamWithDelay();
 
     let apiResponse = null;
-    if (this.accessControl.canCreate()) {
+    if (this.accessControl.canRemoveCoach()) {
       apiResponse = await this.fumbblApi.removeAssistantCoach(
         this.team.getId(),
       );
@@ -1611,7 +1621,7 @@ class TeamComponent extends Vue {
     this.reloadTeamWithDelay();
 
     let apiResponse = null;
-    if (this.accessControl.canCreate()) {
+    if (this.accessControl.canRemoveCheerleader()) {
       apiResponse = await this.fumbblApi.removeCheerleader(this.team.getId());
     } else {
       apiResponse = await this.fumbblApi.fireCheerleader(this.team.getId());
@@ -1642,7 +1652,7 @@ class TeamComponent extends Vue {
     this.reloadTeamWithDelay();
 
     let apiResponse = null;
-    if (this.accessControl.canCreate()) {
+    if (this.accessControl.canRemoveApothecary()) {
       apiResponse = await this.fumbblApi.removeApothecary(this.team.getId());
     } else {
       apiResponse = await this.fumbblApi.fireApothecary(this.team.getId());
@@ -1828,7 +1838,18 @@ class TeamComponent extends Vue {
     }
   }
 
-  public async interceptCompleteRedrafting() {}
+  public async interceptCompleteRedrafting() {
+    const apiResponse = await this.fumbblApi.completeRedrafting(
+      this.team.getId(),
+    );
+    if (!apiResponse.isSuccessful()) {
+      await this.recoverFromUnexpectedError(
+        "An error occurred completing redrafting.",
+        apiResponse.getErrorMessage(),
+      );
+    }
+    await this.reloadTeam();
+  }
 
   public async interceptReadyToPlay() {
     if (
@@ -1923,6 +1944,22 @@ class TeamComponent extends Vue {
       this.team.setTeamStatus(originalTeamStatus.getStatus());
       await this.recoverFromUnexpectedError(
         "An error occurred unreadying the team.",
+        apiResponse.getErrorMessage(),
+      );
+    }
+  }
+
+  public async redraft() {
+    this.menuHide();
+    const originalTeamStatus = this.team.getTeamStatus();
+    this.team.setTeamStatus("REDRAFTING");
+    const apiResponse = await this.fumbblApi.redraftTeam(this.team.getId());
+    this.reloadTeam();
+
+    if (!apiResponse.isSuccessful()) {
+      this.team.setTeamStatus(originalTeamStatus.getStatus());
+      await this.recoverFromUnexpectedError(
+        "An error occurred redrafting the team.",
         apiResponse.getErrorMessage(),
       );
     }
@@ -2088,6 +2125,7 @@ class TeamComponent extends Vue {
     playerGender: PlayerGender,
   ): Player {
     const temporaryPlayer = Player.temporaryPlayer(
+      this.team,
       number,
       position,
       iconRowVersionPosition,

@@ -46,7 +46,12 @@ export type TeamAction =
   | "SET_TREASURY"
   | "SET_DEDICATED_FANS"
   | "RENAME_ALL_PLAYERS"
-  | "SKILL";
+  | "SKILL"
+  | "REMOVE_REROLL"
+  | "REMOVE_COACH"
+  | "REMOVE_CHEERLEADER"
+  | "REMOVE_APOTHECARY"
+  | "REDRAFT_TEAM";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;
@@ -170,6 +175,11 @@ export interface SetupTeamManagementSettings {
   seasons: {
     enabled: boolean;
     seasonLength: number;
+    agentFee: {
+      base: number;
+      perSeason: number;
+      seasonModifier: number;
+    };
   };
   ruleset: {
     expensiveMistakes: {

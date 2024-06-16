@@ -35,6 +35,21 @@ export default class Team {
     cappedBudget: number;
     tooltip: string;
   } = { redraftCap: 0, cappedBudget: 0, tooltip: "" };
+  protected redraftLimits: {
+    budget: number;
+    rerolls: number;
+    fans: number;
+    coaches: number;
+    cheerleaders: number;
+    apothecary: number;
+  } = {
+    budget: 0,
+    rerolls: 0,
+    fans: 0,
+    coaches: 0,
+    cheerleaders: 0,
+    apothecary: 0,
+  };
   private maxPlayers: number;
   public record: any = {};
   private sppLimits: any;
@@ -58,6 +73,14 @@ export default class Team {
     this.dedicatedFans = minStartFans;
     this.treasury = treasury;
     this.maxPlayers = maxPlayers;
+    this.redraftLimits = {
+      budget: 0,
+      rerolls: 0,
+      fans: 0,
+      coaches: 0,
+      cheerleaders: 0,
+      apothecary: 0,
+    };
   }
 
   static fromApi(
@@ -99,6 +122,16 @@ export default class Team {
     team.sppLimits = rawApiTeam.skillLimits.spp;
     team.bio = rawApiTeam.bio.htmlBio;
     team.logo = parseInt(rawApiTeam.bio.image);
+
+    if (rawApiTeam.redraftingLimits != undefined) {
+      team.redraftLimits.budget = rawApiTeam.redraftingLimits.budget;
+      team.redraftLimits.rerolls = rawApiTeam.redraftingLimits.rerolls;
+      team.redraftLimits.fans = rawApiTeam.redraftingLimits.fans;
+      team.redraftLimits.coaches = rawApiTeam.redraftingLimits.coaches;
+      team.redraftLimits.cheerleaders =
+        rawApiTeam.redraftingLimits.cheerleaders;
+      team.redraftLimits.apothecary = rawApiTeam.redraftingLimits.apothecary;
+    }
 
     team.initializePlayers();
 
@@ -146,6 +179,7 @@ export default class Team {
 
     team.addPlayer(
       Player.fromApi(
+        team,
         rawApiPlayer,
         teamManagementSettings.getPosition(rawApiPlayer.positionId),
         iconRowVersionPosition,
@@ -224,7 +258,7 @@ export default class Team {
 
   public initializePlayers() {
     for (let i = 0; i < this.maxPlayers; i++) {
-      this.players.push(Player.emptyPlayer(i + 1));
+      this.players.push(Player.emptyPlayer(this, i + 1));
     }
   }
 
@@ -263,6 +297,7 @@ export default class Team {
       (extraPlayer) => extraPlayer.getId() === player.getId(),
     );
     this.extraPlayers[extraPlayerIndex] = Player.emptyPlayer(
+      this,
       player.playerNumber,
     );
     player.permanentlyHireJourneyman(lastEmptyNumber);
@@ -275,19 +310,19 @@ export default class Team {
   }
   public firePlayer(player: Player): void {
     if (this.teamStatus.isRedrafting()) {
-      this.treasury += player.getPositionCost();
+      this.treasury += player.getRedraftingCost();
     }
     const index = this.players.findIndex(
       (playerToMatch) => playerToMatch.id === player.id,
     );
     if (index !== -1) {
-      this.players[index] = Player.emptyPlayer(player.playerNumber);
+      this.players[index] = Player.emptyPlayer(this, player.playerNumber);
     }
   }
 
   public rehirePlayer(player: Player): void {
     if (this.teamStatus.isRedrafting()) {
-      this.treasury -= player.getPlayerCost();
+      this.treasury -= player.getRedraftingCost();
     }
 
     const number = this.findFirstEmptyNumber();
@@ -305,7 +340,7 @@ export default class Team {
       (playerToMatch) => playerToMatch.id === player.id,
     );
     if (index !== -1) {
-      this.players[index] = Player.emptyPlayer(player.playerNumber);
+      this.players[index] = Player.emptyPlayer(this, player.playerNumber);
     }
   }
 
@@ -345,7 +380,7 @@ export default class Team {
       }
       const emptyPlayers = [];
       for (let i = 0; i < this.maxPlayers; i++) {
-        emptyPlayers.push(Player.emptyPlayer(i + 1));
+        emptyPlayers.push(Player.emptyPlayer(this, i + 1));
       }
       this.players = emptyPlayers;
     }
@@ -379,18 +414,20 @@ export default class Team {
     return this.seasonInfo.currentSeason;
   }
 
-  public getRedraftCappedBudget(): number {
-    return this.redrafting.cappedBudget;
+  public getRedraftLimits() {
+    return this.redraftLimits;
   }
 
-  public getTotalStaffCost(): number {
+  public getTotalStaffCost(includeDedicatedFans: boolean = true): number {
     if (this.settings == null) {
       return 0;
     }
 
     return (
       this.getRerolls() * this.settings?.rerollCostOnCreate +
-      (this.getDedicatedFans() - this.settings?.minStartFans) * 10000 +
+      (includeDedicatedFans
+        ? (this.getDedicatedFans() - this.settings?.minStartFans) * 10000
+        : 0) +
       (this.getApothecary() ? 50000 : 0) +
       this.getCheerleaders() * 10000 +
       this.getAssistantCoaches() * 10000
@@ -400,6 +437,12 @@ export default class Team {
   public getTotalPlayerCost(): number {
     return this.getPlayers()
       .map((player) => player.getPlayerCost())
+      .reduce((prev, curr) => curr + prev);
+  }
+
+  public getTotalPlayerRedraftingCost(): number {
+    return this.getPlayers()
+      .map((player) => player.getRedraftingCost())
       .reduce((prev, curr) => curr + prev);
   }
 
@@ -481,7 +524,7 @@ export default class Team {
 
   public removeReroll(cost: number): void {
     this.rerolls--;
-    if (this.teamStatus.isNew()) {
+    if (this.teamStatus.isNew() || this.teamStatus.isRedrafting()) {
       this.treasury += cost;
     }
   }
@@ -493,7 +536,7 @@ export default class Team {
 
   public removeAssistantCoach(cost: number): void {
     this.assistantCoaches--;
-    if (this.teamStatus.isNew()) {
+    if (this.teamStatus.isNew() || this.teamStatus.isRedrafting()) {
       this.treasury += cost;
     }
   }
@@ -505,7 +548,7 @@ export default class Team {
 
   public removeCheerleader(cost: number): void {
     this.cheerleaders--;
-    if (this.teamStatus.isNew()) {
+    if (this.teamStatus.isNew() || this.teamStatus.isRedrafting()) {
       this.treasury += cost;
     }
   }
@@ -517,7 +560,7 @@ export default class Team {
 
   public removeApothecary(cost: number): void {
     this.apothecary = false;
-    if (this.teamStatus.isNew()) {
+    if (this.teamStatus.isNew() || this.teamStatus.isRedrafting()) {
       this.treasury += cost;
     }
   }
@@ -553,5 +596,9 @@ export default class Team {
 
   public hasEmptyNumbers(): boolean {
     return this.findFirstEmptyNumber() !== null;
+  }
+
+  public getAgentFee(player: Player): number {
+    return this.settings?.getAgentFee(player.getRecord().seasons) ?? 0;
   }
 }

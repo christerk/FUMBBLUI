@@ -192,12 +192,24 @@
           </div>
         </template>
       </div>
+      <div
+        v-if="teamStatus.isRedrafting() && !player.IsEmpty"
+        class="cell right"
+      >
+        s{{ player.getRecord().seasons }}
+      </div>
       <div v-if="!player.IsEmpty" class="cell cost">
-        <div class="costbasic">{{ player.getPlayerCost() / 1000 }}k</div>
+        <div class="costbasic">
+          {{
+            (teamStatus.isRedrafting()
+              ? player.getRedraftingCost()
+              : player.getPlayerCost()) / 1000
+          }}k
+        </div>
         <div class="costbreakdown">
           {{ player.getPositionCost() / 1000 }}+{{
             player.getSkillCost() / 1000
-          }}
+          }}+{{ player.getAgentFee() / 1000 }}
         </div>
       </div>
       <div

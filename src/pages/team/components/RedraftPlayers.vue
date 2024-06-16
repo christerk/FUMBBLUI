@@ -4,6 +4,7 @@
       <div class="rookieheader">
         <div class="positionname" :title="player.getPlayerName()">
           {{ player.getPlayerName() }}
+          ({{ player.sppDisplayInfo().spendable }} SPP)
         </div>
         <div class="positionquantity">
           {{
@@ -18,7 +19,7 @@
             )?.position.quantityAllowed
           }}
         </div>
-        <div class="positioncost">{{ player.getPlayerCost() / 1000 }}k</div>
+        <div class="positioncost">{{ player.getRedraftingCost() / 1000 }}k</div>
       </div>
       <div class="rookiebody">
         <div class="position">{{ player.getPosition()?.name }}</div>
@@ -66,6 +67,10 @@
           </div>
         </div>
         <div class="skillrow">
+          <div class="injuries" v-if="player.getInjuries().length > 0">
+            <span class="label">Injuries: </span
+            >{{ player.getInjuries().join(", ") }}
+          </div>
           <div class="skills">
             <div class="positionskills">
               {{ player.getPositionSkills().join(", ") }}
@@ -193,9 +198,12 @@ class RedraftPlayers extends Vue {
   }
 
   public canBuyPosition(
-    positionDataForBuyingPlayer: PositionDataForBuyingPlayer,
+    positionDataForBuyingPlayer: PositionDataForBuyingPlayer | undefined,
   ): boolean {
-    return this.reasonsCannotBuy(positionDataForBuyingPlayer).length === 0;
+    return (
+      positionDataForBuyingPlayer != undefined &&
+      this.reasonsCannotBuy(positionDataForBuyingPlayer).length === 0
+    );
   }
 
   public rehirePlayer(player: Player) {
