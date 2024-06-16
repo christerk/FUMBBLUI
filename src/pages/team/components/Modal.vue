@@ -1,12 +1,13 @@
 <template>
   <transition name="modal-fade">
-    <div v-show="show" class="modalbackdrop">
+    <div v-show="show" class="modalbackdrop" @click="triggerCancel">
       <div
         class="modal"
         :class="getModalClasses()"
         role="dialog"
         aria-labelledby="modalTitle"
         aria-describedby="modalDescription"
+        @click.stop=""
       >
         <header
           v-if="excludeHeader !== true"

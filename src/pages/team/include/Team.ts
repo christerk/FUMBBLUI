@@ -29,14 +29,50 @@ export default class Team {
   public seasonInfo: {
     gamesPlayedInCurrentSeason: number;
     currentSeason: number;
-  } = { gamesPlayedInCurrentSeason: 0, currentSeason: 1 };
+    wins: number;
+    ties: number;
+    losses: number;
+  } = {
+    gamesPlayedInCurrentSeason: 0,
+    currentSeason: 1,
+    wins: 0,
+    ties: 0,
+    losses: 0,
+  };
   private redrafting: {
     redraftCap: number;
     cappedBudget: number;
     tooltip: string;
-  } = { redraftCap: 0, cappedBudget: 0, tooltip: "" };
+    info: {
+      base: number;
+      goldPerGame: number;
+      goldPerWin: number;
+      goldPerTie: number;
+      goldPerLoss: number;
+      redraftRamp: number;
+      redraftCap: number;
+      seasonGames: number;
+      cappedBudget: number;
+    };
+  } = {
+    redraftCap: 0,
+    cappedBudget: 0,
+    tooltip: "",
+    info: {
+      base: 0,
+      goldPerGame: 0,
+      goldPerWin: 0,
+      goldPerTie: 0,
+      goldPerLoss: 0,
+      redraftCap: 0,
+      redraftRamp: 0,
+      seasonGames: 0,
+      cappedBudget: 0,
+    },
+  };
   protected redraftLimits: {
     budget: number;
+    treasury: number;
     rerolls: number;
     fans: number;
     coaches: number;
@@ -44,6 +80,7 @@ export default class Team {
     apothecary: number;
   } = {
     budget: 0,
+    treasury: 0,
     rerolls: 0,
     fans: 0,
     coaches: 0,
@@ -114,10 +151,14 @@ export default class Team {
     team.apothecary = rawApiTeam.apothecary === "Yes";
     team.seasonInfo.gamesPlayedInCurrentSeason =
       rawApiTeam.seasonInfo.gamesPlayedInCurrentSeason;
+    team.seasonInfo.wins = rawApiTeam.seasonInfo.record.wins;
+    team.seasonInfo.ties = rawApiTeam.seasonInfo.record.ties;
+    team.seasonInfo.losses = rawApiTeam.seasonInfo.record.losses;
     team.seasonInfo.currentSeason = rawApiTeam.seasonInfo.currentSeason;
     team.redrafting.redraftCap = rawApiTeam.redrafting.redraftCap;
     team.redrafting.cappedBudget = rawApiTeam.redrafting.cappedBudget;
     team.redrafting.tooltip = rawApiTeam.redrafting.tooltip;
+    team.redrafting.info = rawApiTeam.redrafting;
     team.record = rawApiTeam.record;
     team.sppLimits = rawApiTeam.skillLimits.spp;
     team.bio = rawApiTeam.bio.htmlBio;
@@ -125,6 +166,7 @@ export default class Team {
 
     if (rawApiTeam.redraftingLimits != undefined) {
       team.redraftLimits.budget = rawApiTeam.redraftingLimits.budget;
+      team.redraftLimits.treasury = rawApiTeam.redraftingLimits.treasury;
       team.redraftLimits.rerolls = rawApiTeam.redraftingLimits.rerolls;
       team.redraftLimits.fans = rawApiTeam.redraftingLimits.fans;
       team.redraftLimits.coaches = rawApiTeam.redraftingLimits.coaches;
@@ -416,6 +458,14 @@ export default class Team {
 
   public getRedraftLimits() {
     return this.redraftLimits;
+  }
+
+  public getRedraftInfo() {
+    return this.redrafting.info;
+  }
+
+  public getRedraftingCap() {
+    return this.redrafting.redraftCap;
   }
 
   public getTotalStaffCost(includeDedicatedFans: boolean = true): number {
