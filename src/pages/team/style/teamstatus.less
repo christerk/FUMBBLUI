@@ -1,0 +1,16 @@
+.teamstatus {
+  display: grid;
+  grid-template-columns: auto;
+  place-items: center;
+
+  &.showText {
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 0.25rem;
+  }
+
+  svg {
+    cursor: default;
+    vertical-align: middle;
+    display: inline-block;
+  }
+}

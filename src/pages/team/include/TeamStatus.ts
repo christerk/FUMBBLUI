@@ -2,6 +2,112 @@ import { TeamStatusValue } from "./Interfaces";
 
 export default class TeamStatus {
   private status: TeamStatusValue = "NEW";
+
+  private statusData = new Map<
+    TeamStatusValue,
+    { displayName: string; letter: string; style: string; textColour: string }
+  >([
+    [
+      "NEW",
+      {
+        displayName: "New",
+        letter: "N",
+        style: "offwhite",
+        textColour: "#2f2f2f",
+      },
+    ],
+    [
+      "ACTIVE",
+      {
+        displayName: "Ready to Play",
+        letter: "R",
+        style: "forest",
+        textColour: "white",
+      },
+    ],
+    [
+      "READY_FOR_TOURNAMENT",
+      {
+        displayName: "Ready for Tournament",
+        letter: "T",
+        style: "apricot",
+        textColour: "white",
+      },
+    ],
+    [
+      "WAITING_FOR_OPPONENT",
+      {
+        displayName: "Waiting for Opponent",
+        letter: "W",
+        style: "jet",
+        textColour: "white",
+      },
+    ],
+    [
+      "SKILL_ROLLS_PENDING",
+      {
+        displayName: "Skill Rolls Pending",
+        letter: "S",
+        style: "carmine",
+        textColour: "white",
+      },
+    ],
+    [
+      "POST_MATCH_SEQUENCE",
+      {
+        displayName: "Post-Match",
+        letter: "P",
+        style: "apricot",
+        textColour: "white",
+      },
+    ],
+    [
+      "REDRAFTING",
+      {
+        displayName: "Redrafting",
+        letter: "D",
+        style: "blueberry",
+        textColour: "white",
+      },
+    ],
+    [
+      "RETIRED",
+      {
+        displayName: "Retired",
+        letter: "R",
+        style: "neutral",
+        textColour: "#e0e0e0",
+      },
+    ],
+    [
+      "PENDING_APPROVAL",
+      {
+        displayName: "Reported",
+        letter: "A",
+        style: "jet",
+        textColour: "white",
+      },
+    ],
+    [
+      "BLOCKED",
+      {
+        displayName: "Blocked",
+        letter: "B",
+        style: "jet",
+        textColour: "white",
+      },
+    ],
+    [
+      "END_OF_SEASON",
+      {
+        displayName: "End of Season",
+        letter: "E",
+        style: "blueberry",
+        textColour: "white",
+      },
+    ],
+  ]);
+
   private displayNames: Map<TeamStatusValue, string> = new Map<
     TeamStatusValue,
     string
@@ -16,6 +122,7 @@ export default class TeamStatus {
     ["RETIRED", "Retired"],
     ["PENDING_APPROVAL", "Reported"],
     ["BLOCKED", "Blocked"],
+    ["END_OF_SEASON", "End of Season"],
   ]);
 
   constructor(teamStatusValue: TeamStatusValue) {
@@ -34,6 +141,7 @@ export default class TeamStatus {
       Retired: "RETIRED", // Retired team, no changes allowed (except for staff who can unretire, rename etc)
       "Pending Approval": "PENDING_APPROVAL", // This is a state for teams that have been reported for violating the naming rules. Should be essentially locked until staff has reviewed (except for staff, who need access to the team)
       Blocked: "BLOCKED", // I don't remember fully what this does
+      "End of Season": "END_OF_SEASON",
     };
 
     return new TeamStatus(statusLookup[rawApiStatus]);
@@ -44,7 +152,18 @@ export default class TeamStatus {
   }
 
   public get displayName() {
-    return this.displayNames.get(this.status);
+    return this.statusData.get(this.status)?.displayName;
+  }
+  public get letter() {
+    return this.statusData.get(this.status)?.letter;
+  }
+
+  public get textColour() {
+    return this.statusData.get(this.status)?.textColour;
+  }
+
+  public get style() {
+    return this.statusData.get(this.status)?.style;
   }
 
   public isNew(): boolean {
@@ -73,5 +192,9 @@ export default class TeamStatus {
 
   public isRedrafting(): boolean {
     return this.status === "REDRAFTING";
+  }
+
+  public isEndSeason(): boolean {
+    return this.status === "END_OF_SEASON";
   }
 }

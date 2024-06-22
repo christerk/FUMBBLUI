@@ -119,7 +119,7 @@ class Die extends Vue {
       return;
     }
 
-    let targetCoordinate = t[Math.floor(Math.random() * t.length)];
+    const targetCoordinate = t[Math.floor(Math.random() * t.length)];
 
     this.rotate = targetCoordinate[2];
     this.number = result;
@@ -128,8 +128,8 @@ class Die extends Vue {
     this.targetX = -50 * targetCoordinate[0];
     this.targetY = -50 * targetCoordinate[1];
 
-    let radius = 5000;
-    let angle = 2 * Math.PI * Math.random();
+    const radius = 5000;
+    const angle = 2 * Math.PI * Math.random();
     this.startX = this.targetX + radius * Math.cos(angle);
     this.startY = this.targetY + radius * Math.sin(angle);
 
@@ -145,11 +145,8 @@ class Die extends Vue {
   }
 
   public tick() {
-    let animTime = performance.now() - this.time;
-
-    var pct = animTime / this.animationTime;
-
-    pct = this.ease(Math.min(1, pct));
+    const animTime = performance.now() - this.time;
+    const pct = this.ease(Math.min(1, animTime / this.animationTime));
 
     if (pct < 1) {
       window.requestAnimationFrame(() => this.tick());
@@ -157,10 +154,10 @@ class Die extends Vue {
       this.complete(this.number);
     }
 
-    let currentX = Math.round(
+    const currentX = Math.round(
       (this.targetX + (1 - pct) * (this.targetX - this.startX)) / 50,
     );
-    let currentY = Math.round(
+    const currentY = Math.round(
       (this.targetY + (1 - pct) * (this.targetY - this.startY)) / 50,
     );
 

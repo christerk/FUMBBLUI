@@ -64,11 +64,11 @@ class SortableTable extends Vue {
 
   @Emit
   public onChange(evt: any) {
-    let oldIndex = evt.oldDraggableIndex;
-    let newIndex = evt.newDraggableIndex;
+    const oldIndex = evt.oldDraggableIndex;
+    const newIndex = evt.newDraggableIndex;
 
-    let min = Math.min(oldIndex, newIndex);
-    let max = Math.max(oldIndex, newIndex);
+    const min = Math.min(oldIndex, newIndex);
+    const max = Math.max(oldIndex, newIndex);
 
     for (let i = 0; i < this.Items.length; i++) {
       let newNumber = i + 1;
@@ -89,10 +89,10 @@ class SortableTable extends Vue {
   @Emit
   public onEnd(evt: any) {
     if (evt.oldDraggableIndex > evt.newDraggableIndex) {
-      let item = this.Items.splice(evt.oldDraggableIndex, 1);
+      const item = this.Items.splice(evt.oldDraggableIndex, 1);
       this.Items.splice(evt.newDraggableIndex, 0, item[0]);
     } else {
-      let items = this.Items.splice(
+      const items = this.Items.splice(
         evt.oldDraggableIndex + 1,
         evt.newDraggableIndex - evt.oldDraggableIndex,
       );

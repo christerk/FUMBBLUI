@@ -53,6 +53,7 @@ export default class Team {
       redraftCap: number;
       seasonGames: number;
       cappedBudget: number;
+      budgetCap: number;
     };
   } = {
     redraftCap: 0,
@@ -68,11 +69,13 @@ export default class Team {
       redraftRamp: 0,
       seasonGames: 0,
       cappedBudget: 0,
+      budgetCap: 0,
     },
   };
   protected redraftLimits: {
     budget: number;
     treasury: number;
+    newTreasury: number;
     rerolls: number;
     fans: number;
     coaches: number;
@@ -81,6 +84,7 @@ export default class Team {
   } = {
     budget: 0,
     treasury: 0,
+    newTreasury: 0,
     rerolls: 0,
     fans: 0,
     coaches: 0,
@@ -112,6 +116,8 @@ export default class Team {
     this.maxPlayers = maxPlayers;
     this.redraftLimits = {
       budget: 0,
+      treasury: 0,
+      newTreasury: 0,
       rerolls: 0,
       fans: 0,
       coaches: 0,
@@ -247,6 +253,10 @@ export default class Team {
 
   public isLeagueDivision(): boolean {
     return this.getDivision() === this.LEAGUE_DIVISION_NAME;
+  }
+
+  public isAtSeasonEnd(): boolean {
+    return this.getTeamStatus().isEndSeason();
   }
 
   public getDivisionAbbreviated(): string {
@@ -465,7 +475,7 @@ export default class Team {
   }
 
   public getRedraftingCap() {
-    return this.redrafting.redraftCap;
+    return this.redrafting.info.budgetCap;
   }
 
   public getTotalStaffCost(includeDedicatedFans: boolean = true): number {

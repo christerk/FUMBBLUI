@@ -8,7 +8,7 @@
         <div class="record">Games</div>
         <div class="tds">Touchdowns</div>
         <div class="cas">Casualties</div>
-        <div class="tv top">TV</div>
+        <div class="tv top">CTV</div>
       </div>
       <div class="teamstatrow panelheader">
         <div></div>
@@ -16,7 +16,7 @@
         <div class="record small"># (WTL)</div>
         <div class="tds small">For / Agnst</div>
         <div class="cas small">For / Against</div>
-        <div class="tv small">Avg TV</div>
+        <div class="tv small">Avg CTV</div>
       </div>
       <template v-for="stats in statistics" :key="stats.info.roster">
         <div class="teamstatrow">
@@ -56,9 +56,8 @@
           </div>
 
           <div>
-            {{ Math.round(stats.tv.for/1000) }}k
-            /
-            {{ Math.round(stats.tv.against/1000) }}k
+            {{ Math.round(stats.tv.for / 1000) }}k /
+            {{ Math.round(stats.tv.against / 1000) }}k
           </div>
         </div>
       </template>
@@ -101,12 +100,15 @@ class TeamStats extends Vue {
 
   public async loadStats() {
     let summaryRow = {
-        info: { roster: "Summary", logo: 735926 },
-        record: { games: 0, wins: 0, ties: 0, losses: 0 },
-        td: { for: 0, against: 0 },
-        cas: { for: {bh: 0, si: 0, kill: 0}, against: {bh: 0, si: 0, kill: 0} },
-        tv: {for: 0, against: 0 },
-      };
+      info: { roster: "Summary", logo: 735926 },
+      record: { games: 0, wins: 0, ties: 0, losses: 0 },
+      td: { for: 0, against: 0 },
+      cas: {
+        for: { bh: 0, si: 0, kill: 0 },
+        against: { bh: 0, si: 0, kill: 0 },
+      },
+      tv: { for: 0, against: 0 },
+    };
 
     const apiResponse = await this.fumbblApi.getTeamStats(this.team.id);
     if (apiResponse.isSuccessful()) {
@@ -128,12 +130,17 @@ class TeamStats extends Vue {
         summaryRow["cas"]["for"]["bh"] += stats[roster]["cas"]["for"]["bh"];
         summaryRow["cas"]["for"]["si"] += stats[roster]["cas"]["for"]["si"];
         summaryRow["cas"]["for"]["kill"] += stats[roster]["cas"]["for"]["kill"];
-        summaryRow["cas"]["against"]["bh"] += stats[roster]["cas"]["against"]["bh"];
-        summaryRow["cas"]["against"]["si"] += stats[roster]["cas"]["against"]["si"];
-        summaryRow["cas"]["against"]["kill"] += stats[roster]["cas"]["against"]["kill"];
+        summaryRow["cas"]["against"]["bh"] +=
+          stats[roster]["cas"]["against"]["bh"];
+        summaryRow["cas"]["against"]["si"] +=
+          stats[roster]["cas"]["against"]["si"];
+        summaryRow["cas"]["against"]["kill"] +=
+          stats[roster]["cas"]["against"]["kill"];
 
-        summaryRow["tv"]["for"] += stats[roster]["tv"]["for"] * stats[roster]["record"]["games"];
-        summaryRow["tv"]["against"] += stats[roster]["tv"]["against"] * stats[roster]["record"]["games"];
+        summaryRow["tv"]["for"] +=
+          stats[roster]["tv"]["for"] * stats[roster]["record"]["games"];
+        summaryRow["tv"]["against"] +=
+          stats[roster]["tv"]["against"] * stats[roster]["record"]["games"];
       });
 
       if (summaryRow["record"]["games"] > 0) {

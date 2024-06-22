@@ -10,6 +10,7 @@ import RetireTeamModal from "./RetireTeam.vue";
 import SetTreasuryModal from "./SetTreasury.vue";
 import SetDedicatedFansModal from "./SetDedicatedFans.vue";
 import RenameAllPlayersModal from "./RenameAllPlayers.vue";
+import RedraftCompleteModal from "./RedraftComplete.vue";
 
 export {
   DiscardRerollModal,
@@ -24,4 +25,5 @@ export {
   SetTreasuryModal,
   SetDedicatedFansModal,
   RenameAllPlayersModal,
+  RedraftCompleteModal,
 };

@@ -6,7 +6,7 @@
     ]"
     v-if="dataPropertiesInitialized"
   >
-    <div class="teamheader" :lid="loadCount">
+    <div class="teamheader" :key="loadCount">
       <div class="rosterlogo quickstats">
         <div class="division">{{ teamManagementSettings.rosterName }}</div>
         <div class="infobox logo">
@@ -39,7 +39,9 @@
             @cancel="handleCancelEditTeamName"
           ></editteamname>
           <div class="rosterinfo" style="margin-top: 0.5em">
-            <div class="status">{{ team.getTeamStatus().displayName }}</div>
+            <div class="status">
+              <TeamStatus :team="team" :showText="true"></TeamStatus>
+            </div>
           </div>
           <ul class="teamnav">
             <button
@@ -73,7 +75,7 @@
                 accessControl.canReadyTeam()
               "
               class="menu"
-              @click="interceptSkipTournament"
+              @click="skipTournament"
             >
               Play on
             </button>
@@ -127,11 +129,25 @@
                 </li>
                 <li
                   v-if="
+                    accessControl.canUndoEndSeason() && team.isAtSeasonEnd()
+                  "
+                >
+                  <a href="#" @click.prevent="skipTournament()"
+                    >Undo end-season</a
+                  >
+                </li>
+                <li
+                  v-if="
                     accessControl.canRedraft() &&
                     teamManagementSettings.seasonsEnabled
                   "
                 >
-                  <a href="#" @click.prevent="redraft()">Redraft</a>
+                  <a href="#" @click.prevent="budgetModal?.show()">Redraft</a>
+                </li>
+                <li v-if="accessControl.canCancelRedraft()">
+                  <a href="#" @click.prevent="cancelRedraft()"
+                    >Cancel Redraft</a
+                  >
                 </li>
               </ul>
             </li>
@@ -159,6 +175,15 @@
                     :href="`https://fumbbl.com/p/team?op=editbio&amp;team_id=${team.getId()}`"
                     >Edit Bio</a
                   >
+                </li>
+                <li
+                  v-if="
+                    accessControl.canEndSeason() &&
+                    team.getGamesPlayedInSeason() > 0 &&
+                    teamManagementSettings.seasonsEnabled
+                  "
+                >
+                  <a href="#" @click.prevent="endSeason()">End Season</a>
                 </li>
                 <li v-if="accessControl.canRetireTeam()">
                   <a href="#" @click.prevent="retireTeamModal?.show()"
@@ -215,8 +240,7 @@
                 </li>
                 <template v-if="accessControl.canViewHistory()">
                   <li>
-                    <a
-                      :href="`https://fumbbl.com/p/team?op=log&team_id=${team.getId()}`"
+                    <a href="#" @click.prevent="showTeamPanel('teamlog')"
                       >Log</a
                     >
                   </li>
@@ -318,14 +342,6 @@
       </div>
     </div>
 
-    <redraftingsummary
-      v-if="team.getTeamStatus().isRedrafting() && accessControl.canEdit()"
-      ref="redraftingSummary"
-      :team="team"
-      :settings="dataTeamManagementSettings"
-      :fumbblApi="fumbblApi"
-    ></redraftingsummary>
-
     <div
       class="biowrapper"
       v-if="
@@ -354,8 +370,29 @@
       </div>
       <a :href="'/p/team?id=' + team.id">Back to legacy team page</a>
     </div>
+
     <div class="container" :class="{ showsidepanel: showSidePanel }">
       <div class="panel teamsheet" :class="{ hidden: showSidePanel }">
+        <redraftingsummary
+          v-if="team.getTeamStatus().isRedrafting() && accessControl.canEdit()"
+          ref="redraftingSummary"
+          :team="team"
+          :settings="dataTeamManagementSettings"
+          :fumbblApi="fumbblApi"
+        ></redraftingsummary>
+
+        <endseasonpanel
+          v-if="team.isAtSeasonEnd()"
+          :team="team"
+          :settings="dataTeamManagementSettings"
+          :allowRedraft="
+            accessControl.canRedraft() && teamManagementSettings.seasonsEnabled
+          "
+          @redraft="budgetModal?.show()"
+          @skipTournaments="skipTournament()"
+        >
+        </endseasonpanel>
+
         <div v-if="accessControl.canCreate()" class="createteamstats">
           <div class="playerinfo">
             <span class="currentplayercount">{{
@@ -412,6 +449,7 @@
               :class="{
                 playerrows: true,
                 showplayercontrols: accessControl.canShowPlayerControls(),
+                compact: showHireRookiesWithPermissionsCheck,
               }"
             >
               <div
@@ -423,6 +461,8 @@
                 <template v-if="!showHireRookiesWithPermissionsCheck">
                   <div class="cell"></div>
                   <div class="cell"></div>
+                  <div class="cell"></div>
+                  <div class="cell"></div>
                   <div class="cell statma">Ma</div>
                   <div class="cell statst">St</div>
                   <div class="cell statag">Ag</div>
@@ -431,12 +471,7 @@
                   <div class="cell skills">Skills</div>
                   <div class="cell injuries">Inj</div>
                   <div class="cell spp">SPP</div>
-                  <div
-                    v-if="team.getTeamStatus().isRedrafting()"
-                    class="cell right"
-                  >
-                    Ssn
-                  </div>
+                  <div class="cell right" title="Sesason / Games">S/G</div>
                   <div class="cell cost">Cost</div>
                   <div
                     v-if="accessControl.canCreate()"
@@ -448,7 +483,16 @@
                   ></div>
                 </template>
                 <template v-else>
-                  <div class="cell">&nbsp;</div>
+                  <div class="cell"></div>
+                  <div class="cell"></div>
+                  <div class="cell"></div>
+                  <div class="cell"></div>
+                  <div class="cell">Skills</div>
+                  <div class="cell">Inj</div>
+                  <div class="cell">SPP</div>
+                  <div class="cell">S/G</div>
+                  <div class="cell cost">Cost</div>
+                  <div class="cell"></div>
                 </template>
               </div>
 
@@ -692,6 +736,16 @@
             :fumbblApi="fumbblApi"
           ></TeamDebug>
         </div>
+        <div v-show="sidePanel == 'teamlog'" class="teamlog">
+          <TeamLog
+            ref="teamLog"
+            @unexpected-error="triggerUnexpectedError"
+            @close="showTeamPanel('main')"
+            :team="team"
+            :fumbblApi="fumbblApi"
+            :isStaff="isSiteStaff"
+          ></TeamLog>
+        </div>
       </div>
     </div>
 
@@ -745,6 +799,15 @@
       :teamManagementSettings="teamManagementSettings"
       :team="team"
     />
+    <redraftbudget
+      :team="team"
+      ref="budgetModal"
+      :showConfirm="true"
+      @confirm="redraft()"
+    >
+    </redraftbudget>
+    <RedraftCompleteModal :team="team" ref="redraftCompleteModal">
+    </RedraftCompleteModal>
 
     <modal
       v-show="modals.skillPlayer === true"
@@ -880,8 +943,12 @@ import TeamStats from "./TeamStats.vue";
 import TeamMatches from "./TeamMatches.vue";
 import TeamBio from "./TeamBio.vue";
 import TeamDebug from "./TeamDebug.vue";
+import TeamLog from "./TeamLog.vue";
 import RedraftingSummary from "./RedraftingSummary.vue";
 import RedraftPlayers from "./RedraftPlayers.vue";
+import RedraftBudget from "./modals/RedraftBudget.vue";
+import EndSeasonPanel from "./EndSeasonPanel.vue";
+import TeamStatus from "./TeamStatus.vue";
 
 import {
   DiscardRerollModal,
@@ -896,6 +963,7 @@ import {
   SetTreasuryModal,
   SetDedicatedFansModal,
   RenameAllPlayersModal,
+  RedraftCompleteModal,
 } from "./modals/Modals";
 
 import {
@@ -917,12 +985,15 @@ import EditTeamName from "./EditTeamName.vue";
     readytoplay: ReadyToPlayComponent,
     redraftingsummary: RedraftingSummary,
     redraftplayers: RedraftPlayers,
+    redraftbudget: RedraftBudget,
+    endseasonpanel: EndSeasonPanel,
     SortableTable,
     die: Die,
     TeamStats,
     TeamMatches,
     TeamBio,
     TeamDebug,
+    TeamLog,
     Spinner,
     DiscardRerollModal,
     FireAssistantCoachModal,
@@ -936,6 +1007,8 @@ import EditTeamName from "./EditTeamName.vue";
     SetTreasuryModal,
     SetDedicatedFansModal,
     RenameAllPlayersModal,
+    RedraftCompleteModal,
+    TeamStatus,
   },
 })
 class TeamComponent extends Vue {
@@ -1003,11 +1076,16 @@ class TeamComponent extends Vue {
   @Ref
   private teamDebug: InstanceType<typeof TeamDebug> | undefined;
   @Ref
+  private teamLog: InstanceType<typeof TeamLog> | undefined;
+  @Ref
   private nameEdit: InstanceType<typeof EditTeamName> | undefined;
   @Ref
   private redraftPlayers: InstanceType<typeof RedraftPlayers> | undefined;
   @Ref
-  public redraftingSummary: InstanceType<typeof RedraftingSummary> | undefined;
+  public redraftingSummary: InstanceType<typeof RedraftingSummary> | undefined =
+    undefined;
+  @Ref
+  public budgetModal: InstanceType<typeof RedraftBudget> | undefined;
 
   @Ref
   public discardRerollModal:
@@ -1044,6 +1122,10 @@ class TeamComponent extends Vue {
   @Ref
   public renameAllPlayersModal:
     | InstanceType<typeof RenameAllPlayersModal>
+    | undefined;
+  @Ref
+  public redraftCompleteModal:
+    | InstanceType<typeof RedraftCompleteModal>
     | undefined;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
@@ -1170,7 +1252,11 @@ class TeamComponent extends Vue {
   }
 
   public async showTeamPanel(panel: string) {
-    this.mainMenuShow = "";
+    this.menuHide();
+
+    this.showSidePanel = panel != "main";
+
+    await this.$nextTick();
 
     switch (panel) {
       case "teamstats":
@@ -1188,9 +1274,16 @@ class TeamComponent extends Vue {
           await this.teamBio.loadBio();
         }
         break;
+      case "teamlog":
+        if (this.teamLog != undefined) {
+          await this.teamLog.loadLog();
+        }
+        break;
     }
 
     this.showSidePanel = panel != "main";
+
+    await this.$nextTick();
 
     if (this.showSidePanel) {
       this.sidePanel = panel;
@@ -1441,7 +1534,7 @@ class TeamComponent extends Vue {
   }
 
   public async onPlayerRenumbered() {
-    var newNumbers: { [key: number]: number } = {};
+    let newNumbers: { [key: number]: number } = {};
     this.team.players
       .filter((p) => !p.IsEmpty)
       .forEach((p) => (newNumbers[p.id] = p.playerNumber));
@@ -1847,6 +1940,7 @@ class TeamComponent extends Vue {
   }
 
   public async interceptCompleteRedrafting() {
+    this.team.setTeamStatus("ACTIVE");
     const apiResponse = await this.fumbblApi.completeRedrafting(
       this.team.getId(),
     );
@@ -1856,6 +1950,8 @@ class TeamComponent extends Vue {
         apiResponse.getErrorMessage(),
       );
     }
+    this.redraftCompleteModal?.show(apiResponse.data);
+
     await this.reloadTeam();
   }
 
@@ -1872,11 +1968,6 @@ class TeamComponent extends Vue {
       this.team.setTeamStatus("ACTIVE");
       this.triggerReadyToPlay();
     }
-  }
-
-  public async interceptSkipTournament() {
-    this.team.setTeamStatus("ACTIVE");
-    await this.fumbblApi.skipTournament(this.team.getId());
   }
 
   public getSpecialRuleErrors(teamSpecialRules: any): string[] {
@@ -1957,12 +2048,32 @@ class TeamComponent extends Vue {
     }
   }
 
+  public async endSeason() {
+    this.menuHide();
+    const originalTeamStatus = this.team.getTeamStatus();
+    this.team.setTeamStatus("END_OF_SEASON");
+    const apiResponse = await this.fumbblApi.endSeason(this.team.getId());
+    await this.reloadTeam();
+    await this.$nextTick();
+    this.loadCount++;
+
+    if (!apiResponse.isSuccessful()) {
+      this.team.setTeamStatus(originalTeamStatus.getStatus());
+      await this.recoverFromUnexpectedError(
+        "An error occurred ending season the team.",
+        apiResponse.getErrorMessage(),
+      );
+    }
+  }
+
   public async redraft() {
     this.menuHide();
     const originalTeamStatus = this.team.getTeamStatus();
     this.team.setTeamStatus("REDRAFTING");
     const apiResponse = await this.fumbblApi.redraftTeam(this.team.getId());
-    this.reloadTeam();
+    await this.reloadTeam();
+    await this.$nextTick();
+    this.loadCount++;
 
     if (!apiResponse.isSuccessful()) {
       this.team.setTeamStatus(originalTeamStatus.getStatus());
@@ -1973,6 +2084,41 @@ class TeamComponent extends Vue {
     }
   }
 
+  public async skipTournament() {
+    this.menuHide();
+    const originalTeamStatus = this.team.getTeamStatus();
+    this.team.setTeamStatus("ACTIVE");
+    const apiResponse = await this.fumbblApi.skipTournament(this.team.getId());
+    await this.reloadTeam();
+    await this.$nextTick();
+    this.loadCount++;
+
+    if (!apiResponse.isSuccessful()) {
+      this.team.setTeamStatus(originalTeamStatus.getStatus());
+      await this.recoverFromUnexpectedError(
+        "An error occurred redrafting the team.",
+        apiResponse.getErrorMessage(),
+      );
+    }
+  }
+
+  public async cancelRedraft() {
+    this.menuHide();
+    const originalTeamStatus = this.team.getTeamStatus();
+    this.team.setTeamStatus("ACTIVE");
+    const apiResponse = await this.fumbblApi.cancelRedraftTeam(
+      this.team.getId(),
+    );
+    this.reloadTeam();
+
+    if (!apiResponse.isSuccessful()) {
+      this.team.setTeamStatus(originalTeamStatus.getStatus());
+      await this.recoverFromUnexpectedError(
+        "An error occurred cancelling the re-draft.",
+        apiResponse.getErrorMessage(),
+      );
+    }
+  }
   public async renameTeam() {
     this.menuHide();
     this.nameEdit?.begin();

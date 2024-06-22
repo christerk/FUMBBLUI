@@ -103,7 +103,7 @@
         </div>
       </div>
       <template v-if="!compactView && !player.IsEmpty">
-        <div class="cell statma">
+        <div class="cell statma center">
           <span
             :class="{
               statincrease: player.hasMovementIncrease,
@@ -112,7 +112,7 @@
             >{{ player.movementStat }}</span
           >
         </div>
-        <div class="cell statst">
+        <div class="cell statst center">
           <span
             :class="{
               statincrease: player.hasStrengthIncrease,
@@ -121,7 +121,7 @@
             >{{ player.strengthStat }}</span
           >
         </div>
-        <div class="cell statag">
+        <div class="cell statag center">
           <span
             :class="{
               statincrease: player.hasAgilityIncrease,
@@ -130,7 +130,7 @@
             >{{ player.agilityStat }}+</span
           >
         </div>
-        <div class="cell statpa">
+        <div class="cell statpa center">
           <span
             v-if="player.getPositionStats().Passing"
             :class="{
@@ -141,7 +141,7 @@
           >
           <span v-else>-</span>
         </div>
-        <div class="cell statav">
+        <div class="cell statav center">
           <span
             :class="{
               statincrease: player.hasArmourIncrease,
@@ -192,11 +192,9 @@
           </div>
         </template>
       </div>
-      <div
-        v-if="teamStatus.isRedrafting() && !player.IsEmpty"
-        class="cell right"
-      >
-        s{{ player.getRecord().seasons }}
+      <div v-if="!player.IsEmpty" class="cell right nowrap">
+        <div class="season">s{{ player.getRecord().seasons }}</div>
+        {{ player.getRecord().games }}
       </div>
       <div v-if="!player.IsEmpty" class="cell cost">
         <div class="costbasic">
@@ -206,10 +204,15 @@
               : player.getPlayerCost()) / 1000
           }}k
         </div>
-        <div class="costbreakdown">
+        <div v-if="teamStatus.isRedrafting()" class="costbreakdown">
           {{ player.getPositionCost() / 1000 }}+{{
             player.getSkillCost() / 1000
           }}+{{ player.getAgentFee() / 1000 }}
+        </div>
+        <div v-else class="costbreakdown">
+          {{ player.getPositionCost() / 1000 }}+{{
+            player.getSkillCost() / 1000
+          }}
         </div>
       </div>
       <div
@@ -265,6 +268,10 @@
     </div>
   </div>
 </template>
+
+<style scoped>
+@import "@pages/team/style/player.less";
+</style>
 
 <script lang="ts">
 import { PropType } from "vue";

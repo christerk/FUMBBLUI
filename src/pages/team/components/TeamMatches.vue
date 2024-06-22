@@ -33,10 +33,12 @@
             <a :href="teamUrl(match.team2.id)">{{ match.team2.name }}</a>
           </div>
           <div class="matchownroster">
-            TV {{ match.team1.teamValue }} {{ match.team1.roster }}
+            CTV {{ match.team1.currentTeamValue / 1000 }}k
+            {{ match.team1.roster }}
           </div>
           <div class="matchopproster">
-            {{ match.team2.roster }} TV {{ match.team2.teamValue }}
+            {{ match.team2.roster }} CTV
+            {{ match.team2.currentTeamValue / 1000 }}k
           </div>
           <div class="matchownlogo">
             <img :src="'https://fumbbl.com/i/' + match.team1.logo" />

@@ -56,7 +56,7 @@ class PageHeader extends Vue {
   public setPage(newPage: string) {
     this.page = newPage;
 
-    let element = document.getElementById("nav-" + newPage);
+    const element = document.getElementById("nav-" + newPage);
 
     if (element != null) {
       this.pageMarkerPosition =

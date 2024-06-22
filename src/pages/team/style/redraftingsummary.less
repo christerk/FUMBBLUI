@@ -8,6 +8,7 @@
   top: 0px;
   z-index: 10;
   border: solid @Forest 2px;
+  margin-bottom: 0.5rem;
 
   display: grid;
   grid-template-columns: repeat(3, 1fr auto) 1fr;
@@ -54,49 +55,4 @@
     vertical-align: middle;
     cursor: pointer;
   }
-}
-::v-deep .budget {
-  display: grid;
-  row-gap: 0.5rem;
-  font-size: 1.3rem;
-  line-height: 1.3rem;
-  width: 25rem;
-  padding: 1rem;
-
-  .line {
-    display: contents;
-
-    &.header {
-      font-weight: bold;
-      div {
-      }
-    }
-
-    &.small {
-      font-size: 1rem;
-    }
-
-    &.summary div {
-      border-top: solid @Forest 1px;
-    }
-
-    .label,
-    .val,
-    .sum {
-      padding: 0.2rem;
-      padding-left: 0.5rem;
-      padding-right: 0.5rem;
-    }
-
-    .val {
-      font-size: 1rem;
-      line-height: 1rem;
-      vertical-align: baseline;
-    }
-  }
-  .val,
-  .sum {
-    text-align: right;
-  }
-  grid-template-columns: 1fr auto auto auto;
 }

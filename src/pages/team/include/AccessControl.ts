@@ -40,7 +40,7 @@ export default class AccessControl {
           action: "HIRE_ROOKIE",
           grantAccessToList: [
             {
-              userRoles: ["OWNER"],
+              userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
               teamStatusValues: [
                 "NEW",
                 "POST_MATCH_SEQUENCE",
@@ -79,7 +79,7 @@ export default class AccessControl {
           action: "HIRE_ROOKIE",
           grantAccessToList: [
             {
-              userRoles: ["OWNER"],
+              userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
               teamStatusValues: ["NEW"],
             },
           ],
@@ -101,7 +101,7 @@ export default class AccessControl {
         action: "REMOVE_REROLL",
         grantAccessToList: [
           {
-            userRoles: ["OWNER"],
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
             teamStatusValues: ["NEW", "REDRAFTING"],
           },
         ],
@@ -110,7 +110,7 @@ export default class AccessControl {
         action: "REMOVE_COACH",
         grantAccessToList: [
           {
-            userRoles: ["OWNER"],
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
             teamStatusValues: ["NEW", "REDRAFTING"],
           },
         ],
@@ -119,7 +119,7 @@ export default class AccessControl {
         action: "REMOVE_CHEERLEADER",
         grantAccessToList: [
           {
-            userRoles: ["OWNER"],
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
             teamStatusValues: ["NEW", "REDRAFTING"],
           },
         ],
@@ -128,7 +128,7 @@ export default class AccessControl {
         action: "REMOVE_APOTHECARY",
         grantAccessToList: [
           {
-            userRoles: ["OWNER"],
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
             teamStatusValues: ["NEW", "REDRAFTING"],
           },
         ],
@@ -137,7 +137,7 @@ export default class AccessControl {
         action: "RENUMBER_PLAYERS",
         grantAccessToList: [
           {
-            userRoles: ["OWNER"],
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
             teamStatusValues: [
               "NEW",
               "ACTIVE",
@@ -145,6 +145,7 @@ export default class AccessControl {
               "SKILL_ROLLS_PENDING",
               "READY_FOR_TOURNAMENT",
               "REDRAFTING",
+              "END_OF_SEASON",
             ],
           },
         ],
@@ -171,6 +172,7 @@ export default class AccessControl {
               "SKILL_ROLLS_PENDING",
               "REDRAFTING",
               "RETIRED",
+              "END_OF_SEASON",
             ],
           },
         ],
@@ -188,6 +190,7 @@ export default class AccessControl {
               "SKILL_ROLLS_PENDING",
               "REDRAFTING",
               "RETIRED",
+              "END_OF_SEASON",
             ],
           },
         ],
@@ -205,6 +208,7 @@ export default class AccessControl {
               "SKILL_ROLLS_PENDING",
               "REDRAFTING",
               "RETIRED",
+              "END_OF_SEASON",
             ],
           },
         ],
@@ -222,6 +226,7 @@ export default class AccessControl {
               "SKILL_ROLLS_PENDING",
               "REDRAFTING",
               "RETIRED",
+              "END_OF_SEASON",
             ],
           },
         ],
@@ -239,8 +244,35 @@ export default class AccessControl {
         action: "REDRAFT_TEAM",
         grantAccessToList: [
           {
-            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["END_OF_SEASON"],
+          },
+        ],
+      },
+      {
+        action: "END_SEASON",
+        grantAccessToList: [
+          {
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
             teamStatusValues: ["ACTIVE"],
+          },
+        ],
+      },
+      {
+        action: "UNDO_END_SEASON",
+        grantAccessToList: [
+          {
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["END_OF_SEASON"],
+          },
+        ],
+      },
+      {
+        action: "CANCEL_REDRAFT_TEAM",
+        grantAccessToList: [
+          {
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["REDRAFTING"],
           },
         ],
       },
@@ -257,6 +289,7 @@ export default class AccessControl {
               "SKILL_ROLLS_PENDING",
               "REDRAFTING",
               "RETIRED",
+              "END_OF_SEASON",
             ],
           },
         ],
@@ -266,7 +299,11 @@ export default class AccessControl {
         grantAccessToList: [
           {
             userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
-            teamStatusValues: ["ACTIVE", "READY_FOR_TOURNAMENT"],
+            teamStatusValues: [
+              "ACTIVE",
+              "READY_FOR_TOURNAMENT",
+              "END_OF_SEASON",
+            ],
           },
         ],
       },
@@ -281,6 +318,8 @@ export default class AccessControl {
               "POST_MATCH_SEQUENCE",
               "SKILL_ROLLS_PENDING",
               "RETIRED",
+              "REDRAFTING",
+              "END_OF_SEASON",
             ],
           },
         ],
@@ -311,6 +350,7 @@ export default class AccessControl {
               "POST_MATCH_SEQUENCE",
               "SKILL_ROLLS_PENDING",
               "REDRAFTING",
+              "END_OF_SEASON",
             ],
           },
         ],
@@ -328,6 +368,7 @@ export default class AccessControl {
               "SKILL_ROLLS_PENDING",
               "REDRAFTING",
               "RETIRED",
+              "END_OF_SEASON",
             ],
           },
         ],
@@ -345,6 +386,7 @@ export default class AccessControl {
               "SKILL_ROLLS_PENDING",
               "REDRAFTING",
               "RETIRED",
+              "END_OF_SEASON",
             ],
           },
         ],
@@ -411,6 +453,17 @@ export default class AccessControl {
     return this.isGranted("REDRAFT_TEAM");
   }
 
+  public canUndoEndSeason(): boolean {
+    return this.isGranted("UNDO_END_SEASON");
+  }
+
+  public canEndSeason(): boolean {
+    return this.isGranted("END_SEASON");
+  }
+
+  public canCancelRedraft(): boolean {
+    return this.isGranted("CANCEL_REDRAFT_TEAM");
+  }
   public canRenameTeam(): boolean {
     return this.isGranted("RENAME_TEAM");
   }

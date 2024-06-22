@@ -470,6 +470,20 @@ export default class FumbblApi {
     );
   }
 
+  public async endSeason(teamId: number): Promise<ApiResponse> {
+    return await this.simplePostWithOnlyTeamIdInBody(
+      teamId,
+      this.getUrl("/api/team/endSeason"),
+    );
+  }
+
+  public async cancelRedraftTeam(teamId: number): Promise<ApiResponse> {
+    return await this.simplePostWithOnlyTeamIdInBody(
+      teamId,
+      this.getUrl("/api/team/cancelRedraft"),
+    );
+  }
+
   public async completeRedrafting(teamId: number): Promise<ApiResponse> {
     return await this.simplePostWithOnlyTeamIdInBody(
       teamId,
@@ -512,5 +526,10 @@ export default class FumbblApi {
     const url = this.getUrl("/api/team/renumber");
     const data = { teamId, playerNumbers };
     return await this.enqueuePost(url, data);
+  }
+
+  public async getLog(teamId: number): Promise<ApiResponse> {
+    const url = this.getUrl("/api/team/log/" + teamId);
+    return await this.enqueuePost(url);
   }
 }

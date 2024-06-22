@@ -26,7 +26,8 @@ export type TeamStatusValue =
   | "WAITING_FOR_OPPONENT"
   | "SKILL_ROLLS_PENDING"
   | "POST_MATCH_SEQUENCE"
-  | "REDRAFTING";
+  | "REDRAFTING"
+  | "END_OF_SEASON";
 
 export type TeamAction =
   | "CREATE"
@@ -51,7 +52,10 @@ export type TeamAction =
   | "REMOVE_COACH"
   | "REMOVE_CHEERLEADER"
   | "REMOVE_APOTHECARY"
-  | "REDRAFT_TEAM";
+  | "REDRAFT_TEAM"
+  | "CANCEL_REDRAFT_TEAM"
+  | "END_SEASON"
+  | "UNDO_END_SEASON";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;
