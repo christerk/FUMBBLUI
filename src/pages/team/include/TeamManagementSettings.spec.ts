@@ -4,6 +4,11 @@ import { PlayerType, Position } from "./Interfaces";
 import Player from "./Player";
 import TeamManagementSettings from './TeamManagementSettings';
 
+const rerollCost = 60000;
+const apoCost = 50000;
+const acCost = 10000;
+const clCost = 10000;
+
 let team: Team;
 let teamManagementSettings: TeamManagementSettings
 const rawApiRuleset = buildApiRuleset()
@@ -15,28 +20,31 @@ describe("TeamManagementSettings", () => {
     teamManagementSettings = new TeamManagementSettings(rawApiRuleset, rawApiRoster, true)
     team = new Team("mock division", 3, 100000, 16);
     let counter = 1;
-    team.addPlayer(buildPlayer(counter++, "NORMAL", blitzer, 10000));
-    team.addPlayer(buildPlayer(counter++, "NORMAL", blitzer, 0));
-    team.addPlayer(buildPlayer(counter++, "NORMAL", lino, 0));
-    team.addPlayer(buildPlayer(counter++, "NORMAL", lino, 0));
-    team.addPlayer(buildPlayer(counter++, "NORMAL", lino, 20000));
-    team.addPlayer(buildPlayer(counter++, "NORMAL", lino, 0));
-    team.addPlayer(buildPlayer(counter++, "TEMP", lino, 0));
-    team.addPlayer(buildPlayer(counter++, "NORMAL", lino, 0));
-    team.addPlayer(buildPlayer(counter++, "NORMAL", lino, 0, true));
-    team.addPlayer(buildPlayer(counter++, "EMPTY", lino, 0));
-    team.addPlayer(buildPlayer(counter++, "EMPTY", lino, 0));
-    team.addPlayer(buildPlayer(counter++, "EMPTY", lino, 0));
-    team.addPlayer(buildPlayer(counter++, "EMPTY", lino, 0));
-    team.addPlayer(buildPlayer(counter++, "EMPTY", lino, 0));
-    team.addPlayer(buildPlayer(counter++, "EMPTY", lino, 0));
-    team.addPlayer(buildPlayer(counter++, "EMPTY", lino, 0));
-    team.addPlayer(buildPlayer(counter++, "TEMP", lino, 0));
-    team.addApothecary(50000);
-    team.addAssistantCoach(1);
-    team.addCheerleader(2);
+    team.addPlayer(buildPlayer(counter++, false, blitzer, 10000));
+    team.addPlayer(buildPlayer(counter++, false, blitzer, 0));
+    team.addPlayer(buildPlayer(counter++, false, lino, 0));
+    team.addPlayer(buildPlayer(counter++, false, lino, 0));
+    team.addPlayer(buildPlayer(counter++, false, lino, 20000));
+    team.addPlayer(buildPlayer(counter++, false, lino, 0));
+    team.addPlayer(buildPlayer(counter++, true, lino, 0));
+    team.addPlayer(buildPlayer(counter++, false, lino, 0));
+    team.addPlayer(buildPlayer(counter++, false, lino, 0, true));
+    team.addPlayer(buildPlayer(counter++, null, lino, 0));
+    team.addPlayer(buildPlayer(counter++, null, lino, 0));
+    team.addPlayer(buildPlayer(counter++, null, lino, 0));
+    team.addPlayer(buildPlayer(counter++, null, lino, 0));
+    team.addPlayer(buildPlayer(counter++, null, lino, 0));
+    team.addPlayer(buildPlayer(counter++, null, lino, 0));
+    team.addPlayer(buildPlayer(counter++, null, lino, 0));
+    team.addPlayer(buildPlayer(counter++, true, lino, 0));
+    team.addApothecary(apoCost);
+    team.addAssistantCoach(acCost);
+    team.addCheerleader(clCost);
+    team.addCheerleader(clCost);
     team.addDedicatedFans(6);
-    team.addReroll(60000);
+    team.addReroll(rerollCost);
+    team.addReroll(rerollCost);
+    team.addReroll(rerollCost);
 });
   describe("calculateTeamValue", () => {
     it("adds all rostered players and team goods", () => {
@@ -46,10 +54,10 @@ describe("TeamManagementSettings", () => {
       lino.cost * 6 + 
       10000 + // blitzer skill
       20000 + // lino skill
-      50000 + // apo
-      10000 + // AC
-      20000 + // CL
-      60000 * 3; // RR
+      apoCost +
+      acCost +
+      2 * clCost +
+      rerollCost * 3;
 
     expect(teamManagementSettings.calculateTeamValue(team)).toBe(expectedCost)
     });
@@ -58,14 +66,14 @@ describe("TeamManagementSettings", () => {
 
 function buildPlayer(
   id: number,
-  playerType: PlayerType,
+  isJourneyman: boolean,
   position: Position,
   skillCost: number,
   missing: boolean = false,
 ): Player {
   const player = new Player(
     team,
-    playerType,
+    isJourneyman == null ? "EMPTY" : "NORMAL",
     id,
     id,
     id + "",
@@ -79,6 +87,7 @@ function buildPlayer(
   if (missing) {
     player['injuries'] = ['m']
   }
+  player.setIsJourneyman(isJourneyman)
   return player;
 }
 
@@ -136,9 +145,12 @@ function buildApiRuleset(): any {
 }
 
 function buildApiRoster(): any {
-    return {
+    const roster = {
         positions: [],
         logos: new Array<number>(200)
     }
+    roster['rerollCost'] = rerollCost
+
+    return roster;
 }
 
