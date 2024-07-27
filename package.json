@@ -49,7 +49,8 @@
     "typescript": "^5.4.5",
     "vite": "^5.2.13",
     "vite-plugin-handlebars": "^2.0.0",
-    "vitest": "^1.6.0",
+    "vitest": "^2.0.0",
+    "vitest-mock-extended": "^2.0.0",
     "vue-facing-decorator": "^3.0.4",
     "vue-loading-overlay": "^6.0.4",
     "vue-tsc": "^2.0.21"
