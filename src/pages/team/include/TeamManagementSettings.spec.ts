@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach, test } from "vitest";
 import Team from "./Team";
-import { Position } from "./Interfaces";
+import { PlayerType, Position } from "./Interfaces";
 import Player from "./Player";
 import TeamManagementSettings from "./TeamManagementSettings";
 
@@ -37,14 +37,14 @@ describe.each([
     team.addPlayer(buildPlayer(counter++, true, lino, 0));
     team.addPlayer(buildPlayer(counter++, false, lino, 0));
     team.addPlayer(buildPlayer(counter++, false, lino, 0, true));
-    team.addPlayer(buildPlayer(counter++, null, lino, 0));
-    team.addPlayer(buildPlayer(counter++, null, lino, 0));
-    team.addPlayer(buildPlayer(counter++, null, lino, 0));
-    team.addPlayer(buildPlayer(counter++, null, lino, 0));
-    team.addPlayer(buildPlayer(counter++, null, lino, 0));
-    team.addPlayer(buildPlayer(counter++, null, lino, 0));
-    team.addPlayer(buildPlayer(counter++, null, lino, 0));
-    team.addPlayer(buildPlayer(counter++, true, lino, 0));
+    team.addPlayer(buildEmptySlot(counter++));
+    team.addPlayer(buildEmptySlot(counter++));
+    team.addPlayer(buildEmptySlot(counter++));
+    team.addPlayer(buildEmptySlot(counter++));
+    team.addPlayer(buildEmptySlot(counter++));
+    team.addPlayer(buildEmptySlot(counter++));
+    team.addPlayer(buildEmptySlot(counter++));
+    team.addPlayer(buildEmptySlot(counter++));
     team.addApothecary(apoCost);
     team.addAssistantCoach(acCost);
     team.addCheerleader(clCost);
@@ -115,10 +115,26 @@ function buildPlayer(
   position: Position,
   skillCost: number,
   missing: boolean = false,
+
+) {
+  return buildPlayerSlot(id, isJourneyman, position, skillCost, missing, "NORMAL");
+}
+
+function buildEmptySlot(id: number) {
+  return buildPlayerSlot(id, false, null, 0, false, "EMPTY")
+}
+
+function buildPlayerSlot(
+  id: number,
+  isJourneyman: boolean,
+  position: Position | null,
+  skillCost: number,
+  missing: boolean,
+  playerType: PlayerType
 ): Player {
   const player = new Player(
     team,
-    isJourneyman == null ? "EMPTY" : "NORMAL",
+    playerType,
     id,
     id,
     id + "",
@@ -192,8 +208,8 @@ function buildApiRoster(): any {
   const roster = {
     positions: [],
     logos: new Array<number>(200),
+    rerollCost: rerollCost
   };
-  roster["rerollCost"] = rerollCost;
 
   return roster;
 }
