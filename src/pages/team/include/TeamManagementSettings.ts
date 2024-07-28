@@ -284,6 +284,10 @@ export default class TeamManagementSettings {
     );
   }
 
+  public calculateCurrentTeamValueAfterReady(team: Team): number {
+    return 0;
+  }
+
   public calculateCurrentTeamValue(team: Team): number {
     const mngCost = team
       .getMissNextGamePlayers()
