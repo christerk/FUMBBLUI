@@ -24,6 +24,7 @@ describe.each([
       rawApiRoster,
       lcl,
     );
+    teamManagementSettings["settings"].players.positions = [blitzer, lino]
     team = new Team("mock division", 3, 100000, 16);
     let counter = 1;
     team.addPlayer(buildPlayer(counter++, false, blitzer, 10000));
@@ -180,6 +181,9 @@ function buildApiRuleset(): any {
     options: {
       rulesetOptions: {},
       teamSettings: {},
+      clientOptions: {
+        playersOnField: 11
+      }
     },
   };
 }

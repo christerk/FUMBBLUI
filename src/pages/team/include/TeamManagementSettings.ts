@@ -110,6 +110,8 @@ export default class TeamManagementSettings {
         },
         isProgression:
           rawApiRuleset.options.teamSettings.teamProgression === "standard",
+        minPlayers:
+          rawApiRuleset.options.clientOptions.playersOnField
       },
     };
 
@@ -285,7 +287,20 @@ export default class TeamManagementSettings {
   }
 
   public calculateCurrentTeamValueAfterReady(team: Team): number {
-    return 0;
+    const preReadyCtv = this.calculateCurrentTeamValue(team);
+    if (this.settings.players.lowCostLinemen) {
+      return preReadyCtv;
+    }
+    const journeymenToAdd = this.settings.ruleset.minPlayers -  (team.getRosteredPlayers().length - team.getMissNextGamePlayers().length)
+
+    const journeyPositions = this.settings.players.positions.filter(pos => pos.quantityAllowed == 12 || pos.quantityAllowed == 16)
+
+    let journeyCosts = 0;
+    if (journeyPositions && journeyPositions.length > 0) {
+      journeyCosts = journeyPositions[0].cost * journeymenToAdd
+    }
+    
+    return preReadyCtv + journeyCosts;
   }
 
   public calculateCurrentTeamValue(team: Team): number {
