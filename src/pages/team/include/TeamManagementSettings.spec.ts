@@ -17,7 +17,7 @@ const rawApiRoster = buildApiRoster();
 describe.each([
   { lcl: false, desc: "w/o lcl", linosTv: 6, linosCtv: 5, linosCtvAr: 9 },
   { lcl: true, desc: "with lcl", linosTv: 6, linosCtv: 0, linosCtvAr: 0 },
-])("TeamManagementSettings", ({ lcl, linosTv, linosCtv, linosCtvAr }) => {
+])("TeamManagementSettings $desc", ({ lcl, desc, linosTv, linosCtv, linosCtvAr }) => {
   beforeEach(() => {
     teamManagementSettings = new TeamManagementSettings(
       rawApiRuleset,
