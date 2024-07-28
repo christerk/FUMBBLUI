@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import Team from "./Team";
-import { PlayerType, Position } from "./Interfaces";
+import { Position } from "./Interfaces";
 import Player from "./Player";
 import TeamManagementSettings from './TeamManagementSettings';
 
@@ -17,11 +17,12 @@ const rawApiRoster = buildApiRoster()
 describe("TeamManagementSettings", () => {
   beforeEach(() => {
 
-    teamManagementSettings = new TeamManagementSettings(rawApiRuleset, rawApiRoster, true)
+    teamManagementSettings = new TeamManagementSettings(rawApiRuleset, rawApiRoster, false)
     team = new Team("mock division", 3, 100000, 16);
     let counter = 1;
     team.addPlayer(buildPlayer(counter++, false, blitzer, 10000));
     team.addPlayer(buildPlayer(counter++, false, blitzer, 0));
+    team.addPlayer(buildPlayer(counter++, false, blitzer, 0, true));
     team.addPlayer(buildPlayer(counter++, false, lino, 0));
     team.addPlayer(buildPlayer(counter++, false, lino, 0));
     team.addPlayer(buildPlayer(counter++, false, lino, 20000));
@@ -46,12 +47,29 @@ describe("TeamManagementSettings", () => {
     team.addReroll(rerollCost);
     team.addReroll(rerollCost);
 });
-  describe("calculateTeamValue", () => {
-    it("adds all rostered players and team goods", () => {
+describe("calculateTeamValue", () => {
+  it("adds all rostered players and team goods", () => {
+
+    const expectedCost = 
+    blitzer.cost * 3 + 
+    lino.cost * 6 + 
+    10000 + // blitzer skill
+    20000 + // lino skill
+    apoCost +
+    acCost +
+    2 * clCost +
+    rerollCost * 3;
+
+  expect(teamManagementSettings.calculateTeamValue(team)).toBe(expectedCost)
+  });
+});
+
+describe("calculateCurrentTeamValue", () => {
+    it("adds all rostered players not mng and team goods", () => {
 
       const expectedCost = 
       blitzer.cost * 2 + 
-      lino.cost * 6 + 
+      lino.cost * 5 + 
       10000 + // blitzer skill
       20000 + // lino skill
       apoCost +
@@ -59,7 +77,7 @@ describe("TeamManagementSettings", () => {
       2 * clCost +
       rerollCost * 3;
 
-    expect(teamManagementSettings.calculateTeamValue(team)).toBe(expectedCost)
+    expect(teamManagementSettings.calculateCurrentTeamValue(team)).toBe(expectedCost)
     });
   });
 });
