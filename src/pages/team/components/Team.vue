@@ -1485,7 +1485,7 @@ class TeamComponent extends Vue {
   public get currentTeamValueAfterReady(): number {
     return this.teamManagementSettings.calculateCurrentTeamValueAfterReady(
       this.team,
-    );
+    )[0];
   }
 
   public get teamCreationCost(): number {

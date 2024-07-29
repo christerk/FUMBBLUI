@@ -104,7 +104,7 @@ describe.each([
 
       expect(
         teamManagementSettings.calculateCurrentTeamValueAfterReady(team),
-      ).toBe(expectedCost);
+      ).toEqual([expectedCost]);
     });
   });
 });

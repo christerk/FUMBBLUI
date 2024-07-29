@@ -286,10 +286,10 @@ export default class TeamManagementSettings {
     );
   }
 
-  public calculateCurrentTeamValueAfterReady(team: Team): number {
+  public calculateCurrentTeamValueAfterReady(team: Team): [number] {
     const preReadyCtv = this.calculateCurrentTeamValue(team);
     if (this.settings.players.lowCostLinemen || !this.journeymanPositions) {
-      return preReadyCtv;
+      return [preReadyCtv];
     }
     const journeymenToAdd = this.settings.ruleset.minPlayers -  (team.getRosteredPlayers().length - team.getMissNextGamePlayers().length)
 
@@ -299,7 +299,7 @@ export default class TeamManagementSettings {
       journeyCosts = this.journeymanPositions[0].cost * journeymenToAdd
     }
     
-    return preReadyCtv + journeyCosts;
+    return [preReadyCtv + journeyCosts];
   }
 
   public calculateCurrentTeamValue(team: Team): number {
