@@ -288,16 +288,15 @@ export default class TeamManagementSettings {
 
   public calculateCurrentTeamValueAfterReady(team: Team): number {
     const preReadyCtv = this.calculateCurrentTeamValue(team);
-    if (this.settings.players.lowCostLinemen) {
+    if (this.settings.players.lowCostLinemen || !this.journeymanPositions) {
       return preReadyCtv;
     }
     const journeymenToAdd = this.settings.ruleset.minPlayers -  (team.getRosteredPlayers().length - team.getMissNextGamePlayers().length)
 
-    const journeyPositions = this.settings.players.positions.filter(pos => pos.quantityAllowed == 12 || pos.quantityAllowed == 16)
 
     let journeyCosts = 0;
-    if (journeyPositions && journeyPositions.length > 0) {
-      journeyCosts = journeyPositions[0].cost * journeymenToAdd
+    if (this.journeymanPositions && this.journeymanPositions.length > 0) {
+      journeyCosts = this.journeymanPositions[0].cost * journeymenToAdd
     }
     
     return preReadyCtv + journeyCosts;
