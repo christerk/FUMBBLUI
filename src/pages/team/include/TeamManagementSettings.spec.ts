@@ -15,16 +15,16 @@ const rawApiRuleset = buildApiRuleset();
 const rawApiRoster = buildApiRoster();
 
 describe.each([
-  { lcl: false, desc: "w/o lcl", linosTv: 6, linosCtv: 6, linosCtvAr: 9 },
-  { lcl: true, desc: "with lcl", linosTv: 6, linosCtv: 6, linosCtvAr: 0 },
-])("TeamManagementSettings $desc", ({ lcl, linosTv, linosCtv, linosCtvAr }) => {
+  { lcl: false, desc: "w/o lcl", linosTv: 6, linosCtv: 6, linosFixed: 5, linosVariable: 4 },
+  { lcl: true, desc: "with lcl", linosTv: 6, linosCtv: 6, linosFixed: 0, linosVariable: 0 },
+])("TeamManagementSettings $desc", ({ lcl, linosTv, linosCtv, linosFixed, linosVariable }) => {
   beforeEach(() => {
     teamManagementSettings = new TeamManagementSettings(
       rawApiRuleset,
       rawApiRoster,
       lcl,
     );
-    teamManagementSettings["settings"].players.positions = [blitzer, lino]
+    teamManagementSettings["settings"].players.positions = [blitzer, lino, linoCheap, linoIgnored]
     team = new Team("mock division", 3, 100000, 16);
     let counter = 1;
     team.addPlayer(buildPlayer(counter++, false, blitzer, 10000));
@@ -91,9 +91,9 @@ describe.each([
 
   describe("calculateCurrentTeamValueAfterReady", () => {
     it("adds all rostered players not mng and team goods", () => {
-      const expectedCost =
+      const expectedBaseCost =
         blitzer.cost * 2 +
-        lino.cost * linosCtvAr +
+        lino.cost * linosFixed +
         10000 + // blitzer skill
         (lcl ? 0 :20000) + // lino skill
         apoCost +
@@ -101,9 +101,14 @@ describe.each([
         2 * clCost +
         rerollCost * 3;
 
+      const min = expectedBaseCost + linoCheap.cost * linosVariable
+      const max = expectedBaseCost + lino.cost * linosVariable
+
+      const expected = lcl ? [min] : [min, max]
+
       expect(
-        teamManagementSettings.calculateCurrentTeamValueAfterReady(team),
-      ).toEqual([expectedCost]);
+        teamManagementSettings.calculateCurrentTeamValueRange(team),
+      ).toEqual(expected);
     });
   });
 });
@@ -164,6 +169,46 @@ const lino: Position = {
     Armour: 9,
   },
   quantityAllowed: 16,
+  isPeaked: false,
+  defaultGender: "NEUTRAL",
+  isBigGuy: false,
+  primarySkills: [],
+  secondarySkills: [],
+};
+
+const linoCheap: Position = {
+  id: 3,
+  name: "linoCheap",
+  cost: 30000,
+  skills: [],
+  stats: {
+    Movement: 7,
+    Strength: 3,
+    Agility: 2,
+    Passing: 5,
+    Armour: 9,
+  },
+  quantityAllowed: 12,
+  isPeaked: false,
+  defaultGender: "NEUTRAL",
+  isBigGuy: false,
+  primarySkills: [],
+  secondarySkills: [],
+};
+
+const linoIgnored: Position = {
+  id: 4,
+  name: "linoIgnored",
+  cost: 40000,
+  skills: [],
+  stats: {
+    Movement: 7,
+    Strength: 3,
+    Agility: 2,
+    Passing: 5,
+    Armour: 9,
+  },
+  quantityAllowed: 12,
   isPeaked: false,
   defaultGender: "NEUTRAL",
   isBigGuy: false,

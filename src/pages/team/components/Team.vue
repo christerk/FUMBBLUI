@@ -1483,7 +1483,7 @@ class TeamComponent extends Vue {
   }
 
   public get currentTeamValueAfterReady(): number {
-    return this.teamManagementSettings.calculateCurrentTeamValueAfterReady(
+    return this.teamManagementSettings.calculateCurrentTeamValueRange(
       this.team,
     )[0];
   }

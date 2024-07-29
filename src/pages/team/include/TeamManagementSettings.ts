@@ -287,7 +287,7 @@ export default class TeamManagementSettings {
     );
   }
 
-  public calculateCurrentTeamValueAfterReady(team: Team): [number] {
+  public calculateCurrentTeamValueRange(team: Team): [number] {
     const preReadyCtv = this.calculateTeamValueForPlayers(
       team,
       team
