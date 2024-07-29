@@ -287,7 +287,7 @@ export default class TeamManagementSettings {
     );
   }
 
-  public calculateCurrentTeamValueRange(team: Team): [number] {
+  public calculateCurrentTeamValueRange(team: Team): number[] {
     const preReadyCtv = this.calculateTeamValueForPlayers(
       team,
       team
@@ -310,19 +310,22 @@ export default class TeamManagementSettings {
       this.settings.ruleset.minPlayers -
       (team.getRosteredPlayers().length - team.getMissNextGamePlayers().length);
 
-    let journeyCosts = 0;
-    if (this.journeymanPositions && this.journeymanPositions.length > 0) {
-      journeyCosts = this.journeymanPositions[0].cost * journeymenToAdd;
-    }
+    const potentialCtvs = this.journeymanPositions.map(
+      (pos) => preReadyCtv + pos.cost * journeymenToAdd,
+    );
+    const uniqCtvs: number[] = potentialCtvs
+      .filter((value, index, arr) => index === arr.indexOf(value))
+      .sort((a, b) => a - b);
 
-    return [preReadyCtv + journeyCosts];
+    return [uniqCtvs[0], uniqCtvs[uniqCtvs.length - 1]];
   }
 
   public calculateCurrentTeamValue(team: Team): number {
     return this.calculateTeamValueForPlayers(
       team,
       team
-        .getRosteredPlayers().concat(team.extraPlayers)
+        .getRosteredPlayers()
+        .concat(team.extraPlayers)
         .filter(
           (player) => player.getPosition() != null && !player.isMissNextGame(),
         ),
