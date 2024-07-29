@@ -5,6 +5,7 @@ import {
   PositionStats,
   SetupTeamManagementSettings,
 } from "./Interfaces";
+import Player from "./Player";
 import Team from "./Team";
 
 export default class TeamManagementSettings {
@@ -110,8 +111,7 @@ export default class TeamManagementSettings {
         },
         isProgression:
           rawApiRuleset.options.teamSettings.teamProgression === "standard",
-        minPlayers:
-          rawApiRuleset.options.clientOptions.playersOnField
+        minPlayers: rawApiRuleset.options.clientOptions.playersOnField,
       },
     };
 
@@ -266,13 +266,14 @@ export default class TeamManagementSettings {
   }
 
   public calculateTeamValue(team: Team): number {
-    const playerCost = team
-      .getPlayers()
-      .filter((p) => !p.IsEmpty)
-      .reduce(
-        (playerCost, player) => (playerCost += player.getPlayerCost()),
-        0,
-      );
+    return this.calculateTeamValueForPlayers(team, team.getRosteredPlayers());
+  }
+
+  private calculateTeamValueForPlayers(team: Team, players: Player[]): number {
+    const playerCost = players.reduce(
+      (playerCost, player) => (playerCost += player.getPlayerCost()),
+      0,
+    );
 
     return (
       playerCost +
@@ -287,35 +288,51 @@ export default class TeamManagementSettings {
   }
 
   public calculateCurrentTeamValueAfterReady(team: Team): [number] {
-    const preReadyCtv = this.calculateCurrentTeamValue(team);
+    const preReadyCtv = this.calculateTeamValueForPlayers(
+      team,
+      team
+        .getRosteredPlayers()
+        .filter(
+          (player) =>
+            player.getPosition() != null &&
+            !(
+              player.isMissNextGame() ||
+              (this.settings.players.lowCostLinemen &&
+                this.journeymanPositions.includes(player.getPosition()!))
+            )
+        ),
+    );
+    
     if (this.settings.players.lowCostLinemen || !this.journeymanPositions) {
       return [preReadyCtv];
     }
-    const journeymenToAdd = this.settings.ruleset.minPlayers -  (team.getRosteredPlayers().length - team.getMissNextGamePlayers().length)
-
+    const journeymenToAdd =
+      this.settings.ruleset.minPlayers -
+      (team.getRosteredPlayers().length - team.getMissNextGamePlayers().length);
 
     let journeyCosts = 0;
     if (this.journeymanPositions && this.journeymanPositions.length > 0) {
-      journeyCosts = this.journeymanPositions[0].cost * journeymenToAdd
+      journeyCosts = this.journeymanPositions[0].cost * journeymenToAdd;
     }
-    
+
     return [preReadyCtv + journeyCosts];
   }
 
   public calculateCurrentTeamValue(team: Team): number {
-    const mngCost = team
-      .getMissNextGamePlayers()
-      .reduce((cost, player) => cost + player.getPlayerCost(), 0);
-
-    let lowCostLinemenRefund = 0;
-    if (this.settings.players.lowCostLinemen) {
-      lowCostLinemenRefund = team
-        .getLinemenPlayers()
-        .filter((player) => !player.isMissNextGame())
-        .reduce((cost, player) => cost + player.getPositionCost(), 0);
-    }
-
-    return this.calculateTeamValue(team) - mngCost - lowCostLinemenRefund;
+    return this.calculateTeamValueForPlayers(
+      team,
+      team
+        .getRosteredPlayers()
+        .filter(
+          (player) =>
+            player.getPosition() != null &&
+            !(
+              player.isMissNextGame() ||
+              (this.settings.players.lowCostLinemen &&
+                this.journeymanPositions.includes(player.getPosition()!))
+            )
+        ),
+    );
   }
 
   public calculateCreateTeamCost(team: Team): number {

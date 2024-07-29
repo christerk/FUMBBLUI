@@ -36,7 +36,7 @@ describe.each([
     team.addPlayer(buildPlayer(counter++, false, lino, 0));
     team.addPlayer(buildPlayer(counter++, true, lino, 0));
     team.addPlayer(buildPlayer(counter++, false, lino, 0));
-    team.addPlayer(buildPlayer(counter++, false, lino, 0, true));
+    team.addPlayer(buildPlayer(counter++, false, lino, 20000, true));
     team.addPlayer(buildEmptySlot(counter++));
     team.addPlayer(buildEmptySlot(counter++));
     team.addPlayer(buildEmptySlot(counter++));
@@ -61,6 +61,7 @@ describe.each([
         lino.cost * linosTv +
         10000 + // blitzer skill
         20000 + // lino skill
+        20000 + // lino mng skill
         apoCost +
         acCost +
         2 * clCost +
@@ -78,7 +79,7 @@ describe.each([
         blitzer.cost * 2 +
         lino.cost * linosCtv +
         10000 + // blitzer skill
-        20000 + // lino skill
+        (lcl ? 0 :20000) + // lino skill
         apoCost +
         acCost +
         2 * clCost +
@@ -96,7 +97,7 @@ describe.each([
         blitzer.cost * 2 +
         lino.cost * linosCtvAr +
         10000 + // blitzer skill
-        20000 + // lino skill
+        (lcl ? 0 :20000) + // lino skill
         apoCost +
         acCost +
         2 * clCost +
