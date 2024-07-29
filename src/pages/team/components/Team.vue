@@ -607,10 +607,10 @@
             <div v-else class="title left">Current Team Value:</div>
             <div class="info left">
               <span v-if="team.getTeamStatus().isPostMatch()"
-                >{{ currentTeamValue / 1000 }}k /
+                >
                 {{ currentTeamValueAfterReady / 1000 }}k</span
               >
-              <span v-else>{{ currentTeamValueAfterReady / 1000 }}k</span>
+              <span v-else>{{ currentTeamValue / 1000 }}k</span>
               <span v-if="team.getTvLimitDisplay() !== 0">
                 (±{{ team.getTvLimitDisplay() }})</span
               >

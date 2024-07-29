@@ -299,10 +299,10 @@ export default class TeamManagementSettings {
               player.isMissNextGame() ||
               (this.settings.players.lowCostLinemen &&
                 this.journeymanPositions.includes(player.getPosition()!))
-            )
+            ),
         ),
     );
-    
+
     if (this.settings.players.lowCostLinemen || !this.journeymanPositions) {
       return [preReadyCtv];
     }
@@ -322,15 +322,9 @@ export default class TeamManagementSettings {
     return this.calculateTeamValueForPlayers(
       team,
       team
-        .getRosteredPlayers()
+        .getRosteredPlayers().concat(team.extraPlayers)
         .filter(
-          (player) =>
-            player.getPosition() != null &&
-            !(
-              player.isMissNextGame() ||
-              (this.settings.players.lowCostLinemen &&
-                this.journeymanPositions.includes(player.getPosition()!))
-            )
+          (player) => player.getPosition() != null && !player.isMissNextGame(),
         ),
     );
   }

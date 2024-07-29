@@ -15,9 +15,9 @@ const rawApiRuleset = buildApiRuleset();
 const rawApiRoster = buildApiRoster();
 
 describe.each([
-  { lcl: false, desc: "w/o lcl", linosTv: 6, linosCtv: 5, linosCtvAr: 9 },
-  { lcl: true, desc: "with lcl", linosTv: 6, linosCtv: 0, linosCtvAr: 0 },
-])("TeamManagementSettings $desc", ({ lcl, desc, linosTv, linosCtv, linosCtvAr }) => {
+  { lcl: false, desc: "w/o lcl", linosTv: 6, linosCtv: 6, linosCtvAr: 9 },
+  { lcl: true, desc: "with lcl", linosTv: 6, linosCtv: 6, linosCtvAr: 0 },
+])("TeamManagementSettings $desc", ({ lcl, linosTv, linosCtv, linosCtvAr }) => {
   beforeEach(() => {
     teamManagementSettings = new TeamManagementSettings(
       rawApiRuleset,
@@ -37,8 +37,6 @@ describe.each([
     team.addPlayer(buildPlayer(counter++, true, lino, 0));
     team.addPlayer(buildPlayer(counter++, false, lino, 0));
     team.addPlayer(buildPlayer(counter++, false, lino, 20000, true));
-    team.addPlayer(buildEmptySlot(counter++));
-    team.addPlayer(buildEmptySlot(counter++));
     team.addPlayer(buildEmptySlot(counter++));
     team.addPlayer(buildEmptySlot(counter++));
     team.addPlayer(buildEmptySlot(counter++));
@@ -79,7 +77,7 @@ describe.each([
         blitzer.cost * 2 +
         lino.cost * linosCtv +
         10000 + // blitzer skill
-        (lcl ? 0 :20000) + // lino skill
+        20000 + // lino skill
         apoCost +
         acCost +
         2 * clCost +
