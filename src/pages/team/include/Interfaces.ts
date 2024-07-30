@@ -191,6 +191,7 @@ export interface SetupTeamManagementSettings {
       start: number;
     };
     isProgression: boolean;
+    minPlayers: number;
   };
 }
 

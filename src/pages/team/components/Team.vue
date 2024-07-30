@@ -23,7 +23,8 @@
         </div>
         <div class="infobox">
           <div class="title">CTV</div>
-          <div class="info">{{ currentTeamValue / 1000 }}k</div>
+          <div class="info" v-if="team.getTeamStatus().isPostMatch()">{{ currentTeamValueRange }}</div>
+          <div class="info" v-else>{{ currentTeamValue }}</div>
         </div>
       </div>
       <div class="teamheadermain">
@@ -603,9 +604,11 @@
           <div class="teammanagementrow">
             <div class="title left">Current Team Value:</div>
             <div class="info left">
-              {{ currentTeamValue / 1000 }}k<span
-                v-if="team.getTvLimitDisplay() !== 0"
+              <span v-if="team.getTeamStatus().isPostMatch()" title="Includes costs of Journeymen">
+                {{ currentTeamValueRange }}</span
               >
+              <span v-else>{{ currentTeamValue }}</span>
+              <span v-if="team.getTvLimitDisplay() !== 0">
                 (±{{ team.getTvLimitDisplay() }})</span
               >
             </div>
@@ -1472,8 +1475,15 @@ class TeamComponent extends Vue {
     return this.teamManagementSettings.calculateTeamValue(this.team);
   }
 
-  public get currentTeamValue(): number {
-    return this.teamManagementSettings.calculateCurrentTeamValue(this.team);
+  public get currentTeamValue(): string {
+    return (this.teamManagementSettings.calculateCurrentTeamValue(this.team) / 1000) + "k";
+  }
+
+  public get currentTeamValueRange(): string {
+    return this.teamManagementSettings
+      .calculateCurrentTeamValueRange(this.team)
+      .map((tv) => (tv / 1000) + "k")
+      .join(" - ");
   }
 
   public get teamCreationCost(): number {
