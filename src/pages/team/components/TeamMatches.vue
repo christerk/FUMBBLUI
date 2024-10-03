@@ -27,7 +27,7 @@
             ({{ match.team2.coach.cr }})
           </div>
           <div class="matchownteam">
-            <a :href="teamUrl(match.team2.id)">{{ match.team1.name }}</a>
+            <a :href="teamUrl(match.team1.id)">{{ match.team1.name }}</a>
           </div>
           <div class="matchoppteam">
             <a :href="teamUrl(match.team2.id)">{{ match.team2.name }}</a>
@@ -130,7 +130,7 @@ class TeamMatches extends Vue {
   }
 
   public teamUrl(id: number) {
-    return "https://fumbbl.com/p/team?team_id=" + id;
+    return "https://fumbbl.com/t/" + id;
   }
 
   public matchUrl(id: number) {
