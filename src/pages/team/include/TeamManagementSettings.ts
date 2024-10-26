@@ -308,7 +308,7 @@ export default class TeamManagementSettings {
     (team.getRosteredPlayers().length - team.getMissNextGamePlayers().length);
 
 
-    if (this.settings.players.lowCostLinemen || journeymenToAdd == 0 || !this.journeymanPositions) {
+    if (this.settings.players.lowCostLinemen || journeymenToAdd < 1 || !this.journeymanPositions) {
       return [preReadyCtv];
     }
 
