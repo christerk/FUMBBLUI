@@ -1,17 +1,25 @@
 <template>
   <div class="editingPane">
-    <div id="title-bar" :style="{ background: tooltipGradient, color: tooltipColor }">
+    <div
+      id="title-bar"
+      :style="{ background: tooltipGradient, color: tooltipColor }"
+    >
       <div id="title">
         {{ editedConfig?.getTitle() }}
       </div>
-      <IconButton :src="applyIcon" alt="Apply" :callback="update" :show-indicator="true" />
+      <IconButton
+        :src="applyIcon"
+        alt="Apply"
+        :callback="update"
+        :show-indicator="true"
+      />
       <IconButton
         :src="resetIcon"
         alt="Reset"
         :callback="
           () => {
-            editedConfig?.resetSettings()
-            editedConfig?.update()
+            editedConfig?.resetSettings();
+            editedConfig?.update();
           }
         "
         :show-indicator="true"
@@ -21,7 +29,7 @@
         alt="Close"
         :callback="
           () => {
-            editedConfig = undefined
+            editedConfig = undefined;
           }
         "
         :show-indicator="false"
@@ -39,7 +47,7 @@
               :checked="settingsUpdate.range == Range.COUNT"
               @input="
                 () => {
-                  settingsUpdate.range = Range.COUNT
+                  settingsUpdate.range = Range.COUNT;
                 }
               "
             />
@@ -87,7 +95,7 @@
               :checked="settingsUpdate.range == Range.ID"
               @input="
                 () => {
-                  settingsUpdate.range = Range.ID
+                  settingsUpdate.range = Range.ID;
                 }
               "
             />
@@ -118,7 +126,10 @@
                 />
               </div>
             </div>
-            <HelpIcon id="idHelp" tooltip="Limits to games with ids within given" />
+            <HelpIcon
+              id="idHelp"
+              tooltip="Limits to games with ids within given"
+            />
           </div>
         </div>
         <div class="setting spaced">
@@ -131,7 +142,7 @@
               :checked="settingsUpdate.range == Range.DATE"
               @input="
                 () => {
-                  settingsUpdate.range = Range.DATE
+                  settingsUpdate.range = Range.DATE;
                 }
               "
             />
@@ -146,11 +157,15 @@
                   class="setting-input"
                   type="date"
                   :value="startDate"
-                  @input="(event: Event) => {
-                if (event.target) {
-                  settingsUpdate.lowerDate = createStartOfDayDate(createDate(event.target))
-                }
-              }"
+                  @input="
+                    (event: Event) => {
+                      if (event.target) {
+                        settingsUpdate.lowerDate = createStartOfDayDate(
+                          createDate(event.target),
+                        );
+                      }
+                    }
+                  "
                 />
               </div>
             </div>
@@ -162,15 +177,22 @@
                   class="setting-input"
                   type="date"
                   :value="endDate"
-                  @input="(event: Event) => {
-                if (event.target) {
-                  settingsUpdate.upperDate = createEndOfDayDate(createDate(event.target))
-                }
-              }"
+                  @input="
+                    (event: Event) => {
+                      if (event.target) {
+                        settingsUpdate.upperDate = createEndOfDayDate(
+                          createDate(event.target),
+                        );
+                      }
+                    }
+                  "
                 />
               </div>
             </div>
-            <HelpIcon id="dateHelp" tooltip="Limits to games played within those dates" />
+            <HelpIcon
+              id="dateHelp"
+              tooltip="Limits to games played within those dates"
+            />
           </div>
         </div>
       </div>
@@ -186,7 +208,7 @@
               :checked="settingsUpdate.aggregation == Aggregation.SUM"
               @input="
                 () => {
-                  settingsUpdate.aggregation = Aggregation.SUM
+                  settingsUpdate.aggregation = Aggregation.SUM;
                 }
               "
             />
@@ -205,7 +227,7 @@
               :checked="settingsUpdate.aggregation == Aggregation.WINDOW"
               @input="
                 () => {
-                  settingsUpdate.aggregation = Aggregation.WINDOW
+                  settingsUpdate.aggregation = Aggregation.WINDOW;
                 }
               "
             />
@@ -231,62 +253,62 @@
   <div class="separator" />
 </template>
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
-import { useMatchStore } from '../pinia/store'
-import HelpIcon from '../help/HelpIcon.vue'
+import { storeToRefs } from "pinia";
+import { useMatchStore } from "../pinia/store";
+import HelpIcon from "../help/HelpIcon.vue";
 import {
   Aggregation,
   createEndOfDayDate,
   createStartOfDayDate,
   htmlFormatDate,
-  Range
-} from '../rating/store'
-import IconButton from '../iconButton/IconButton.vue'
-import applyIcon from '../icons/applyIcon.png'
-import removeIcon from '../icons/removeIcon.png'
-import resetIcon from '../icons/resetIcon.png'
-import { computed } from 'vue'
-import Color from 'color'
+  Range,
+} from "../rating/store";
+import IconButton from "../iconButton/IconButton.vue";
+import applyIcon from "../icons/applyIcon.png";
+import removeIcon from "../icons/removeIcon.png";
+import resetIcon from "../icons/resetIcon.png";
+import { computed } from "vue";
+import Color from "color";
 
-const { editedConfig, errorMessage } = storeToRefs(useMatchStore())
+const { editedConfig, errorMessage } = storeToRefs(useMatchStore());
 
 const settingsUpdate = computed(() => {
-  return editedConfig.value?.settings.buildSettingsUpdate()!
-})
+  return editedConfig.value?.settings.buildSettingsUpdate()!;
+});
 
 const startDate = computed(() => {
-  return htmlFormatDate(settingsUpdate.value.lowerDate)
-})
+  return htmlFormatDate(settingsUpdate.value.lowerDate);
+});
 
 const endDate = computed(() => {
-  return htmlFormatDate(settingsUpdate.value.upperDate)
-})
+  return htmlFormatDate(settingsUpdate.value.upperDate);
+});
 
 const tooltipGradient = computed(() => {
   return (
-    'linear-gradient(to bottom, ' +
+    "linear-gradient(to bottom, " +
     new Color(editedConfig.value?.color).darken(0.2).rgb() +
-    ', ' +
+    ", " +
     editedConfig.value?.color +
-    ')'
-  )
-})
+    ")"
+  );
+});
 
 const tooltipColor = computed(() => {
-  return new Color(editedConfig.value?.color).isLight() ? 'black' : 'white'
-})
+  return new Color(editedConfig.value?.color).isLight() ? "black" : "white";
+});
 
 function update() {
   if (editedConfig.value && settingsUpdate) {
-    editedConfig.value.updateIfChanged(settingsUpdate.value, errorMessage)
+    editedConfig.value.updateIfChanged(settingsUpdate.value, errorMessage);
   }
 }
 
 function createDate(element: EventTarget): Date {
-  return new Date((element as HTMLInputElement).value)
+  return new Date((element as HTMLInputElement).value);
 }
 </script>
 
 <style scoped>
-@import './configEditor.less';
+@import "./configEditor.less";
 </style>

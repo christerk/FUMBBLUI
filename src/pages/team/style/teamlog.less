@@ -1,0 +1,43 @@
+@import url("@style/fumbbl");
+
+.panelwrapper {
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: 100%;
+
+  .backbutton {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .logpanel {
+    background: @OldLace;
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+    width: 90%;
+    margin-left: 10%;
+
+    .title {
+      background: @Forest;
+      color: white;
+      border-top-left-radius: 9px;
+      border-top-right-radius: 9px;
+      font-size: 20px;
+      text-align: center;
+      padding: 5px;
+    }
+
+    .logcontent {
+      background: @OldLace;
+      margin: 1rem;
+      display: grid;
+      grid-template-columns: auto auto 1fr;
+      grid-column-gap: 1rem;
+
+      &.staff {
+        grid-template-columns: auto auto auto 1fr;
+      }
+    }
+  }
+}

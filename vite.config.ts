@@ -29,6 +29,7 @@ export default defineConfig({
       '/src': resolve(process.cwd(), 'src'),
       '@': fileURLToPath(new URL('../src', import.meta.url)),
       '@style': resolve(__dirname, 'src', 'style'),
+      '@pages': resolve(__dirname, 'src', 'pages'),
       '@components': resolve(__dirname, 'src', 'components')
     }
   },
@@ -42,7 +43,8 @@ export default defineConfig({
       external: [/^\/i\//, /^\/FUMBBL\//],
       input: {
         tournamentsquads: resolve(__dirname, 'htdocs', 'tournamentsquads.html'),
-        winrater: resolve(__dirname, 'htdocs', 'winrater.html')
+        winrater: resolve(__dirname, 'htdocs', 'winrater.html'),
+        team: resolve(__dirname, 'htdocs', 'team.html')
       },
       output: {
         format: 'esm',

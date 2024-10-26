@@ -1,0 +1,21 @@
+{{> header }}
+<script defer type="module" src="/src/pages/team/team.ts"></script>
+
+<div class="teammanagement">
+  <div
+    id="app"
+    coach="%VITE_USER%"
+    teamid=""
+    sitestaff="true"
+    leaguestaff="false"
+  ></div>
+</div>
+
+<script>
+  const applicationDiv = document.getElementById("app");
+  applicationDiv.setAttribute(
+    "teamid",
+    new URLSearchParams(window.location.search).get("team_id"),
+  );
+</script>
+{{> footer }}

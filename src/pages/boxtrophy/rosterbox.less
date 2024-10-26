@@ -1,0 +1,31 @@
+@import url("@style/fumbbl");
+
+.roster {
+  display: inline-block;
+  background: @OffWhite;
+  padding: 0.25rem;
+  border-radius: 1rem;
+  border: solid 1px @Quicksilver;
+  margin: 0.25rem;
+
+  font-size: 110%;
+  line-height: 32px;
+  white-space: nowrap;
+
+  div.name {
+    display: inline-block;
+    padding: 0 0.4rem;
+  }
+
+  &.draggable {
+    cursor: move;
+
+    &:hover {
+      background: @Spring;
+    }
+
+    &.drag-source {
+      opacity: 0.5;
+    }
+  }
+}

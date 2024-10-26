@@ -1,0 +1,45 @@
+@import url("@style/fumbbl");
+
+.playerEffects {
+  background: @OffWhite;
+  border: solid @Forest 1px;
+  border-radius: 10px;
+  margin-left: 3rem;
+  margin-right: 3rem;
+  margin-top: 1rem;
+  padding: 1rem;
+
+  width: 30rem;
+
+  .name {
+    font-size: 1.1rem;
+  }
+  .type {
+    padding-left: 1rem;
+  }
+  .roll {
+    padding-left: 2rem;
+  }
+  .effect {
+    font-weight: bold;
+    padding-left: 2rem;
+  }
+
+  &.condensed {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    .actions {
+      display: contents;
+    }
+    .name {
+      font-size: 0.8rem;
+      display: inline-block;
+    }
+    .type {
+      float: right;
+      font-size: 0.8rem;
+      display: block;
+    }
+  }
+}

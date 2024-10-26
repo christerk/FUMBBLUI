@@ -11,59 +11,65 @@
     <ul class="pagenav">
       <template v-for="navItem in navItems" :key="navItem.page">
         <li :id="'nav-' + navItem.page" @click.prevent="setPage(navItem.page)">
-          <a v-if="navItem.page != page" @click.prevent="" href="#">{{
-            navItem.label
-          }}</a>
-          <div v-if="navItem.page == page" @click.prevent="" href="#">
+          <div @click.prevent="" href="#">
             {{ navItem.label }}
           </div>
         </li>
       </template>
 
       <img
-      v-if="pageMarkerPosition != 0"
-      class="pagemarker"
-      src="https://fumbbl.com/FUMBBL/Images/Icons/pagemarker.png"
-      :style="{ display: 'block', left: pageMarkerPosition + 'px' }"
+        v-if="pageMarkerPosition != 0"
+        class="pagemarker"
+        src="https://fumbbl.com/FUMBBL/Images/Icons/pagemarker.png"
+        :style="{ display: 'block', left: pageMarkerPosition + 'px' }"
       />
     </ul>
   </div>
 </template>
 
 <style scoped>
-@import './pageheader.less';
+@import "./pageheader.less";
 </style>
 
 <script lang="ts">
-import { Emit, Prop, Component, Vue, toNative } from 'vue-facing-decorator'
+import { Emit, Prop, Component, Vue, toNative } from "vue-facing-decorator";
 
 @Component
 class PageHeader extends Vue {
   @Prop
-  navItems: any = []
+  navItems: any = [];
 
   @Prop
-  defaultPage: string = ""
+  defaultPage: string = "";
 
-  public page: string = ''
-  public pageMarkerPosition: number = 0
+  public page: string = "";
+  public pageMarkerPosition: number = 0;
 
   public mounted() {
-    this.setPage(this.defaultPage)
+    this.setPage(this.defaultPage);
   }
 
   @Emit
   public setPage(newPage: string) {
-    this.page = newPage
+    this.page = newPage;
 
-    let element = document.getElementById('nav-' + newPage)
+    const element = document.getElementById("nav-" + newPage);
 
     if (element != null) {
-      this.pageMarkerPosition = element.offsetLeft + element.offsetWidth / 2 - 9
+      this.pageMarkerPosition =
+        element.offsetLeft + element.offsetWidth / 2 - 9;
     }
-    return newPage
+    return newPage;
+  }
+
+  public addNav(label: string, page: string) {
+    this.navItems.push({ label: label, page: page });
+
+    this.$nextTick(() => {
+      this.setPage(this.page);
+    });
   }
 }
 
-export default toNative(PageHeader)
+export default toNative(PageHeader);
 </script>

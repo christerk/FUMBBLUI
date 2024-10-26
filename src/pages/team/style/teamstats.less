@@ -1,0 +1,71 @@
+@import url("@style/fumbbl");
+
+.panelwrapper {
+  display: grid;
+  place-items: center;
+  position: relative;
+
+  .backbutton {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .statpanel {
+    text-align: center;
+    background: @OldLace;
+    display: inline-grid;
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+
+    .teamstatrow {
+      display: grid;
+      grid-template-columns: 3rem 10rem repeat(5, 6rem);
+      line-height: 32px;
+
+      &.panelheader {
+        div {
+          background: @Forest;
+          color: white;
+          font-weight: bold;
+          padding: 2px;
+
+          &.small {
+            font-size: 80%;
+          }
+
+          &.top:first-child {
+            border-top-left-radius: 9px;
+          }
+          &.top:last-child {
+            border-top-right-radius: 9px;
+          }
+        }
+
+        .roster {
+          grid-column: e("2 / 3");
+        }
+        .record {
+          grid-column: e("3 / 4");
+        }
+        .tds {
+          grid-column: e("4 / 5");
+        }
+        .cas {
+          grid-column: e("5 / 7");
+        }
+        .tv {
+          grid-column: e("7 / 8");
+        }
+      }
+
+      div {
+        padding: 2px;
+        border-bottom: solid 1px @Forest;
+      }
+
+      .roster {
+        text-align: left;
+      }
+    }
+  }
+}

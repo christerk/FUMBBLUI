@@ -1,0 +1,70 @@
+@import '@style/fumbbl';
+
+.loader {
+  position: relative;
+  width: 100px;
+  height: 16px;
+  margin: 10px;
+
+  &.show {
+    opacity: 1;
+  }
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s cubic-bezier(0.32, 0, 0.67, 0);
+  transition-delay: 0.3s;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
+.loader:before , .loader:after{
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: @Forest;
+  box-shadow: 32px 0 @Forest;
+  left: 0;
+  top: 0;
+  animation: ballMoveX 2s linear infinite;
+}
+.loader:after {
+  box-shadow: none;
+  transform: translateX(64px) scale(1);
+  z-index: 2;
+  animation: none;
+  animation: trfLoader 2s linear infinite;
+}
+
+@keyframes trfLoader {
+  0% , 5%{
+    transform: translateX(64px) scale(1);
+    background: @Forest;
+  }
+  10%{
+    transform: translateX(64px) scale(1);
+    background: lighten(@Forest, 20%);
+  }
+  40%{
+      transform: translateX(32px) scale(1.5);
+      background: lighten(@Forest, 20%);
+    }
+  90%, 95% {
+    transform: translateX(0px) scale(1);
+    background: lighten(@Forest, 20%);
+  }
+  100% {
+    transform: translateX(0px) scale(1);
+    background: @Forest;
+  }
+}
+@keyframes ballMoveX {
+  0% , 10%{  transform: translateX(0) }
+  90%, 100% { transform: translateX(32px) }
+}

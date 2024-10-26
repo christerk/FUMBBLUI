@@ -10,15 +10,14 @@
 </template>
 
 <style scoped>
-@import './titledpanel.less';
+@import "./titledpanel.less";
 </style>
 
 <script lang="ts">
-import { Component, Vue, toNative } from 'vue-facing-decorator'
+import { Component, Vue, toNative } from "vue-facing-decorator";
 
 @Component
-class TitledPanel extends Vue {
-}
+class TitledPanel extends Vue {}
 
-export default toNative(TitledPanel)
+export default toNative(TitledPanel);
 </script>

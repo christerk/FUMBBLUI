@@ -7,3 +7,32 @@
 @Quicksilver: #999999;
 @Jet: #2f2f2f;
 @Black: #000;
+@OffWhite: #fbfaf3;
+@Spring: #d5febf;
+
+// Variants
+@LightSilver: #d8d8d8;
+
+button {
+  background: lighten(@Forest, 10%);
+  border-color: darken(@Forest, 2%);
+  border-radius: 10px;
+  border-style: solid;
+  color: white;
+  transition: all ease-in-out 0.15s;
+  cursor: pointer;
+  padding: 0 1rem;
+
+  &:hover {
+    border-color: lighten(@Forest, 30%);
+  }
+
+  &.light {
+    background: lighten(@Forest, 10%);
+    border-color: lighten(@Forest, 8%);
+
+    &:hover {
+      border-color: lighten(@Forest, 30%);
+    }
+  }
+}

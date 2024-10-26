@@ -1,6 +1,6 @@
-import '../../style/main.less'
+import "../../style/main.less";
 
-import { createApp } from 'vue'
-import TournamentSquads from './tournamentsquads.vue'
+import { createApp } from "vue";
+import TournamentSquads from "./tournamentsquads.vue";
 
-createApp(TournamentSquads).mount('#app')
+createApp(TournamentSquads).mount("#app");

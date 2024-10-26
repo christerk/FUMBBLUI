@@ -1,5 +1,5 @@
 <style scoped>
-@import './graphConfig.less';
+@import "./graphConfig.less";
 </style>
 
 <template>
@@ -13,7 +13,12 @@
         :show-indicator="false"
       />
       <div class="config-title">
-        <input type="color" class="config-color" :value="background" @change="updateColor" />
+        <input
+          type="color"
+          class="config-color"
+          :value="background"
+          @change="updateColor"
+        />
         <div>{{ config.matches().length }} (#{{ config.configNumber }})</div>
       </div>
       <IconButton
@@ -39,48 +44,48 @@
 </template>
 
 <script setup lang="ts">
-import CategoryLabel from './CategoryLabel.vue'
-import { Category } from './match'
-import { GraphConfig, Store } from './store'
-import IconButton from '../iconButton/IconButton.vue'
-import removeIcon from '../icons/removeIcon.png'
-import editIcon from '../icons/editIcon.png'
-import { storeToRefs } from 'pinia'
-import { useMatchStore } from '../pinia/store'
+import CategoryLabel from "./CategoryLabel.vue";
+import { Category } from "./match";
+import { GraphConfig, Store } from "./store";
+import IconButton from "../iconButton/IconButton.vue";
+import removeIcon from "../icons/removeIcon.png";
+import editIcon from "../icons/editIcon.png";
+import { storeToRefs } from "pinia";
+import { useMatchStore } from "../pinia/store";
 
 const props = defineProps({
   config: GraphConfig,
   store: Store,
-  showRemoveButton: Boolean
-})
+  showRemoveButton: Boolean,
+});
 
-const config = props.config as GraphConfig
-const background = config.color.hex()
+const config = props.config as GraphConfig;
+const background = config.color.hex();
 
-const categories: Category[] = config.categories
+const categories: Category[] = config.categories;
 
-const store = props.store as Store
-const storeCategories = store.categories
+const store = props.store as Store;
+const storeCategories = store.categories;
 
 function updateColor(value: Event) {
-  const newColorHex = (value.target as HTMLInputElement).value
-  config.updateHexColor(newColorHex)
+  const newColorHex = (value.target as HTMLInputElement).value;
+  config.updateHexColor(newColorHex);
 }
 
 function isActive(category: Category): boolean {
-  return categories.indexOf(category) >= 0
+  return categories.indexOf(category) >= 0;
 }
 
 function remove() {
-  store.removeConfig(config)
+  store.removeConfig(config);
 }
 
 function toggleCategory(category: Category) {
-  config.toggleCategory(category)
+  config.toggleCategory(category);
 }
 
 function edit() {
-  const { editedConfig } = storeToRefs(useMatchStore())
-  editedConfig.value = config
+  const { editedConfig } = storeToRefs(useMatchStore());
+  editedConfig.value = config;
 }
 </script>
