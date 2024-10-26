@@ -32,6 +32,7 @@ export default class Player {
     tier: number;
   } | null = null;
   private skillCost: number = 0;
+  private skillRewards: number = 0;
   private isJourneyman: boolean = false;
   private isRefundable: boolean = true;
   public foldOut: PlayerRowFoldOutMode = "CLOSED";
@@ -119,6 +120,11 @@ export default class Player {
 
     player.skillCost = rawApiPlayer.skillCosts.reduce(
       (totalCost: number, skillCost: number) => (totalCost += skillCost),
+      0,
+    );
+
+    player.skillRewards = rawApiPlayer.skillCosts.reduce(
+      (skillRewards: number, skillCost: number) => (skillRewards += skillCost == 0 ? 1 : 0),
       0,
     );
 
@@ -231,7 +237,7 @@ export default class Player {
   public get IsLegend(): boolean {
     return (
       this.numberOfSkillsForLegend > 0 &&
-      this.skills.length === this.numberOfSkillsForLegend
+      this.skills.length - this.skillRewards >= this.numberOfSkillsForLegend
     );
   }
 
@@ -470,7 +476,7 @@ export default class Player {
       characteristic: number;
     };
   } {
-    const numberOfSkills = this.getSkills().length;
+    const numberOfSkills = this.getSkills().length - this.skillRewards;
     const randomPrimaryThresholds: { [key: number]: number } = {
       0: 3,
       1: 4,
