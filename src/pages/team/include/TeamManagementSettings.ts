@@ -319,6 +319,10 @@ export default class TeamManagementSettings {
       .filter((value, index, arr) => index === arr.indexOf(value))
       .sort((a, b) => a - b);
 
+    if (uniqCtvs.length == 1)  {
+      return uniqCtvs;
+    }
+
     return [uniqCtvs[0], uniqCtvs[uniqCtvs.length - 1]];
   }
 
