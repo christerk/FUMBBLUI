@@ -123,10 +123,7 @@ export default class Player {
       0,
     );
 
-    player.skillRewards = rawApiPlayer.skillCosts.reduce(
-      (skillRewards: number, skillCost: number) => (skillRewards += skillCost == 0 ? 1 : 0),
-      0,
-    );
+    player.skillRewards = rawApiPlayer.skillStatus.numRewards;
 
     player.record.seasons = rawApiPlayer.record.seasons;
     player.record.games = rawApiPlayer.record.games;
