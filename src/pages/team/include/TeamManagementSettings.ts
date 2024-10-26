@@ -303,12 +303,14 @@ export default class TeamManagementSettings {
         ),
     );
 
-    if (this.settings.players.lowCostLinemen || !this.journeymanPositions) {
+    const journeymenToAdd =
+    this.settings.ruleset.minPlayers -
+    (team.getRosteredPlayers().length - team.getMissNextGamePlayers().length);
+
+
+    if (this.settings.players.lowCostLinemen || journeymenToAdd == 0) {
       return [preReadyCtv];
     }
-    const journeymenToAdd =
-      this.settings.ruleset.minPlayers -
-      (team.getRosteredPlayers().length - team.getMissNextGamePlayers().length);
 
     const potentialCtvs = this.journeymanPositions.map(
       (pos) => preReadyCtv + pos.cost * journeymenToAdd,
