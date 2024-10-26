@@ -11,10 +11,7 @@
     <ul class="pagenav">
       <template v-for="navItem in navItems" :key="navItem.page">
         <li :id="'nav-' + navItem.page" @click.prevent="setPage(navItem.page)">
-          <a v-if="navItem.page != page" @click.prevent="" href="#">{{
-            navItem.label
-          }}</a>
-          <div v-if="navItem.page == page" @click.prevent="" href="#">
+          <div @click.prevent="" href="#">
             {{ navItem.label }}
           </div>
         </li>
@@ -63,6 +60,14 @@ class PageHeader extends Vue {
         element.offsetLeft + element.offsetWidth / 2 - 9;
     }
     return newPage;
+  }
+
+  public addNav(label: string, page: string) {
+    this.navItems.push({ label: label, page: page });
+
+    this.$nextTick(() => {
+      this.setPage(this.page);
+    });
   }
 }
 

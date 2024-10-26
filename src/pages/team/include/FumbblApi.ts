@@ -532,4 +532,60 @@ export default class FumbblApi {
     const url = this.getUrl("/api/team/log/" + teamId);
     return await this.enqueuePost(url);
   }
+
+  public async getSeasonConfig(season: number) {
+    const url = this.getUrl("/api/boxtrophy/config/" + season);
+    return await this.enqueuePost(url);
+  }
+
+  public async getSeasons(): Promise<ApiResponse> {
+    const url = this.getUrl("/api/boxtrophy/seasons");
+    return await this.enqueuePost(url);
+  }
+
+  public async getSeason(season: number | string): Promise<ApiResponse> {
+    const url = this.getUrl("/api/boxtrophy/rosterData/" + Number(season));
+    return await this.enqueuePost(url);
+  }
+
+  public async newSeason(): Promise<ApiResponse> {
+    const url = this.getUrl("/api/boxtrophy/newSeason");
+    return await this.enqueuePost(url);
+  }
+
+  public async setSeasonCost(
+    season: number | string,
+    roster: number,
+    cost: number,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl("/api/boxtrophy/setCost");
+    const data = {
+      season: Number(season),
+      roster: roster,
+      cost: cost,
+    };
+    return await this.enqueuePost(url, data);
+  }
+
+  public async getSeasonStats(season: number): Promise<ApiResponse> {
+    const url = this.getUrl("/api/boxtrophy/stats/" + season);
+    return await this.enqueuePost(url);
+  }
+
+  public async getSeasonStandings(season: number): Promise<ApiResponse> {
+    const url = this.getUrl("/api/boxtrophy/standings?season=" + season);
+    return await this.enqueuePost(url);
+  }
+
+  public async getSeasonTeamStandings(
+    season: number,
+    loadOwn: boolean,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl(
+      "/api/boxtrophy/teamStandings?season=" +
+        season +
+        (loadOwn ? "&own=1" : ""),
+    );
+    return await this.enqueuePost(url);
+  }
 }
