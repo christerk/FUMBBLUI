@@ -1,57 +1,58 @@
-import { fileURLToPath, URL } from 'node:url'
+import { fileURLToPath, URL } from "node:url";
 
-import { resolve } from 'path'
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import handlebars from 'vite-plugin-handlebars'
+import { resolve } from "path";
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import handlebars from "vite-plugin-handlebars";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  appType: 'mpa',
+  appType: "mpa",
   plugins: [
     vue(),
     handlebars({
-      partialDirectory: resolve(__dirname, 'src', 'partials')
-    })
+      partialDirectory: resolve(__dirname, "src", "partials"),
+    }),
   ],
-  root: 'htdocs',
+  root: "htdocs",
   css: {
     preprocessorOptions: {
       less: {
-        math: 'always',
+        math: "always",
         relativeUrls: true,
-        javascriptEnabled: true
-      }
-    }
+        javascriptEnabled: true,
+      },
+    },
   },
   resolve: {
     alias: {
-      '/src': resolve(process.cwd(), 'src'),
-      '@': fileURLToPath(new URL('../src', import.meta.url)),
-      '@style': resolve(__dirname, 'src', 'style'),
-      '@pages': resolve(__dirname, 'src', 'pages'),
-      '@components': resolve(__dirname, 'src', 'components')
-    }
+      "/src": resolve(process.cwd(), "src"),
+      "@": fileURLToPath(new URL("../src", import.meta.url)),
+      "@style": resolve(__dirname, "src", "style"),
+      "@pages": resolve(__dirname, "src", "pages"),
+      "@components": resolve(__dirname, "src", "components"),
+    },
   },
-  publicDir: '../public',
-  assetsInclude: ['**/*.png'],
+  publicDir: "../public",
+  assetsInclude: ["**/*.png"],
   build: {
-    outDir: '../dist',
+    outDir: "../dist",
     emptyOutDir: true,
     manifest: true,
     rollupOptions: {
       external: [/^\/i\//, /^\/FUMBBL\//],
       input: {
-        tournamentsquads: resolve(__dirname, 'htdocs', 'tournamentsquads.html'),
-        winrater: resolve(__dirname, 'htdocs', 'winrater.html'),
-        team: resolve(__dirname, 'htdocs', 'team.html')
+        tournamentsquads: resolve(__dirname, "htdocs", "tournamentsquads.html"),
+        winrater: resolve(__dirname, "htdocs", "winrater.html"),
+        team: resolve(__dirname, "htdocs", "team.html"),
+        boxtrophy: resolve(__dirname, "htdocs", "boxtrophy.html"),
       },
       output: {
-        format: 'esm',
+        format: "esm",
         //entryFileNames: 'entries/[name].js',
         //chunkFileNames: 'chunks/[name].js',
         //assetFileNames: 'assets/[name].[ext]'
-      }
-    }
-  }
-})
+      },
+    },
+  },
+});

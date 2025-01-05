@@ -1,6 +1,6 @@
 <template>
   <transition name="modal-fade">
-    <div v-show="show" class="modalbackdrop" @click="triggerCancel">
+    <div v-show="isVisible" class="modalbackdrop" @click="triggerCancel">
       <div
         class="modal"
         :class="getModalClasses()"
@@ -74,6 +74,8 @@ interface ModalButtonSettings {
 
 @Component
 class Modal extends Vue {
+  public isVisible: boolean = false;
+
   @Prop({
     type: Object as PropType<ModalButtonSettings>,
     required: false,
@@ -117,8 +119,6 @@ class Modal extends Vue {
 
   @Emit("confirm")
   public triggerConfirm() {}
-
-  public show: boolean = true;
 
   public getModalClasses(): any {
     return {

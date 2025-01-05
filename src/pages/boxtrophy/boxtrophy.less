@@ -129,6 +129,7 @@
 #teamstandings,
 #standings,
 #playoffSettings,
+#designate,
 #stats {
   width: 100%;
 
@@ -235,6 +236,10 @@
   }
 }
 
+.rosterlogo {
+  vertical-align: middle;
+}
+
 #teamstandings {
   table {
     tr.team {
@@ -257,6 +262,31 @@
     white-space: nowrap;
     overflow-x: hidden;
     text-overflow: ellipsis;
+  }
+}
+
+#designate {
+  .info {
+    text-align: center;
+    background: @OldLace;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    .description {
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  input {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .label {
+    width: 100%;
+    height: 100%;
+    display: inline-block;
   }
 }
 
@@ -288,8 +318,14 @@
     width: 80%;
   }
 
-  .content {
-    padding: 2px;
+  :deep(.content) {
+    padding: 0.25rem;
+  }
+
+  .sortablerow {
+    &:first-child .teamrow {
+      border-top: 0;
+    }
   }
 
   .teamrows {
@@ -314,8 +350,10 @@
     background: @OldLace;
     padding: 0.25rem;
 
-    &.teamrow:first-child {
-      border-top: 0;
+    border-top: solid 1px @Forest;
+
+    img {
+      margin-right: 0.5rem;
     }
 
     div {
@@ -334,5 +372,109 @@
         top: 6px;
       }
     }
+  }
+}
+
+#recentmatches {
+  grid-area: content;
+  place-self: center;
+
+  :deep(.content) {
+    padding: 0.25rem;
+  }
+
+  .match {
+    display: grid;
+    grid-template-columns: 1fr 10% 1fr;
+    background: @OldLace;
+    border-top: solid 1px @Forest;
+    padding: 0.25rem;
+
+    color: black;
+    &:hover {
+      text-decoration: none;
+    }
+
+    &:hover {
+      cursor: pointer;
+      background: @OffWhite;
+    }
+
+    &:first-child {
+      border-top: 0;
+    }
+
+    .team {
+      display: grid;
+      .name {
+        grid-area: team;
+        font-weight: bold;
+      }
+
+      .coach {
+        grid-area: coach;
+
+        &.participant {
+          color: #393;
+          font-weight: bold;
+        }
+      }
+
+      img {
+        grid-area: logo;
+        margin: 0 0.25rem;
+      }
+    }
+
+    .score {
+      line-height: 20px;
+      vertical-align: middle;
+      text-align: center;
+      font-size: 16pt;
+      margin-top: 5px;
+      place-self: center;
+
+      a {
+        font-size: 10px;
+        display: block;
+        margin-top: -4px;
+      }
+    }
+
+    .home {
+      grid-template-areas:
+        "team logo"
+        "roster logo"
+        "coach logo";
+      grid-template-columns: 1fr auto;
+
+      .name,
+      .roster,
+      .coach {
+        text-align: right;
+      }
+    }
+    .away {
+      grid-template-areas:
+        "logo team"
+        "logo roster"
+        "logo coach";
+      grid-template-columns: auto 1fr;
+    }
+  }
+}
+
+.errorMessage {
+  font-weight: bold;
+  color: @Carmine;
+}
+
+.controlpanel {
+  width: 80%;
+  margin: 0.5rem auto;
+  text-align: right;
+
+  &.center {
+    text-align: center;
   }
 }

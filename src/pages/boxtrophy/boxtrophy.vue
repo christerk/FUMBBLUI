@@ -19,7 +19,7 @@
       </template>
     </PageHeader>
 
-    <div v-if="page == 'rules' && selectedSeason != null">
+    <div class="panel" v-if="page == 'rules' && selectedSeason != null">
       <TitledPanel>
         <template #header>Rules</template>
         <template #content>
@@ -116,26 +116,148 @@
       </TitledPanel>
     </div>
 
-    <div class="panel" id="mysquads" v-if="page == 'mySquads'">
-      <div class="join">
-        <div v-if="started && !ended" class="float_right">
-          <input
-            type="button"
-            value="Playoff Settings"
-            @click="setPage('playoffSettings')"
-          />
+    <div class="panel" id="designate" v-if="page == 'designate'">
+      <div class="info">
+        <div class="description">
+          Each roster can be designated into a squad once per season.
         </div>
 
-        <div v-if="!showPlayoffControls">
+        <div
+          class="info"
+          v-if="
+            coachStatus != null &&
+            coachStatus.filter((x: any) => x.used).length > 0
+          "
+        >
+          These are the rosters you have already used this season:
+        </div>
+        <template v-for="status in coachStatus" :key="status.roster.id">
+          <img
+            v-if="status.used"
+            :title="status.roster.name"
+            :src="'https://fumbbl.com/i/' + status.roster.logos[0].logo"
+          />
+        </template>
+      </div>
+
+      <TitledPanel>
+        <template #header>Choose your squad</template>
+        <template #content>
+          <table>
+            <thead>
+              <tr class="columns">
+                <th colspan="2">Team</th>
+                <th>Roster</th>
+                <th class="right" width="10%">Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template v-for="team in designateTeams" :key="team.teamId">
+                <tr v-if="allowRoster(team.rosterId)">
+                  <td width="1%">
+                    <input
+                      :id="'Team-' + team.id"
+                      type="checkbox"
+                      v-model="checkedTeams"
+                      :value="team"
+                    />
+                  </td>
+                  <td>
+                    <label class="label" :for="'Team-' + team.id">{{
+                      team.name
+                    }}</label>
+                  </td>
+                  <td>
+                    <img
+                      class="rosterlogo"
+                      :src="'https://fumbbl.com/i/' + team.logo"
+                    />
+                    {{ team.race }}
+                  </td>
+                  <td class="right">{{ getRosterCost(team) }}</td>
+                </tr>
+              </template>
+              <tr>
+                <td class="errorMessage" colspan="2" align="left">
+                  {{ getSquadError() }}
+                </td>
+                <td colspan="2" align="right">
+                  Total cost: {{ getTotalSquadCost() }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </template>
+      </TitledPanel>
+      <div class="controlpanel">
+        <button v-if="getSquadError().length == 0" @click="designateSquad()">
+          Designate Squad
+        </button>
+      </div>
+    </div>
+
+    <div class="panel" id="recentmatches" v-if="page == 'recentMatches'">
+      <TitledPanel>
+        <template #header> Recent Matches </template>
+        <template #content>
+          <a
+            :href="matchLink(match.id)"
+            class="match"
+            v-for="match in recentMatches"
+            :key="match.id"
+          >
+            <div class="home team">
+              <img :src="'https://fumbbl.com/i/' + match.home.logo64" />
+              <div class="name">
+                <div v-if="isParticipant(match.home.coach)" class="tag">
+                  BBT
+                </div>
+                <a :href="teamLink(match.home)">{{ match.home.team }}</a>
+              </div>
+              <div class="roster">
+                CTV {{ match.home.ctv / 1000 }}k {{ match.home.race }}
+              </div>
+              <div class="coach">
+                ({{ match.home.ratingBracket }})
+                <a :href="coachLink(match.home.coach)">{{
+                  match.home.coach
+                }}</a>
+              </div>
+            </div>
+            <div class="score">
+              {{ match.home.score }} - {{ match.away.score }}
+              <br />
+              <a :href="match.replayLink">Replay</a>
+            </div>
+            <div class="away team">
+              <div class="name">
+                <a :href="teamLink(match.away)">{{ match.away.team }}</a>
+                <div v-if="isParticipant(match.away.coach)" class="tag">
+                  BBT
+                </div>
+              </div>
+              <div class="roster">
+                {{ match.away.race }} CTV {{ match.away.ctv / 1000 }}k
+              </div>
+              <div class="coach">
+                <a :href="coachLink(match.away.coach)">{{
+                  match.away.coach
+                }}</a>
+                ({{ match.away.ratingBracket }})
+              </div>
+              <img :src="'https://fumbbl.com/i/' + match.away.logo64" />
+            </div>
+          </a>
+        </template>
+      </TitledPanel>
+    </div>
+
+    <div class="panel" id="mysquads" v-if="page == 'mySquads'">
+      <div class="join" v-if="showPlayoffControls || squads.length == 0">
+        <div v-if="!showPlayoffControls && squads.length == 0">
           To join, create your {{ selectedSeason.numTeams }} competitive
           division teams and click the button below to sign up.
         </div>
-        <input
-          v-if="!showPlayoffControls && started && !ended"
-          type="button"
-          value="Designate a New Squad"
-          v-on:click="setPage('designate')"
-        />
 
         <div v-if="showPlayoffControls">
           This view lets you choose which teams you would want to join the Steel
@@ -144,6 +266,17 @@
           count as declining offered spots.
         </div>
       </div>
+
+      <div
+        v-if="!showPlayoffControls && started && !ended"
+        class="controlpanel center"
+      >
+        <button @click="setPage('playoffSettings')" v-if="squads.length > 0">
+          Playoff Settings
+        </button>
+        <button @click="setPage('designate')">Designate new squad</button>
+      </div>
+
       <TitledPanel>
         <template #header>My Squads</template>
         <template #content>
@@ -210,42 +343,39 @@
                     &nbsp;
                   </td>
                 </tr>
-                <tr
-                  class="team"
-                  v-for="team in squad.teams"
-                  v-if="squad.name == coachName"
-                  :key="team.id"
-                >
-                  <td colspan="3">
-                    <img
-                      :src="'https://fumbbl.com/i/' + team.logo"
-                      :title="team.race"
-                    />
-                    <a :href="teamLink(team)">{{ team.name }}</a>
-                  </td>
-                  <td v-if="!showPlayoffControls" class="right">
-                    {{ team.games }}
-                  </td>
-                  <td v-if="!showPlayoffControls" class="right">
-                    {{ team.wins }} / {{ team.ties }} / {{ team.losses }}
-                  </td>
-                  <td v-if="!showPlayoffControls" class="right bold">
-                    {{ team.score.toFixed(1) }}
-                  </td>
-                  <td v-if="!showPlayoffControls" class="right">
-                    {{ rosterLeadScores[team.race].toFixed(1) }}
-                  </td>
-                  <td v-if="!showPlayoffControls" class="right">
-                    {{ getBestForTeam(team).toFixed(1) }}
-                  </td>
-                  <td v-if="showPlayoffControls" class="right">
-                    <Trinary
-                      :name="team.id"
-                      :state="getPlayoffState(team)"
-                      @stateChanged="playoffChanged"
-                    />
-                  </td>
-                </tr>
+                <template v-if="squad.name == coachName">
+                  <tr class="team" v-for="team in squad.teams" :key="team.id">
+                    <td colspan="3">
+                      <img
+                        :src="'https://fumbbl.com/i/' + team.logo"
+                        :title="team.race"
+                      />
+                      <a :href="teamLink(team)">{{ team.name }}</a>
+                    </td>
+                    <td v-if="!showPlayoffControls" class="right">
+                      {{ team.games }}
+                    </td>
+                    <td v-if="!showPlayoffControls" class="right">
+                      {{ team.wins }} / {{ team.ties }} / {{ team.losses }}
+                    </td>
+                    <td v-if="!showPlayoffControls" class="right bold">
+                      {{ team.score.toFixed(1) }}
+                    </td>
+                    <td v-if="!showPlayoffControls" class="right">
+                      {{ rosterLeadScores[team.race].toFixed(1) }}
+                    </td>
+                    <td v-if="!showPlayoffControls" class="right">
+                      {{ getBestForTeam(team).toFixed(1) }}
+                    </td>
+                    <td v-if="showPlayoffControls" class="right">
+                      <Trinary
+                        :name="team.id"
+                        :state="getPlayoffState(team)"
+                        @stateChanged="playoffChanged"
+                      />
+                    </td>
+                  </tr>
+                </template>
               </template>
             </tbody>
           </table>
@@ -263,30 +393,30 @@
       <TitledPanel>
         <template #header>My Teams</template>
         <template #content>
-          <div class="teamrows">
-            <template v-for="team in teams">
-              <div
-                v-if="team.coach == coachName"
-                class="teamrow"
-                :key="team.id"
-              >
+          <SortableTable
+            :Items="teams"
+            @onEnd="onTeamMoved"
+            :key="teamPriority"
+          >
+            <template v-slot="prop">
+              <div class="teamrow handle">
                 <div>
                   <img
-                    :src="'https://fumbbl.com/i/' + team.logo"
-                    :title="team.race"
+                    :src="'https://fumbbl.com/i/' + prop.item.logo"
+                    :title="prop.item.race"
                   />
-                  <a :href="teamLink(team)">{{ team.team }}</a>
+                  <a :href="teamLink(prop.item)">{{ prop.item.team }}</a>
                 </div>
                 <div class="playoffstate">
                   <Trinary
-                    :name="team.id"
-                    :state="getPlayoffState(team)"
+                    :name="prop.item.id"
+                    :state="getPlayoffState(prop.item)"
                     @stateChanged="playoffChanged"
                   />
                 </div>
               </div>
             </template>
-          </div>
+          </SortableTable>
         </template>
       </TitledPanel>
     </div>
@@ -336,7 +466,7 @@
       </TitledPanel>
     </div>
 
-    <div id="standings" class="panel" v-if="page == 'squadStandings'">
+    <div class="panel" id="standings" v-if="page == 'squadStandings'">
       <TitledPanel>
         <template #header>Squad Standings</template>
         <template #content>
@@ -404,7 +534,7 @@
       <div v-if="squads.length > 0">{{ squads.length }} squads signed up.</div>
     </div>
 
-    <div id="teamstandings" class="panel" v-if="page == 'teamStandings'">
+    <div class="panel" id="teamstandings" v-if="page == 'teamStandings'">
       <div class="toolbar">
         <select :value="teamFilter" @change="changeTeamStandingFilter($event)">
           <option value="All">All Teams</option>
@@ -475,9 +605,7 @@
                 <tr class="team">
                   <td class="right">{{ index + 1 }}</td>
                   <td>
-                    <a :href="'/~' + encodeURIComponent(team.coach)">{{
-                      team.coach
-                    }}</a>
+                    <a :href="coachLink(team.coach)">{{ team.coach }}</a>
                   </td>
                   <td class="roster">{{ team.roster }}</td>
                   <td class="teamName">
@@ -502,7 +630,7 @@
       </TitledPanel>
     </div>
 
-    <div v-if="page == 'config'">
+    <div class="panel" v-if="page == 'config'">
       <TitledPanel id="seasons">
         <template #header> Seasons </template>
         <template #content>
@@ -659,6 +787,9 @@
       </drop>
     </template>
   </modal>
+
+  <ErrorModal ref="errorModal" />
+  <RenameSquadModal ref="renameSquadModal" @confirmed="renameSquad" />
 </template>
 
 <style scoped>
@@ -673,12 +804,15 @@ import {
   TitledPanel,
   Modal,
   Trinary,
+  ErrorModal,
+  SortableTable,
 } from "@components/fumbblcomponents";
 import FumbblApi from "../team/include/FumbblApi";
 import RosterBox from "./rosterbox.vue";
 import Progress from "./progress.vue";
 import SeasonPicker from "./seasonpicker.vue";
 import { Drop } from "vue-easy-dnd";
+import RenameSquadModal from "./modals/renamesquad.vue";
 
 @Component({
   components: {
@@ -690,6 +824,9 @@ import { Drop } from "vue-easy-dnd";
     Progress,
     SeasonPicker,
     Trinary,
+    ErrorModal,
+    RenameSquadModal,
+    SortableTable,
   },
 })
 class BoxTrophy extends Vue {
@@ -716,6 +853,18 @@ class BoxTrophy extends Vue {
   public showSquadRenameDialog: boolean = false;
   public oldSquadName: string = "";
   public selectedSquadId: number = 0;
+  public designateTeams: any = null;
+  public coachStatus: any = null;
+  public rosterStatus: any;
+  public checkedTeams: any[] = [];
+  public teamPriority: number = 0;
+  public recentMatches: any[] = [];
+
+  @Ref
+  public errorModal: InstanceType<typeof ErrorModal> | undefined;
+
+  @Ref
+  public renameSquadModal: InstanceType<typeof RenameSquadModal> | undefined;
 
   public get started() {
     return this.progress.started;
@@ -732,6 +881,7 @@ class BoxTrophy extends Vue {
 
   public navItems: any = [
     { label: "Rules", page: "rules" },
+    { label: "Recent Matches", page: "recentMatches" },
     { label: "My Squads", page: "mySquads" },
     { label: "Squad Score", page: "squadStandings" },
     { label: "Team Score", page: "teamStandings" },
@@ -796,6 +946,12 @@ class BoxTrophy extends Vue {
         this.loadStatistics();
         break;
       case "config":
+        break;
+      case "designate":
+        this.loadTeams();
+        break;
+      case "recentMatches":
+        this.loadRecentMatches();
         break;
       default:
         break;
@@ -888,6 +1044,12 @@ class BoxTrophy extends Vue {
   }
 
   public async loadStandings() {
+    if (this.selectedSeason == null) {
+      return;
+    }
+
+    await this.loadTrophyStatus();
+
     let result = await this.fumbblApi?.getSeasonStandings(
       this.selectedSeason.season,
     );
@@ -925,7 +1087,13 @@ class BoxTrophy extends Vue {
     this.expanded = this.expanded === coach ? "" : coach;
   }
   public teamLink(team: any) {
-    return "/p/team?id=" + team.id;
+    return "/t/" + team.id;
+  }
+  public coachLink(coach: string) {
+    return "/~" + encodeURIComponent(coach);
+  }
+  public matchLink(id: number) {
+    return "https://fumbbl.com/p/match?id=" + id;
   }
   public getPosition(score: any) {
     return this.squads.filter((s) => s.score > score).length + 1;
@@ -949,6 +1117,71 @@ class BoxTrophy extends Vue {
     this.loadTeamStandings();
   }
 
+  public async loadTrophyStatus() {
+    if (this.coachName == null) {
+      return;
+    }
+
+    let rosterDict: any = {};
+    this.coachStatus = (
+      await this.fumbblApi?.getTrophyStatus(this.coachName)
+    )?.data;
+
+    for (let r in this.coachStatus) {
+      let team = this.coachStatus[r];
+      rosterDict[team.roster.id] = team;
+    }
+    this.rosterStatus = rosterDict;
+  }
+
+  public async loadTeams() {
+    if (this.coachName == null) {
+      return;
+    }
+
+    await this.loadTrophyStatus();
+
+    let teams = (await this.fumbblApi?.getTeamsForCoach(this.coachName))?.data;
+
+    let teamArray = [];
+
+    for (let t in teams) {
+      let team = teams[t];
+      if (!this.allowDesignate(team)) {
+        continue;
+      }
+
+      teamArray.push(team);
+      let logo = team.raceLogos[0].logo;
+      if (logo == 0) {
+        logo = 486370;
+      }
+      team.logo = logo;
+    }
+
+    this.designateTeams = teamArray;
+  }
+
+  public async loadRecentMatches() {
+    let matches = (await this.fumbblApi?.getRecentTrophyMatches())?.data;
+
+    matches.forEach(
+      (m: any) => (m.replayLink = "/ffblive.jnlp?replay=" + m.replayId),
+    );
+
+    this.recentMatches = matches;
+  }
+
+  private allowDesignate(team: any): boolean {
+    return (
+      team.divisionId == 2 &&
+      team.games == 0 &&
+      team.status == "Active" &&
+      this.rosterStatus[team.rosterId] != undefined &&
+      this.rosterStatus[team.rosterId].used == false
+    );
+  }
+
   public async loadTeamStandings(loadAllOwn = false) {
     let teamStandings = await this.fumbblApi?.getSeasonTeamStandings(
       this.selectedSeason.season,
@@ -961,31 +1194,67 @@ class BoxTrophy extends Vue {
       this.prioritySort();
     }
 
-    /*
-    setTimeout(() => {
-      $(".teamrows").sortable({
-        placeholder: "ui-sortable-placeholder",
-        helper: "clone",
-        start: (event, ui) => {
-          this.startDragIndex = ui.item.index();
-        },
-        stop: (event, ui) => {
-          var startIndex = this.startDragIndex;
-          var stopIndex = ui.item.index();
-          this.teamKey++;
+    this.teamPriority++;
+  }
 
-          if (startIndex == stopIndex) {
-            return;
-          }
+  public getSquadError(): string {
+    if (this.checkedTeams.length != this.selectedSeason.numTeams) {
+      return (
+        "The squad must have exactly " +
+        this.selectedSeason.numTeams +
+        " team" +
+        (this.selectedSeason.numTeams == 1 ? "" : "s")
+      );
+    }
+    if (this.getTotalSquadCost() > this.selectedSeason.totalTeamCost) {
+      return (
+        "Max squad cost must be equal to or lower than " +
+        this.selectedSeason.totalTeamCost
+      );
+    }
 
-          var removed = this.teams.splice(startIndex, 1);
-          this.teams.splice(stopIndex, 0, removed[0]);
+    return "";
+  }
 
-          this.savePriorities();
-        },
+  public async designateSquad(): Promise<void> {
+    if (this.getSquadError().length != 0) {
+      return;
+    }
+
+    const teams = this.checkedTeams.map((x) => parseInt(x.id, 10));
+
+    const response = await this.fumbblApi?.selectSquad(
+      this.coachName ?? "",
+      teams,
+    );
+
+    if (!response?.isSuccessful()) {
+      this.errorModal?.show({
+        general: response?.getErrorMessage(),
+        technical: "",
       });
-    }, 100);
-    */
+      return;
+    }
+
+    this.setPage("mySquads");
+  }
+
+  public getTotalSquadCost(): number {
+    const cost = this.checkedTeams.reduce(
+      (acc, val) => acc + parseFloat(this.rosterStatus[val.rosterId].cost),
+      0,
+    );
+    return cost;
+  }
+
+  public allowRoster(rosterId: number): boolean {
+    return this.rosterStatus[rosterId] != undefined;
+  }
+
+  public getRosterCost(team: any) {
+    let rosterId = team.rosterId;
+
+    return Math.trunc(this.rosterStatus[rosterId].cost);
   }
 
   private prioritySort() {
@@ -1040,26 +1309,31 @@ class BoxTrophy extends Vue {
   }
 
   public showSquadRenameControl(squad: any) {
-    this.oldSquadName = squad.squad;
     this.selectedSquadId = squad.squadId;
-    this.showSquadRenameDialog = true;
-    this.$nextTick(() => {
-      document.getElementById("squadName")?.focus();
+    this.renameSquadModal?.show(squad.squad);
+  }
+
+  public renameSquad(newName: string) {
+    this.$nextTick(async () => {
+      await this.fumbblApi?.renameSquad(this.selectedSquadId, newName);
+      this.setPage("mySquads");
     });
   }
 
   public getBestPossible(teams: any) {
     var best = 0;
     var squadCost = 0;
+
     for (var t in teams) {
-      var teamScore = this.getBestForTeam(teams[t]);
+      let team = teams[t];
+      var teamScore = this.getBestForTeam(team);
       best += teamScore;
 
-      if (teamScore >= this.rosterLeadScores[teams[t].race]) {
+      if (teamScore >= this.rosterLeadScores[team.race]) {
         best += this.selectedSeason.raceLeadPoints;
       }
 
-      squadCost += 0; //this.raceCosts[teams[t].race];
+      squadCost += parseFloat(this.rosterStatus[team.rosterId].cost); //this.raceCosts[teams[t].race];
     }
 
     best +=
@@ -1089,21 +1363,42 @@ class BoxTrophy extends Vue {
     return "M";
   }
 
-  public playoffChanged(name: any, newValue: any) {
-    /*
-    let stateMap = {
+  public async playoffChanged(args: any) {
+    let [team, newValue] = args;
+
+    let teamId = parseInt(team);
+
+    let stateMap: any = {
       L: "Decline",
       M: "Undecided",
       R: "Accept",
     };
 
-    const data: any = {
-      teamId: parseInt(name),
-      state: stateMap[newValue],
-    };
+    for (let i in this.teams) {
+      if (this.teams[i].id == teamId) {
+        this.teams[i].playoffChoice = stateMap[newValue];
+        break;
+      }
+    }
 
-    Axios.post(this.apiBase + "/api/boxtrophy/setPlayoffState", data);
-    */
+    await this.fumbblApi?.setPlayoffState(teamId, stateMap[newValue]);
+  }
+
+  public async onTeamMoved() {
+    this.teamPriority++;
+    console.log(this.teams);
+    console.log(this.teams.map((x) => x.team));
+    let num = 0;
+    for (let i in this.teams) {
+      num++;
+      this.teams[i].priority = num;
+    }
+
+    await this.fumbblApi?.setTeamPriorities(this.teams.map((x) => x.id));
+  }
+
+  public isParticipant(coach: string) {
+    return this.squads.filter((s) => s.name === coach).length > 0;
   }
 }
 

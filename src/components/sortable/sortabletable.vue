@@ -15,7 +15,7 @@
       </template>
     </Sortable>
     <Sortable
-      v-if="FootItems.length > 0"
+      v-if="FootItems != undefined && FootItems.length > 0"
       class="sortwrap"
       :list="FootItems"
       item-key="key"

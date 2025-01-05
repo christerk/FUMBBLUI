@@ -1,12 +1,12 @@
 <template>
-  <div class="trinaryswitch">
-    {{ state }}
+  <div class="trinaryswitch" :key="currentState">
+    {{ currentState }}
     <input
       type="radio"
       :id="idLeft"
       :name="name"
       value="L"
-      :checked="state == 'L'"
+      :checked="currentState == 'L'"
       v-on:change="changed"
     />
     <label :for="idLeft" class="switch__label">No</label>
@@ -16,7 +16,7 @@
       :id="idMid"
       :name="name"
       value="M"
-      :checked="state != 'L' && state != 'R'"
+      :checked="currentState != 'L' && currentState != 'R'"
       v-on:change="changed"
     />
     <label :for="idMid" class="switch__label">??</label>
@@ -26,7 +26,7 @@
       :id="idRight"
       :name="name"
       value="R"
-      :checked="state == 'R'"
+      :checked="currentState == 'R'"
       v-on:change="changed"
     />
     <label :for="idRight" class="switch__label">Yes</label>
@@ -40,23 +40,18 @@
 </style>
 
 <script lang="ts">
-import {
-  Component,
-  Vue,
-  Prop,
-  Emit,
-  toNative,
-  Ref,
-} from "vue-facing-decorator";
+import { Component, Vue, Prop, Emit, toNative } from "vue-facing-decorator";
 
 @Component
 class Trinary extends Vue {
-  @Prop({ required: true }) name: string;
-  @Prop({ required: true }) state: string;
+  @Prop({ required: true }) name!: string;
+  @Prop({ required: true }) state!: string;
 
-  public idLeft: string;
-  public idMid: string;
-  public idRight: string;
+  public idLeft!: string;
+  public idMid!: string;
+  public idRight!: string;
+
+  public currentState: string = "M";
 
   async beforeMount() {
     let componentId = this.uuid();
@@ -65,7 +60,9 @@ class Trinary extends Vue {
     this.idRight = componentId.replace("-", "R");
   }
 
-  public async mounted() {}
+  public async mounted() {
+    this.currentState = this.state;
+  }
 
   private uuid() {
     let re: any = /[018]/g;
@@ -77,13 +74,14 @@ class Trinary extends Vue {
     );
   }
 
-  public changed(event) {
+  public changed(event: any) {
     this.stateChanged(this.name, event.target.value);
   }
 
   @Emit("stateChanged")
-  private stateChanged(name, newValue) {
-    this.state = newValue;
+  private stateChanged(name: string, newValue: string) {
+    this.currentState = newValue;
+    return [name, newValue];
   }
 }
 export default toNative(Trinary);

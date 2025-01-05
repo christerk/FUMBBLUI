@@ -174,6 +174,31 @@ export default class FumbblApi {
     return await this.post(url, data, transform);
   }
 
+  public async getTrophyStatus(coachName: string): Promise<ApiResponse> {
+    const url = this.getUrl("/api/boxtrophy/coachStatus/" + coachName);
+    return await this.post(url);
+  }
+
+  public async getRecentTrophyMatches(): Promise<ApiResponse> {
+    const url = this.getUrl("/api/boxtrophy/recent");
+    return await this.post(url);
+  }
+
+  public async selectSquad(coachName: string, teams: number[]) {
+    // const data = new URLSearchParams();
+    // data.append("coach", this.coachName);
+    // data.append("teams", JSON.stringify(teams));
+
+    const data = {
+      coach: coachName,
+      teams: teams,
+    };
+
+    const url = this.getUrl("/api/boxtrophy/selectsquad");
+
+    return await this.post(url, data);
+  }
+
   public async getRoster(rosterId: number): Promise<ApiResponse> {
     const url = this.getUrl("/api/roster/get/" + rosterId);
     return await this.post(url);
@@ -587,5 +612,40 @@ export default class FumbblApi {
         (loadOwn ? "&own=1" : ""),
     );
     return await this.enqueuePost(url);
+  }
+
+  public async renameSquad(
+    squadId: number,
+    newName: string,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl("/api/boxtrophy/renamesquad");
+    const data = {
+      squad: squadId,
+      newName: newName,
+    };
+
+    return await this.enqueuePost(url, data);
+  }
+
+  public async setPlayoffState(
+    teamId: number,
+    newState: string,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl("/api/boxtrophy/setPlayoffState");
+    const data = {
+      teamId: teamId,
+      state: newState,
+    };
+
+    return await this.enqueuePost(url, data);
+  }
+
+  public async setTeamPriorities(teams: number[]): Promise<ApiResponse> {
+    const url = this.getUrl("/api/boxtrophy/setPriorities");
+    const data = {
+      priorities: teams,
+    };
+
+    return await this.enqueuePost(url, data);
   }
 }

@@ -103,7 +103,7 @@
           <div class="label">Baseline cap</div>
           <div class="val"></div>
           <div class="val"></div>
-          <div class="sum">{{ team.getRedraftingCap() / 1000 }}k</div>
+          <div class="sum">{{ team.getRedraftInfo().redraftCap / 1000 }}k</div>
         </div>
         <div
           class="line small"
@@ -117,7 +117,7 @@
             {{ team.getRedraftInfo().redraftRamp / 1000 }}k / game
           </div>
           <div class="sum">
-            {{ team.getRedraftInfo().cappedBudget / 1000 }}k
+            {{ team.getRedraftInfo().budgetCap / 1000 }}k
           </div>
         </div>
 

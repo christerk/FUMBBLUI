@@ -81,7 +81,7 @@ class RedraftingSummary extends Vue {
       );
     }
     if (this.getRemainingBudget() != this.team.treasury) {
-      return "Treasury and Remaining budget do not match. Typically, this is due to a bug.";
+      return "Treasury does not match Remaining budget. Probably caused by the ruleset changing.";
     }
     return "";
   }

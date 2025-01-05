@@ -501,9 +501,11 @@ export default class Team {
   }
 
   public getTotalPlayerRedraftingCost(): number {
-    return this.getPlayers()
+    const totalPlayerCost = this.getPlayers()
       .map((player) => player.getRedraftingCost())
       .reduce((prev, curr) => curr + prev);
+
+    return totalPlayerCost;
   }
 
   public getRedraftTooltip(): string {
