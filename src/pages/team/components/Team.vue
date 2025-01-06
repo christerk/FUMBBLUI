@@ -852,7 +852,7 @@
           ></iframe>
         </template>
 
-        <template v-else-if="skillProgressionType == 'BB2016'">
+        <template v-else-if="skillProgressionType == 'BB2016' || skillProgressionType == 'CUSTOMSPP'">
           <SkillRoll2016
             :fumbblApi="fumbblApi"
             @close="handleSkillPlayer"
