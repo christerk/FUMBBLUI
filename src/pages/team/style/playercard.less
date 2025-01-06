@@ -1,0 +1,97 @@
+@import url("@style/fumbbl");
+
+.wrap {
+  padding: 1rem;
+}
+
+.header {
+  position: relative;
+  width: 100%;
+  height: 150px;
+
+  .portrait {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: 95px;
+    max-height: 147px;
+  }
+
+  .name {
+    position: absolute;
+    top: 0;
+    left: 120px;
+    right: 120px;
+    text-align: center;
+    font-size: 30px;
+  }
+
+  .position {
+    position: absolute;
+    top: 40px;
+    text-align: center;
+    left: 120px;
+    right: 120px;
+  }
+
+  .stats {
+    position: absolute;
+    top: 70px;
+    left: 120px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    column-gap: 5px;
+
+    .stat {
+      position: relative;
+      width: 30px;
+      height: 40px;
+      border: solid 1px #030;
+      text-align: center;
+      font-size: 15px;
+
+      .title {
+        position: absolute;
+        background: @Forest;
+        color: white;
+        top: 0;
+        left: 0;
+        width: 100%;
+      }
+
+      .val {
+        background: white;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+      }
+    }
+  }
+
+  .skills {
+    position: absolute;
+    top: 70px;
+    left: 300px;
+    right: 0;
+
+    border: solid 1px @Forest;
+
+    .title {
+      background: @Forest;
+      color: white;
+      font-size: 15px;
+      padding: 0 5px;
+    }
+
+    .positionSkills {
+      font-size: 8pt;
+      font-style: italic;
+      padding: 3px;
+    }
+
+    .playerSkills {
+      padding: 3px;
+    }
+  }
+}

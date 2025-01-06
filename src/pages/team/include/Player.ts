@@ -22,6 +22,7 @@ export default class Player {
   public playerStatus: number = 0;
   private gender: PlayerGender = "NEUTRAL";
   private iconRowVersionPosition: number; // allows selection of icon for display when position has multiple versions in the icon image
+  private portrait: string = "";
   private position: Position | null;
   private injuries: string[] = [];
   private skills: string[] = [];
@@ -152,6 +153,8 @@ export default class Player {
     player.numberOfSkillsForLegend = numberOfSkillsForLegend;
 
     player.isRefundable = rawApiPlayer.refundable;
+
+    player.portrait = rawApiPlayer.portrait;
 
     return player;
   }
@@ -317,6 +320,10 @@ export default class Player {
 
   public getIconRowVersionPosition(): number {
     return this.iconRowVersionPosition;
+  }
+
+  public getPortrait(): string {
+    return this.portrait;
   }
 
   public getInjuries(): string[] {

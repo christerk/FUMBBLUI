@@ -23,6 +23,10 @@
       width: 100%;
       grid-template-columns: 15px 25px 48px 1fr repeat(5, auto) 1fr auto auto auto auto auto;
 
+      &[ruleset="2016"] {
+        grid-template-columns: 15px 25px 48px 1fr repeat(4, auto) 1fr auto auto auto auto auto;
+      }
+
       &.compact {
         grid-template-columns: 15px auto auto 1fr 1fr auto auto auto auto auto auto;
       }
@@ -1083,6 +1087,7 @@
           position: absolute;
           top: 0;
           right: 0;
+          z-index: 1;
         }
       }
 

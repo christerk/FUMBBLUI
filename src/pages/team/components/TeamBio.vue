@@ -2,7 +2,9 @@
   <div class="panelwrapper">
     <button @click="close" class="backbutton">&lt;&lt; Back</button>
     <div class="biopanel">
-      <div class="biologo"><img :src="'/i/' + team.logo" /></div>
+      <div class="biologo">
+        <img v-if="team.logo != 0" :src="'/i/' + team.logo" />
+      </div>
       <div class="biocontent" v-html="team.bio"></div>
     </div>
   </div>

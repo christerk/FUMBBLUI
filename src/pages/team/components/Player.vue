@@ -103,53 +103,93 @@
         </div>
       </div>
       <template v-if="!compactView && !player.IsEmpty">
-        <div class="cell statma center">
-          <span
-            :class="{
-              statincrease: player.hasMovementIncrease,
-              statdecrease: player.hasMovementDecrease,
-            }"
-            >{{ player.movementStat }}</span
-          >
-        </div>
-        <div class="cell statst center">
-          <span
-            :class="{
-              statincrease: player.hasStrengthIncrease,
-              statdecrease: player.hasStrengthDecrease,
-            }"
-            >{{ player.strengthStat }}</span
-          >
-        </div>
-        <div class="cell statag center">
-          <span
-            :class="{
-              statincrease: player.hasAgilityIncrease,
-              statdecrease: player.hasAgilityDecrease,
-            }"
-            >{{ player.agilityStat }}+</span
-          >
-        </div>
-        <div class="cell statpa center">
-          <span
-            v-if="player.getPositionStats().Passing"
-            :class="{
-              statincrease: player.hasPassingIncrease,
-              statdecrease: player.hasPassingDecrease,
-            }"
-            >{{ player.passingStat }}+</span
-          >
-          <span v-else>-</span>
-        </div>
-        <div class="cell statav center">
-          <span
-            :class="{
-              statincrease: player.hasArmourIncrease,
-              statdecrease: player.hasArmourDecrease,
-            }"
-            >{{ player.armourStat }}+</span
-          >
-        </div>
+        <template v-if="rulesetVersion == '2020'">
+          <div class="cell statma center">
+            <span
+              :class="{
+                statincrease: player.hasMovementIncrease,
+                statdecrease: player.hasMovementDecrease,
+              }"
+              >{{ player.movementStat }}</span
+            >
+          </div>
+          <div class="cell statst center">
+            <span
+              :class="{
+                statincrease: player.hasStrengthIncrease,
+                statdecrease: player.hasStrengthDecrease,
+              }"
+              >{{ player.strengthStat }}</span
+            >
+          </div>
+          <div class="cell statag center">
+            <span
+              :class="{
+                statincrease: player.hasAgilityIncrease,
+                statdecrease: player.hasAgilityDecrease,
+              }"
+              >{{ player.agilityStat }}+</span
+            >
+          </div>
+          <div class="cell statpa center">
+            <span
+              v-if="player.getPositionStats().Passing"
+              :class="{
+                statincrease: player.hasPassingIncrease,
+                statdecrease: player.hasPassingDecrease,
+              }"
+              >{{ player.passingStat }}+</span
+            >
+            <span v-else>-</span>
+          </div>
+          <div class="cell statav center">
+            <span
+              :class="{
+                statincrease: player.hasArmourIncrease,
+                statdecrease: player.hasArmourDecrease,
+              }"
+              >{{ player.armourStat }}+</span
+            >
+          </div>
+        </template>
+        <template v-if="rulesetVersion == '2016'">
+          <div class="cell statma center">
+            <span
+              :class="{
+                statincrease: player.hasMovementIncrease,
+                statdecrease: player.hasMovementDecrease,
+              }"
+              >{{ player.movementStat }}</span
+            >
+          </div>
+          <div class="cell statst center">
+            <span
+              :class="{
+                statincrease: player.hasStrengthIncrease,
+                statdecrease: player.hasStrengthDecrease,
+              }"
+              >{{ player.strengthStat }}</span
+            >
+          </div>
+          <div class="cell statag center">
+            <span
+              :class="{
+                statincrease: player.hasAgilityIncrease,
+                statdecrease: player.hasAgilityDecrease,
+              }"
+              >{{ player.agilityStat }}</span
+            >
+          </div>
+          <div class="cell statav center">
+            <span
+              :class="{
+                statincrease: player.hasArmourIncrease,
+                statdecrease: player.hasArmourDecrease,
+              }"
+              >{{ player.armourStat }}</span
+            >
+          </div>
+        </template>
       </template>
       <div v-if="!player.IsEmpty" class="cell skills">
         <div
@@ -276,7 +316,7 @@
 <script lang="ts">
 import { PropType } from "vue";
 import { Prop, Component, Vue, toNative, Emit } from "vue-facing-decorator";
-import { PlayerRowFoldOutMode } from "../include/Interfaces";
+import { PlayerRowFoldOutMode, RulesetVersion } from "../include/Interfaces";
 import PlayerDetailsComponent from "./PlayerDetails.vue";
 import FumbblApi from "../include/FumbblApi";
 import AccessControl from "../include/AccessControl";
@@ -342,6 +382,12 @@ class PlayerComponent extends Vue {
     required: true,
   })
   public treasury!: number;
+
+  @Prop({
+    type: String as PropType<RulesetVersion>,
+    required: false,
+  })
+  public rulesetVersion: RulesetVersion = "2020";
 
   @Emit("remove-player")
   public triggerRemovePlayer(): EventDataRemovePlayer {
@@ -460,7 +506,9 @@ class PlayerComponent extends Vue {
         this.$el.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     });
-    this.intervalIdsScrollDuringCssTransition.push(intervalId);
+    this.intervalIdsScrollDuringCssTransition.push(
+      intervalId as unknown as number,
+    );
   }
 
   private clearIntervalIdsScrollDuringCssTransition() {

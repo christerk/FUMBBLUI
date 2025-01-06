@@ -648,4 +648,28 @@ export default class FumbblApi {
 
     return await this.enqueuePost(url, data);
   }
+
+  public async getSkillStatus(playerId: number): Promise<ApiResponse> {
+    const url = this.getUrl("/api/player/skillstatus/" + playerId);
+    return await this.enqueuePost(url);
+  }
+
+  public async getAllowedSkills(playerId: number): Promise<ApiResponse> {
+    const url = this.getUrl("/api/player/allowedSkills/" + playerId);
+    return await this.enqueuePost(url);
+  }
+
+  public async selectSkill2016(
+    playerId: number,
+    skillTypeId: number,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl("/api/player/selectskill2016");
+
+    const data = {
+      playerId: playerId,
+      skillTypeId: skillTypeId,
+    };
+
+    return await this.enqueuePost(url, data);
+  }
 }

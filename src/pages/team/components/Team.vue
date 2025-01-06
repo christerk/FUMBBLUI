@@ -23,7 +23,9 @@
         </div>
         <div class="infobox">
           <div class="title">CTV</div>
-          <div class="info" v-if="team.getTeamStatus().isPostMatch()">{{ currentTeamValueRange }}</div>
+          <div class="info" v-if="team.getTeamStatus().isPostMatch()">
+            {{ currentTeamValueRange }}
+          </div>
           <div class="info" v-else>{{ currentTeamValue }}</div>
         </div>
       </div>
@@ -452,6 +454,8 @@
                 showplayercontrols: accessControl.canShowPlayerControls(),
                 compact: showHireRookiesWithPermissionsCheck,
               }"
+              :ruleset="rulesetVersion"
+              :skillProgression="skillProgressionType"
             >
               <div
                 class="playerrowsheader"
@@ -467,7 +471,9 @@
                   <div class="cell statma">Ma</div>
                   <div class="cell statst">St</div>
                   <div class="cell statag">Ag</div>
-                  <div class="cell statpa">Pa</div>
+                  <div v-show="rulesetVersion == '2020'" class="cell statpa">
+                    Pa
+                  </div>
                   <div class="cell statav">Av</div>
                   <div class="cell skills">Skills</div>
                   <div class="cell injuries">Inj</div>
@@ -516,6 +522,8 @@
                       :compact-view="showHireRookiesWithPermissionsCheck"
                       :team-status="team.getTeamStatus()"
                       :treasury="team.treasury"
+                      :rulesetVersion="rulesetVersion"
+                      :skillProgression="skillProgressionType"
                       @remove-player="handleRemovePlayer"
                       @refund-player="handleRefundPlayer"
                       @nominate-retire-player="handleNominateRetirePlayer"
@@ -586,7 +594,10 @@
             <div class="info left">
               {{ teamManagementSettings.rosterName }}
             </div>
-            <div class="title right">Dedicated Fans:</div>
+            <div class="title right" v-if="rulesetVersion == '2016'">
+              Fanfactor:
+            </div>
+            <div class="title right" v-else>Dedicated Fans:</div>
             <div class="info right">
               <addremove
                 :current-value="team.getDedicatedFans().toString()"
@@ -604,7 +615,10 @@
           <div class="teammanagementrow">
             <div class="title left">Current Team Value:</div>
             <div class="info left">
-              <span v-if="team.getTeamStatus().isPostMatch()" title="Includes costs of Journeymen">
+              <span
+                v-if="team.getTeamStatus().isPostMatch()"
+                title="Includes costs of Journeymen"
+              >
                 {{ currentTeamValueRange }}</span
               >
               <span v-else>{{ currentTeamValue }}</span>
@@ -824,17 +838,31 @@
         <button @click="handleSkillPlayer" class="largeclosebutton">
           <img src="https://fumbbl.com/FUMBBL/Images/cross.png" />
         </button>
-        <iframe
-          v-if="modals.skillPlayer && skillingPlayer != null"
-          style="border-radius: 5px; width: 800px; height: 496px"
-          :src="
-            '/p/selectskill?teamId=' +
-            team.id +
-            '&playerId=' +
-            skillingPlayer.id
-          "
-          title="Select Skill"
-        ></iframe>
+        <template v-if="skillProgressionType == 'BB2020'">
+          <iframe
+            v-if="modals.skillPlayer && skillingPlayer != null"
+            style="border-radius: 5px; width: 800px; height: 496px"
+            :src="
+              '/p/selectskill?teamId=' +
+              team.id +
+              '&playerId=' +
+              skillingPlayer.id
+            "
+            title="Select Skill"
+          ></iframe>
+        </template>
+
+        <template v-else-if="skillProgressionType == 'BB2016'">
+          <SkillRoll2016
+            :fumbblApi="fumbblApi"
+            @close="handleSkillPlayer"
+            ref="skillRoll2016"
+          ></SkillRoll2016>
+        </template>
+
+        <template v-else>
+          <div style="width: 800px; height: 500px">Unsupported skilling</div>
+        </template>
       </template>
     </modal>
 
@@ -927,6 +955,8 @@ import {
   RawApiSpecialRules,
   UserRole,
   Position,
+  RulesetVersion,
+  SkillProgression,
 } from "../include/Interfaces";
 import AccessControl from "../include/AccessControl";
 import Team from "../include/Team";
@@ -952,6 +982,7 @@ import RedraftPlayers from "./RedraftPlayers.vue";
 import RedraftBudget from "./modals/RedraftBudget.vue";
 import EndSeasonPanel from "./EndSeasonPanel.vue";
 import TeamStatus from "./TeamStatus.vue";
+import SkillRoll2016 from "./SkillRoll2016.vue";
 
 import {
   DiscardRerollModal,
@@ -1012,6 +1043,7 @@ import EditTeamName from "./EditTeamName.vue";
     RenameAllPlayersModal,
     RedraftCompleteModal,
     TeamStatus,
+    SkillRoll2016,
   },
 })
 class TeamComponent extends Vue {
@@ -1130,9 +1162,14 @@ class TeamComponent extends Vue {
   public redraftCompleteModal:
     | InstanceType<typeof RedraftCompleteModal>
     | undefined;
+  @Ref
+  public skillRoll2016: InstanceType<typeof SkillRoll2016> | undefined;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
   public loadCount: number = 0;
+
+  public rulesetVersion: RulesetVersion = "UNKNOWN";
+  public skillProgressionType: SkillProgression = "UNKNOWN";
 
   // the following properties (prefixed with data) must be initialized in order to become reactive data properties
   // to avoid warnings we provide getters for each without the data prefix, which also ignore the possibility of them being undefined
@@ -1417,9 +1454,24 @@ class TeamComponent extends Vue {
       const rulesetVersion = rawApiRuleset.options.rulesetOptions.version;
       const skillProgressionType =
         rawApiRuleset.options.teamSettings.skillProgressionType;
+
+      this.rulesetVersion = rulesetVersion;
+
+      const skillProgressionMap: { [key: string]: SkillProgression } = {
+        standard: "BB2016",
+        bb2020: "BB2020",
+        none: "NONE",
+        "custom-spp": "CUSTOMSPP",
+        predetermined: "PREDETERMINED",
+      };
+      this.skillProgressionType =
+        skillProgressionMap[skillProgressionType] ?? "UNKNOWN";
+
       if (
-        rulesetVersion !== "2020" ||
-        !["bb2020", "predetermined"].includes(skillProgressionType)
+        !["2016", "2020"].includes(this.rulesetVersion) ||
+        !["BB2016", "BB2020", "predetermined"].includes(
+          this.skillProgressionType,
+        )
       ) {
         this.supportedTeam();
       }
@@ -1476,13 +1528,16 @@ class TeamComponent extends Vue {
   }
 
   public get currentTeamValue(): string {
-    return (this.teamManagementSettings.calculateCurrentTeamValue(this.team) / 1000) + "k";
+    return (
+      this.teamManagementSettings.calculateCurrentTeamValue(this.team) / 1000 +
+      "k"
+    );
   }
 
   public get currentTeamValueRange(): string {
     return this.teamManagementSettings
       .calculateCurrentTeamValueRange(this.team)
-      .map((tv) => (tv / 1000) + "k")
+      .map((tv) => tv / 1000 + "k")
       .join(" - ");
   }
 
@@ -2160,7 +2215,9 @@ class TeamComponent extends Vue {
 
   public async showSkillPlayer(player: Player) {
     this.skillingPlayer = player;
+
     this.modals.skillPlayer = true;
+    this.skillRoll2016?.setPlayer(player);
   }
 
   public async handleSkillPlayer() {
