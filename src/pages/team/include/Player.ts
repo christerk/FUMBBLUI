@@ -44,6 +44,8 @@ export default class Player {
   private numberOfSkillsForLegend: number = 9999;
   team: Team;
 
+  private rulesVersion: string = "";
+
   constructor(
     team: Team,
     type: PlayerType,
@@ -89,6 +91,8 @@ export default class Player {
       maxLimit: 0,
       tier: 0,
     };
+
+    this.rulesVersion = this.team.getRulesVersion();
   }
 
   static fromApi(
@@ -367,7 +371,18 @@ export default class Player {
     const statIncreases = this.getSkills().filter(
       (skill) => skill === skillIncreaseIdentifier,
     ).length;
-    if (["+MA", "+ST", "+AV"].includes(skillIncreaseIdentifier)) {
+
+    const positiveStatIncreases =
+      this.rulesVersion == "2020"
+        ? ["+MA", "+ST", "+AV"]
+        : ["+MA", "+ST", "+AG", "+AV"];
+
+    const negativeStatDecreases =
+      this.rulesVersion == "2020"
+        ? ["-ma", "-st", "-av"]
+        : ["-ma", "-st", "-ag", "-av"];
+
+    if (positiveStatIncreases.includes(skillIncreaseIdentifier)) {
       finalStat += statIncreases;
     } else {
       finalStat -= statIncreases;
@@ -377,7 +392,7 @@ export default class Player {
     const injuryDecreases = this.getInjuries().filter(
       (injury) => injury === injuryDecreaseIdentifier,
     ).length;
-    if (["-ma", "-st", "-av"].includes(injuryDecreaseIdentifier)) {
+    if (negativeStatDecreases.includes(injuryDecreaseIdentifier)) {
       finalStat -= injuryDecreases;
     } else {
       finalStat += injuryDecreases;
@@ -415,11 +430,15 @@ export default class Player {
   }
 
   public get hasAgilityIncrease(): boolean {
-    return this.agilityStat < this.getPositionStats().Agility;
+    return this.rulesVersion == "2020"
+      ? this.agilityStat < this.getPositionStats().Agility
+      : this.agilityStat > this.getPositionStats().Agility;
   }
 
   public get hasAgilityDecrease(): boolean {
-    return this.agilityStat > this.getPositionStats().Agility;
+    return this.rulesVersion == "2020"
+      ? this.agilityStat > this.getPositionStats().Agility
+      : this.agilityStat < this.getPositionStats().Agility;
   }
 
   public get passingStat(): number | null {

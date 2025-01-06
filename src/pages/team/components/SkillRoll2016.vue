@@ -47,6 +47,7 @@ import { Die, TitledPanel, ErrorModal } from "@components/fumbblcomponents";
 import PlayerCard from "./PlayerCard.vue";
 import FumbblApi from "../include/FumbblApi";
 import { PropType } from "vue";
+import { RulesetVersion } from "../include/Interfaces";
 
 @Component({
   components: {
@@ -62,6 +63,12 @@ class SkillRoll2016 extends Vue {
     required: true,
   })
   public fumbblApi!: FumbblApi;
+
+  @Prop({
+    type: String as PropType<RulesetVersion>,
+    required: true,
+  })
+  public rulesetVersion!: RulesetVersion;
 
   @Ref
   public errorModal: InstanceType<typeof ErrorModal> | undefined;
@@ -133,6 +140,13 @@ class SkillRoll2016 extends Vue {
       });
       return;
     } else {
+      this.availableChoices.filter;
+
+      const skill = this.availableChoices.filter(
+        (c: any) => c[0] == this.selectedSkill,
+      )[0][1];
+      this.player.addSkill(skill);
+
       this.setPlayer(this.player);
     }
   }

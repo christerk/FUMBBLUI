@@ -103,6 +103,7 @@ export default class TeamManagementSettings {
         },
       },
       ruleset: {
+        version: rawApiRuleset.options.rulesetOptions.version,
         expensiveMistakes: {
           enabled:
             rawApiRuleset.options.rulesetOptions.expensiveMistakes === true ||
@@ -200,6 +201,10 @@ export default class TeamManagementSettings {
 
   public get dedicatedFansCost(): number {
     return this.settings.dedicatedFans.cost;
+  }
+
+  public get version(): string {
+    return this.settings.ruleset.version;
   }
 
   public getDedicatedFansAllowedValues(
@@ -304,11 +309,14 @@ export default class TeamManagementSettings {
     );
 
     const journeymenToAdd =
-    this.settings.ruleset.minPlayers -
-    (team.getRosteredPlayers().length - team.getMissNextGamePlayers().length);
+      this.settings.ruleset.minPlayers -
+      (team.getRosteredPlayers().length - team.getMissNextGamePlayers().length);
 
-
-    if (this.settings.players.lowCostLinemen || journeymenToAdd < 1 || !this.journeymanPositions) {
+    if (
+      this.settings.players.lowCostLinemen ||
+      journeymenToAdd < 1 ||
+      !this.journeymanPositions
+    ) {
       return [preReadyCtv];
     }
 
@@ -319,7 +327,7 @@ export default class TeamManagementSettings {
       .filter((value, index, arr) => index === arr.indexOf(value))
       .sort((a, b) => a - b);
 
-    if (uniqCtvs.length == 1)  {
+    if (uniqCtvs.length == 1) {
       return uniqCtvs;
     }
 

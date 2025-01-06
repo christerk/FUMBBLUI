@@ -663,4 +663,8 @@ export default class Team {
   public getAgentFee(player: Player): number {
     return this.settings?.getAgentFee(player.getRecord().seasons) ?? 0;
   }
+
+  public getRulesVersion(): string {
+    return this.settings?.version ?? "";
+  }
 }

@@ -28,7 +28,7 @@
       </div>
       <div class="skills">
         <div class="title">Skills</div>
-        <div class="positionSkills">
+        <div class="positionSkills" :key="serial">
           {{ player.getPositionSkills().join(", ") }}
         </div>
         <div class="playerSkills">{{ player.getSkills().join(", ") }}</div>
@@ -48,6 +48,8 @@ import Player from "../include/Player";
 @Component({})
 class PlayerCard extends Vue {
   public player: Player | null = null;
+
+  public serial: number = 1;
 
   public setPlayer(player: Player) {
     this.player = player;
