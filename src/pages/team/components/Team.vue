@@ -1475,7 +1475,7 @@ class TeamComponent extends Vue {
 
       if (
         !["2016", "2020"].includes(this.rulesetVersion) ||
-        !["BB2016", "BB2020", "PREDETERMINED", "CUSTOMSPP"].includes(
+        !["BB2016", "BB2020", "PREDETERMINED", "CUSTOMSPP", "NONE"].includes(
           this.skillProgressionType,
         )
       ) {
