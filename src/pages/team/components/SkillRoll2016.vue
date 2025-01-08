@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 800px; height: 500px">
+  <div class="skillrollcomponent" style="width: 800px; height: 500px">
     <PlayerCard ref="card" />
     <template v-if="player != null">
       <TitledPanel>
