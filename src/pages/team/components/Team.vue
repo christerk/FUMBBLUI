@@ -130,6 +130,9 @@
                     >Rename Players</a
                   >
                 </li>
+                <li v-if="accessControl.canUnretireTeam()">
+                  <a href="#" @click.prevent="unretireTeam()">Unretire</a>
+                </li>
                 <li
                   v-if="
                     accessControl.canUndoEndSeason() && team.isAtSeasonEnd()
@@ -2114,6 +2117,22 @@ class TeamComponent extends Vue {
       this.team.setTeamStatus(originalTeamStatus.getStatus());
       await this.recoverFromUnexpectedError(
         "An error occurred unreadying the team.",
+        apiResponse.getErrorMessage(),
+      );
+    }
+  }
+
+  public async unretireTeam() {
+    this.menuHide();
+    const originalTeamStatus = this.team.getTeamStatus();
+    this.team.setTeamStatus("ACTIVE");
+    this.reloadTeamWithDelay();
+    const apiResponse = await this.fumbblApi.unretireTeam(this.team.getId());
+
+    if (!apiResponse.isSuccessful()) {
+      this.team.setTeamStatus(originalTeamStatus.getStatus());
+      await this.recoverFromUnexpectedError(
+        "An error occurred unretiring the team.",
         apiResponse.getErrorMessage(),
       );
     }

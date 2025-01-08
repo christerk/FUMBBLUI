@@ -33,6 +33,7 @@ export type TeamAction =
   | "CREATE"
   | "EDIT"
   | "RETIRE_TEAM"
+  | "UNRETIRE_TEAM"
   | "READY_TEAM"
   | "UNREADY_TEAM"
   | "VIEW_HISTORY"

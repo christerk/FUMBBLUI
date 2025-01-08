@@ -241,6 +241,15 @@ export default class AccessControl {
         ],
       },
       {
+        action: "UNRETIRE_TEAM",
+        grantAccessToList: [
+          {
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["RETIRED"],
+          },
+        ],
+      },
+      {
         action: "REDRAFT_TEAM",
         grantAccessToList: [
           {
@@ -447,6 +456,10 @@ export default class AccessControl {
 
   public canUnreadyTeam(): boolean {
     return this.isGranted("UNREADY_TEAM");
+  }
+
+  public canUnretireTeam(): boolean {
+    return this.isGranted("UNRETIRE_TEAM");
   }
 
   public canRedraft(): boolean {

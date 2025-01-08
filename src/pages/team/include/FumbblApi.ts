@@ -488,6 +488,13 @@ export default class FumbblApi {
     );
   }
 
+  public async unretireTeam(teamId: number): Promise<ApiResponse> {
+    return await this.simplePostWithOnlyTeamIdInBody(
+      teamId,
+      this.getUrl("/api/team/unretire"),
+    );
+  }
+
   public async redraftTeam(teamId: number): Promise<ApiResponse> {
     return await this.simplePostWithOnlyTeamIdInBody(
       teamId,
