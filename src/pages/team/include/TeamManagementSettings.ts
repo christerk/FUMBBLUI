@@ -286,6 +286,9 @@ export default class TeamManagementSettings {
       team.getAssistantCoaches() *
         this.settings.sidelineStaff.assistantCoaches.cost +
       team.getCheerleaders() * this.settings.sidelineStaff.cheerleaders.cost +
+      (this.version == "2016"
+        ? team.dedicatedFans * this.settings.dedicatedFans.cost
+        : 0) +
       (team.getApothecary() && this.settings.sidelineStaff.apothecary
         ? this.settings.sidelineStaff.apothecary.cost
         : 0)
