@@ -348,37 +348,40 @@
       </div>
     </div>
 
-    <div
-      class="biowrapper"
-      v-if="
-        !team.getTeamStatus().isRedrafting() &&
-        team.bio != null &&
-        team.bio.length > 0
-      "
-    >
-      <div
-        id="bio"
-        :class="{ bio: true, expand: bioExpanded }"
-        v-html="team.bio"
-      ></div>
-    </div>
-
     <div class="center">
-      <div style="float: right" v-if="showBioSizeToggle" :key="bioKey">
-        <a
-          href="#"
-          v-if="bioExpanded"
-          :key="bioKey"
-          @click.prevent="toggleBio()"
-          >Collapse</a
-        >
-        <a href="#" v-else @click.prevent="toggleBio()">Show More</a>
-      </div>
       <a :href="'/p/team?id=' + team.id">Back to legacy team page</a>
     </div>
 
     <div class="container" :class="{ showsidepanel: showSidePanel }">
       <div class="panel teamsheet" :class="{ hidden: showSidePanel }">
+        <div
+          class="biowrapper"
+          v-if="
+            !team.getTeamStatus().isRedrafting() &&
+            team.bio != null &&
+            team.bio.length > 0
+          "
+        >
+          <div
+            id="bio"
+            :class="{ bio: true, expand: bioExpanded }"
+            v-html="team.bio"
+          ></div>
+        </div>
+
+        <div class="center">
+          <div style="float: right" v-if="showBioSizeToggle" :key="bioKey">
+            <a
+              href="#"
+              v-if="bioExpanded"
+              :key="bioKey"
+              @click.prevent="toggleBio()"
+              >Collapse</a
+            >
+            <a href="#" v-else @click.prevent="toggleBio()">Show More</a>
+          </div>
+        </div>
+
         <redraftingsummary
           v-if="team.getTeamStatus().isRedrafting() && accessControl.canEdit()"
           ref="redraftingSummary"

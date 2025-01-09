@@ -14,12 +14,12 @@
         <div></div>
         <div class="roster"></div>
         <div class="record small"># (WTL)</div>
-        <div class="tds small">For / Agnst</div>
+        <div class="tds small">For / Against</div>
         <div class="cas small">For / Against</div>
         <div class="tv small">Avg CTV</div>
       </div>
       <template v-for="stats in statistics" :key="stats.info.roster">
-        <div class="teamstatrow">
+        <div class="teamstatrow panelcontent">
           <div><img :src="'https://fumbbl.com/i/' + stats.info.logo" /></div>
           <div class="roster">{{ stats.info.roster }}</div>
           <div>
