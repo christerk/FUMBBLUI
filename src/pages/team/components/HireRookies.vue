@@ -179,7 +179,7 @@ class HireRookiesComponent extends Vue {
     }
     if (
       positionDataForBuyingPlayer.position.isBigGuy &&
-      this.bigGuyCount >= this.maxBigGuys
+      this.bigGuyCount >= this.maxBigGuys && this.maxBigGuys >= 0
     ) {
       errors.push("Maximum Big Guy limit reached.");
     }
