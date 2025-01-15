@@ -211,6 +211,9 @@
         "
       >
         {{ displayInjuries(player.getInjuries()) }}
+        <div class="tempretired" v-if="player.IsTemporarilyRetired">
+          Temporarily Retired
+        </div>
       </div>
       <div v-if="!player.IsEmpty" class="cell spp" :title="sppSummaryText">
         <template v-if="player.IsLegend"
@@ -303,6 +306,7 @@
         :player="player"
         :can-edit="accessControl.canEdit()"
         :name-generator="nameGenerator"
+        :accessControl="accessControl"
         @close="performFoldOut('CLOSED')"
       ></playerdetails>
     </div>

@@ -934,8 +934,10 @@
       v-if="playerToRetire && !playerToRetire.getIsRefundable()"
       :fumbblApi="fumbblApi"
       :player="playerToRetire"
+      :seasonsEnabled="teamManagementSettings.seasonsEnabled"
       @nominate-retire-player-cancel="handleNominateRetirePlayerCancel"
       @nominate-retire-player-confirm="handleNominateRetirePlayerConfirm"
+      @nominate-temporary-retire-player="handleNominateTemporaryRetirePlayer"
     ></retireplayer>
   </div>
   <div class="team" v-else>
@@ -1994,6 +1996,31 @@ class TeamComponent extends Vue {
     if (!apiResponse.isSuccessful()) {
       await this.recoverFromUnexpectedError(
         "An error occurred retiring a player.",
+        apiResponse.getErrorMessage(),
+      );
+    }
+  }
+
+  public async handleNominateTemporaryRetirePlayer() {
+    console.log("handleNominateTemporaryRetirePlayer");
+    if (!this.playerToRetire) {
+      return;
+    }
+
+    this.playerToRetire.setTemporaryRetired();
+
+    this.reloadTeamWithDelay();
+
+    const playerToRetireId = this.playerToRetire.id;
+    this.playerToRetire = null;
+
+    const apiResponse = await this.fumbblApi.temporaryRetirePlayer(
+      this.team.id,
+      playerToRetireId,
+    );
+    if (!apiResponse.isSuccessful()) {
+      await this.recoverFromUnexpectedError(
+        "An error occurred temporary retiring a player.",
         apiResponse.getErrorMessage(),
       );
     }

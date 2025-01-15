@@ -2,6 +2,9 @@
   <div class="playerdetails">
     <div class="playerdetailssection playerdetailsedit" v-if="canEdit">
       <div class="title">Edit player details</div>
+      <a v-if="debug" class="editIcon" href="#" @click.prevent="showIconEditor"
+        >Edit icon</a
+      >
       <template v-if="updatePlayerDetails">
         <div class="playername">
           <label :for="'playerName_' + player.playerNumber">Name</label>
@@ -44,6 +47,15 @@
             style="margin-left: 20px"
           >
             Cancel
+          </button>
+          <button
+            v-if="
+              accessControl.canUndoTempRetire() && player.IsTemporarilyRetired
+            "
+            class="teambutton"
+            @click="undoTempRetirement"
+          >
+            Undo Temporary Retirement
           </button>
         </div>
       </template>
@@ -110,6 +122,8 @@
       </template>
     </modal>
   </div>
+
+  <IconEditor :fumbblApi="fumbblApi" :player="player" ref="iconEditor" />
 </template>
 
 <script lang="ts">
@@ -121,16 +135,20 @@ import {
   toNative,
   Emit,
   Watch,
+  Ref,
 } from "vue-facing-decorator";
 import UpdatePlayerDetails from "../include/UpdatePlayerDetails";
 import ModalComponent from "./Modal.vue";
+import IconEditor from "./modals/IconEditor.vue";
 import FumbblApi from "../include/FumbblApi";
 import Player from "../include/Player";
 import { PlayerRowFoldOutMode } from "../include/Interfaces";
+import AccessControl from "../include/AccessControl";
 
 @Component({
   components: {
     modal: ModalComponent,
+    IconEditor: IconEditor,
   },
 })
 class PlayerDetailsComponent extends Vue {
@@ -158,6 +176,12 @@ class PlayerDetailsComponent extends Vue {
   })
   public nameGenerator!: string;
 
+  @Prop({
+    type: Object as PropType<AccessControl>,
+    required: true,
+  })
+  public accessControl!: AccessControl;
+
   @Emit("close")
   public triggerClose() {}
 
@@ -168,9 +192,14 @@ class PlayerDetailsComponent extends Vue {
     }
   }
 
+  @Ref
+  public iconEditor: InstanceType<typeof IconEditor> | undefined;
+
   public dataUpdatePlayerDetails?: UpdatePlayerDetails = undefined;
   public updatePlayerDetailsErrors: string[] = [];
   public errorModalInfo: { general: string; technical: string } | null = null;
+
+  public debug = import.meta.env.MODE == "localdev";
 
   public get updatePlayerDetails(): UpdatePlayerDetails {
     return this.dataUpdatePlayerDetails!;
@@ -185,6 +214,26 @@ class PlayerDetailsComponent extends Vue {
       this.player.getPlayerName(),
       this.player.getGender(),
     );
+  }
+
+  public async undoTempRetirement() {
+    if (!this.player) {
+      return;
+    }
+
+    const apiResponse = await this.fumbblApi.undoTempRetirement(
+      this.player.team.id,
+      this.player.id,
+    );
+    if (apiResponse.isSuccessful()) {
+      this.player.undoTemporaryRetired();
+    } else {
+      this.errorModalInfo = {
+        general: "An error occurred undoing temporary retirement.",
+        technical: apiResponse.getErrorMessage(),
+      };
+    }
+    this.triggerClose();
   }
 
   public async saveUpdatedPlayerDetails() {
@@ -228,6 +277,10 @@ class PlayerDetailsComponent extends Vue {
         technical: apiResponse.getErrorMessage(),
       };
     }
+  }
+
+  public showIconEditor(): void {
+    this.iconEditor?.show();
   }
 }
 

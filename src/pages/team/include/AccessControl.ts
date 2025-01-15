@@ -277,6 +277,15 @@ export default class AccessControl {
         ],
       },
       {
+        action: "UNDO_TEMP_RETIRE",
+        grantAccessToList: [
+          {
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["POST_MATCH_SEQUENCE"],
+          },
+        ],
+      },
+      {
         action: "CANCEL_REDRAFT_TEAM",
         grantAccessToList: [
           {
@@ -472,6 +481,10 @@ export default class AccessControl {
 
   public canEndSeason(): boolean {
     return this.isGranted("END_SEASON");
+  }
+
+  public canUndoTempRetire(): boolean {
+    return this.isGranted("UNDO_TEMP_RETIRE");
   }
 
   public canCancelRedraft(): boolean {

@@ -56,7 +56,8 @@ export type TeamAction =
   | "REDRAFT_TEAM"
   | "CANCEL_REDRAFT_TEAM"
   | "END_SEASON"
-  | "UNDO_END_SEASON";
+  | "UNDO_END_SEASON"
+  | "UNDO_TEMP_RETIRE";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;
@@ -232,4 +233,5 @@ export interface AddRemovePermissions {
 export interface ModalButtonSettings {
   cancel: { enabled: boolean; label: string };
   confirm: { enabled: boolean; label: string };
+  extra: { enabled: boolean; label: string }[];
 }

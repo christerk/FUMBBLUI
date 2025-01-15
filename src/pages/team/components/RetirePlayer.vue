@@ -1,40 +1,26 @@
 <template>
   <modal
     :button-settings="{
-      cancel: { enabled: true, label: 'Close' },
+      cancel: { enabled: true, label: 'Never mind' },
+      extra: [
+        {
+          enabled: canTemporaryRetire(),
+          label: 'Temporarily retire player',
+        },
+      ],
       confirm: { enabled: true, label: 'Retire player' },
     }"
-    :modal-size="'small'"
+    :modal-size="'medium'"
     @cancel="triggerNominateRetirePlayerCancel"
     @confirm="triggerNominateRetirePlayerConfirm"
+    @extra="triggerNominateTemporaryRetirePlayer"
   >
     <template v-slot:header> Retire player? </template>
 
     <template v-slot:body>
       <template v-if="errors.length === 0">
         <p>Are you sure you want to retire the following player?</p>
-        <p>
-          #{{ player.playerNumber }}
-          <strong>{{ player.getPositionName() }}:</strong>
-          {{ player.getPlayerName() }}
-        </p>
-        <template v-if="player.getSkills().length === 0">
-          <p>No earned skills.</p>
-        </template>
-        <template v-else>
-          <p>
-            Earned skills: <strong>{{ player.getSkills().join(", ") }}</strong>
-          </p>
-        </template>
-        <p>Unspent SPP: {{ player.sppDisplayInfo().spendable }}</p>
-        <p>
-          Injuries:
-          {{
-            player.getInjuries().length > 0
-              ? player.getInjuries().join(", ")
-              : "none"
-          }}
-        </p>
+        <PlayerCard ref="playerCard" :narrow="false" />
       </template>
       <template v-else>
         <p>
@@ -52,14 +38,23 @@
 
 <script lang="ts">
 import { PropType } from "vue";
-import { Prop, Component, Vue, toNative, Emit } from "vue-facing-decorator";
+import {
+  Prop,
+  Component,
+  Vue,
+  toNative,
+  Emit,
+  Ref,
+} from "vue-facing-decorator";
 import ModalComponent from "./Modal.vue";
 import Player from "../include/Player";
 import FumbblApi from "../include/FumbblApi";
+import PlayerCard from "./PlayerCard.vue";
 
 @Component({
   components: {
     modal: ModalComponent,
+    PlayerCard,
   },
 })
 class RetirePlayerComponent extends Vue {
@@ -75,11 +70,24 @@ class RetirePlayerComponent extends Vue {
   })
   public player!: Player;
 
+  @Prop({
+    required: true,
+  })
+  public seasonsEnabled!: boolean;
+
   @Emit("nominate-retire-player-cancel")
   public triggerNominateRetirePlayerCancel() {}
 
   @Emit("nominate-retire-player-confirm")
   public triggerNominateRetirePlayerConfirm() {}
+
+  @Emit("nominate-temporary-retire-player")
+  public triggerNominateTemporaryRetirePlayer() {
+    console.log("triggerNominateTemporaryRetirePlayer");
+  }
+
+  @Ref
+  public playerCard: InstanceType<typeof PlayerCard> | undefined;
 
   public errors: string[] = [];
 
@@ -92,11 +100,48 @@ class RetirePlayerComponent extends Vue {
       this.errors.push("Unable to verify player details.");
     }
 
+    this.playerCard?.setPlayer(this.player);
     // some way to safely reload the team when errors exist.
   }
 
+  public canTemporaryRetire(): boolean {
+    if (!this.seasonsEnabled) {
+      return false;
+    }
+
+    if (this.player.IsExtraPlayer) {
+      return false;
+    }
+
+    if (this.player.IsTemporarilyRetired) {
+      return false;
+    }
+
+    const injuries = this.player.getInjuryStatus();
+
+    if (injuries == null) {
+      return false;
+    }
+
+    if (!this.player.team.getTeamStatus().isPostMatch()) {
+      return false;
+    }
+
+    let allow: boolean = false;
+    for (let i of injuries) {
+      if (i.lasting && i.lastMatch) {
+        allow = true;
+      }
+    }
+
+    return allow;
+  }
+
   private validatePlayer(rawApiPlayer: any) {
-    if (rawApiPlayer.status !== "Active") {
+    if (
+      rawApiPlayer.status !== "Active" &&
+      rawApiPlayer.status !== "Temporarily Retired"
+    ) {
       this.errors.push("This player is not active.");
     }
 
@@ -138,6 +183,11 @@ class RetirePlayerComponent extends Vue {
       rawApiPlayer.skills.length
     ) {
       this.errors.push("Local skills out of sync with saved skills.");
+      this.errors.push("Player Skills: " + this.player.getSkills().length);
+      this.errors.push(
+        "Position Skills: " + this.player.getPositionSkills().length,
+      );
+      this.errors.push("API Skills: " + rawApiPlayer.skills.length);
     }
   }
 }

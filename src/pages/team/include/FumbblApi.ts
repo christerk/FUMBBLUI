@@ -431,6 +431,24 @@ export default class FumbblApi {
     return await this.enqueuePost(url, data);
   }
 
+  public async temporaryRetirePlayer(
+    teamId: number,
+    playerId: number,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl("/api/team/temporaryRetirePlayer");
+    const data = { teamId: teamId, playerId: playerId };
+    return await this.enqueuePost(url, data);
+  }
+
+  public async undoTempRetirement(
+    teamId: number,
+    playerId: number,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl("/api/team/undoTemporaryRetire");
+    const data = { teamId: teamId, playerId: playerId };
+    return await this.enqueuePost(url, data);
+  }
+
   public async hireJourneyman(
     teamId: number,
     playerId: number,
@@ -678,5 +696,11 @@ export default class FumbblApi {
     };
 
     return await this.enqueuePost(url, data);
+  }
+
+  public async getIconData(positionId: number): Promise<ApiResponse> {
+    const url = this.getUrl("/api/iconskeleton/icondata/" + positionId);
+
+    return await this.enqueuePost(url);
   }
 }

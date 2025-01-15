@@ -1,46 +1,65 @@
 @import url("@style/fumbbl");
 
 .wrap {
-  padding: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .header {
-  position: relative;
+  display: grid;
   width: 100%;
-  height: 150px;
+  grid-template-areas:
+    "portrait name name"
+    "portrait position position"
+    "portrait stats skills"
+    "portrait stats injuries";
+  grid-template-rows: auto auto 1fr;
+  grid-template-columns: auto auto 1fr;
+  grid-gap: 0.25rem;
+
+  &.narrow {
+    grid-template-areas:
+      "name name"
+      "position position"
+      "portrait stats"
+      "portrait skills"
+      "portrait injuries";
+
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto auto auto 1fr;
+
+    .name {
+      font-size: 24px;
+    }
+  }
 
   .portrait {
-    position: absolute;
-    top: 0;
-    left: 0;
+    grid-area: portrait;
     max-width: 95px;
     max-height: 147px;
   }
 
   .name {
-    position: absolute;
-    top: 0;
-    left: 120px;
-    right: 120px;
+    grid-area: name;
     text-align: center;
     font-size: 30px;
   }
 
   .position {
-    position: absolute;
-    top: 40px;
+    grid-area: position;
     text-align: center;
-    left: 120px;
-    right: 120px;
   }
 
   .stats {
-    position: absolute;
-    top: 70px;
-    left: 120px;
+    grid-area: stats;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     column-gap: 5px;
+    place-self: start center;
+    grid-row-gap: 0.25rem;
+
+    &.hasPass {
+      grid-template-columns: repeat(5, 1fr);
+    }
 
     .stat {
       position: relative;
@@ -70,13 +89,18 @@
   }
 
   .skills {
-    position: absolute;
-    top: 70px;
-    left: 300px;
-    right: 0;
-
+    grid-area: skills;
     border: solid 1px @Forest;
+  }
 
+  .injuries {
+    grid-area: injuries;
+    border: solid 1px @Forest;
+  }
+
+  .skills,
+  .injuries {
+    min-height: 2.5rem;
     .title {
       background: @Forest;
       color: white;
@@ -93,5 +117,8 @@
     .playerSkills {
       padding: 3px;
     }
+  }
+
+  &.narrow {
   }
 }

@@ -45,6 +45,18 @@
             >
               {{ buttonSettings.cancel.label }}
             </button>
+            <template
+              v-for="extraButton in buttonSettings.extra"
+              :key="extraButton"
+            >
+              <button
+                v-if="extraButton.enabled"
+                class="teambutton"
+                @click="triggerExtra(extraButton.label)"
+              >
+                {{ extraButton.label }}
+              </button>
+            </template>
             <button
               v-if="buttonSettings.confirm.enabled"
               class="teambutton"
@@ -72,6 +84,7 @@ class ModalComponent extends Vue {
     default: {
       cancel: { enabled: true, label: "Cancel" },
       confirm: { enabled: true, label: "Ok" },
+      extra: [],
     },
   })
   public buttonSettings!: ModalButtonSettings;
@@ -106,6 +119,11 @@ class ModalComponent extends Vue {
 
   @Emit("cancel")
   public triggerCancel() {}
+
+  @Emit("extra")
+  public triggerExtra(button: string) {
+    return button;
+  }
 
   @Emit("confirm")
   public triggerConfirm() {}

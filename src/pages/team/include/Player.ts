@@ -25,6 +25,11 @@ export default class Player {
   private portrait: string = "";
   private position: Position | null;
   private injuries: string[] = [];
+  private injuryStatus: {
+    injury: string;
+    lasting: boolean;
+    lastMatch: boolean;
+  }[] = [];
   private skills: string[] = [];
   private record: PlayerRecord;
   private skillStatus: {
@@ -72,6 +77,7 @@ export default class Player {
     this.playerStatus = playerStatus;
 
     this.injuries = [];
+    this.injuryStatus = [];
     this.skills = [];
 
     this.record = {
@@ -121,6 +127,7 @@ export default class Player {
     player.injuries = rawApiPlayer.injuries
       .split(",")
       .filter((injury: string) => injury !== "");
+    player.injuryStatus = rawApiPlayer.injuryStatus;
     player.skills = rawApiPlayer.skills;
 
     player.skillCost = rawApiPlayer.skillCosts.reduce(
@@ -231,7 +238,11 @@ export default class Player {
   }
 
   public get IsFired(): boolean {
-    return this.playerStatus == 11;
+    return this.playerStatus == 11 || this.playerStatus == 13;
+  }
+
+  public get IsTemporarilyRetired(): boolean {
+    return this.playerStatus == 12 || this.playerStatus == 13;
   }
 
   public set number(value) {
@@ -260,6 +271,14 @@ export default class Player {
   public setPlayerName(playerName: string) {
     this.playerName = playerName;
     this.version++;
+  }
+
+  public setTemporaryRetired() {
+    this.playerStatus = 12;
+  }
+
+  public undoTemporaryRetired() {
+    this.playerStatus = 0;
   }
 
   public getPosition(): Position | null {
@@ -332,6 +351,14 @@ export default class Player {
 
   public getInjuries(): string[] {
     return this.injuries;
+  }
+
+  public getInjuryStatus(): {
+    injury: string;
+    lasting: boolean;
+    lastMatch: boolean;
+  }[] {
+    return this.injuryStatus;
   }
 
   public getSkills(): string[] {
