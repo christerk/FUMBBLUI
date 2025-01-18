@@ -26,6 +26,7 @@ export default class Team {
   private assistantCoaches: number = 0;
   private cheerleaders: number = 0;
   private apothecary: boolean = false;
+  public allowEndSeason: boolean = true;
   public seasonInfo: {
     gamesPlayedInCurrentSeason: number;
     currentSeason: number;
@@ -169,6 +170,10 @@ export default class Team {
     team.sppLimits = rawApiTeam.skillLimits.spp;
     team.bio = rawApiTeam.bio.htmlBio;
     team.logo = parseInt(rawApiTeam.bio.image);
+    team.allowEndSeason =
+      rawApiTeam.tournament != null
+        ? rawApiTeam.tournament.allowEndSeason
+        : false;
 
     if (rawApiTeam.redraftingLimits != undefined) {
       team.redraftLimits.budget = rawApiTeam.redraftingLimits.budget;
@@ -381,6 +386,9 @@ export default class Team {
 
     if (number != null) {
       this.players[number - 1] = player;
+      if (player.IsTemporarilyRetired) {
+        player.setTemporaryRetired();
+      }
     }
   }
 
