@@ -186,7 +186,8 @@
                   v-if="
                     accessControl.canEndSeason() &&
                     team.getGamesPlayedInSeason() > 0 &&
-                    teamManagementSettings.seasonsEnabled
+                    teamManagementSettings.seasonsEnabled &&
+                    team.allowEndSeason
                   "
                 >
                   <a href="#" @click.prevent="endSeason()">End Season</a>
@@ -2263,9 +2264,13 @@ class TeamComponent extends Vue {
     const apiResponse = await this.fumbblApi.magicFixTeam(this.team.getId());
 
     if (!apiResponse.isSuccessful()) {
-      this.menuHide();
-      this.reloadTeam();
+      await this.recoverFromUnexpectedError(
+        "An error occurred while trying to fix the team.",
+        apiResponse.getErrorMessage(),
+      );
     }
+    this.menuHide();
+    this.reloadTeam();
   }
 
   public async showSkillPlayer(player: Player) {
@@ -2556,6 +2561,7 @@ class TeamComponent extends Vue {
         await this.reloadTeam();
       }
     } else {
+      this.modals.readyTeam = false;
       await this.recoverFromUnexpectedError(
         "An error occurred readying your team.",
         apiResponse.getErrorMessage(),
