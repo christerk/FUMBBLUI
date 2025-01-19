@@ -285,12 +285,28 @@ export default class TeamManagementSettings {
   }
 
   public calculateTeamValue(team: Team): number {
-    return this.calculateTeamValueForPlayers(team, team.getRosteredPlayers());
+    return this.calculateTeamValueForPlayers(
+      team,
+      team.getRosteredPlayers(),
+      true,
+    );
   }
 
-  private calculateTeamValueForPlayers(team: Team, players: Player[]): number {
+  private calculateTeamValueForPlayers(
+    team: Team,
+    players: Player[],
+    includeLowCostLinemen: boolean = true,
+  ): number {
+    const hasLowCostLinemen = this.settings.players.lowCostLinemen;
+    const reduceLow = !includeLowCostLinemen && hasLowCostLinemen;
+    console.log(includeLowCostLinemen, reduceLow);
     const playerCost = players.reduce(
-      (playerCost, player) => (playerCost += player.getPlayerCost()),
+      (playerCost, player) =>
+        (playerCost +=
+          player.getPlayerCost() -
+          (reduceLow && this.journeymanPositions.includes(player.getPosition()!)
+            ? player.getPositionCost()
+            : 0)),
       0,
     );
 
@@ -323,6 +339,7 @@ export default class TeamManagementSettings {
                 this.journeymanPositions.includes(player.getPosition()!))
             ),
         ),
+      false,
     );
 
     const journeymenToAdd =
@@ -360,6 +377,7 @@ export default class TeamManagementSettings {
         .filter(
           (player) => player.getPosition() != null && !player.isMissNextGame(),
         ),
+      false,
     );
   }
 
