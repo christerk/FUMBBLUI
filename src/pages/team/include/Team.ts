@@ -173,7 +173,7 @@ export default class Team {
     team.allowEndSeason =
       rawApiTeam.tournament != null
         ? rawApiTeam.tournament.allowEndSeason
-        : false;
+        : true;
 
     if (rawApiTeam.redraftingLimits != undefined) {
       team.redraftLimits.budget = rawApiTeam.redraftingLimits.budget;

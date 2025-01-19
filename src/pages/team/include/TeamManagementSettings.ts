@@ -267,6 +267,20 @@ export default class TeamManagementSettings {
         return position;
       }
     }
+    return {
+      id: 0,
+      name: "Unknown Position",
+      cost: 0,
+      skills: [],
+      stats: { Movement: 6, Strength: 3, Agility: 3, Passing: 3, Armour: 8 },
+      quantityAllowed: 0,
+      isBigGuy: false,
+      defaultGender: "random",
+      isPeaked: false,
+      primarySkills: [],
+      secondarySkills: [],
+    };
+
     throw Error(`Position not found ${positionId}`);
   }
 

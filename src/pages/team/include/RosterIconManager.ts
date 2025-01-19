@@ -59,6 +59,9 @@ export default class RosterIconManager {
     positionId: number,
     takenIconRowVersionPositions: number[],
   ): number {
+    if (this.positionsIconData[positionId] == undefined) {
+      return 0;
+    }
     const nextAvailableIconRowVersionPosition = this.positionsIconData[
       positionId
     ].iconData.iconRowVersionPositions.findIndex(
@@ -76,6 +79,10 @@ export default class RosterIconManager {
     iconRowVersionPosition: number | null,
   ): string {
     const positionIconInfo = this.positionsIconData[positionId];
+
+    if (positionIconInfo == null) {
+      return "";
+    }
 
     if (iconRowVersionPosition === null) {
       iconRowVersionPosition = 0;
