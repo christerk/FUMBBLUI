@@ -326,6 +326,16 @@ export default class AccessControl {
         ],
       },
       {
+        action: "MIGRATE_TEAM",
+        grantAccessToList: [
+          {
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: [
+              "ACTIVE",
+            ],
+          },
+        ],
+      },      {
         action: "VIEW_HISTORY",
         grantAccessToList: [
           {
@@ -457,6 +467,10 @@ export default class AccessControl {
 
   public canRetireTeam(): boolean {
     return this.isGrantedAny(["RETIRE_TEAM"]);
+  }
+
+  public canMigrateTeam(): boolean {
+    return this.isGranted("MIGRATE_TEAM");
   }
 
   public canReadyTeam(): boolean {

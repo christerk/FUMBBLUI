@@ -197,6 +197,12 @@
                     >Retire Team</a
                   >
                 </li>
+                <li v-if="accessControl.canMigrateTeam() &&
+                  team.getDivision() == 'Ranked' || team.getDivision() == 'Blackbox'">
+                  <a :href="'/p/migrateteam?id='+teamId"
+                    >Migrate Team</a
+                  >
+                </li>
                 <li v-if="accessControl.canCreate()">
                   <a href="#" @click.prevent="deleteTeamModal?.show()"
                     >Delete Team</a

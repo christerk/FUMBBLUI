@@ -57,7 +57,8 @@ export type TeamAction =
   | "CANCEL_REDRAFT_TEAM"
   | "END_SEASON"
   | "UNDO_END_SEASON"
-  | "UNDO_TEMP_RETIRE";
+  | "UNDO_TEMP_RETIRE"
+  | "MIGRATE_TEAM";
 
 export type ActionGrantAccessTo = {
   action: TeamAction;
