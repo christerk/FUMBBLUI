@@ -167,6 +167,11 @@ export default class FumbblApi {
     return await this.post(url);
   }
 
+  public async getRosters(rulesetId: number): Promise<ApiResponse> {
+    const url = this.getUrl("/api/roster/list/" + rulesetId);
+    return await this.post(url);
+  }
+
   public async getTeamsForCoach(coachName: string): Promise<ApiResponse> {
     const url = this.getUrl("/api/coach/teams/" + coachName);
     const data = null;
@@ -635,6 +640,16 @@ export default class FumbblApi {
       "/api/boxtrophy/teamStandings?season=" +
         season +
         (loadOwn ? "&own=1" : ""),
+    );
+    return await this.enqueuePost(url);
+  }
+
+  public async getSeasonIdtStandings(
+    season: number,
+    loadOwn: boolean,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl(
+      "/api/idt/teamStandings?season=" + season + (loadOwn ? "&own=1" : ""),
     );
     return await this.enqueuePost(url);
   }

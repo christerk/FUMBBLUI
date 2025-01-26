@@ -299,7 +299,6 @@ export default class TeamManagementSettings {
   ): number {
     const hasLowCostLinemen = this.settings.players.lowCostLinemen;
     const reduceLow = !includeLowCostLinemen && hasLowCostLinemen;
-    console.log(includeLowCostLinemen, reduceLow);
     const playerCost = players.reduce(
       (playerCost, player) =>
         (playerCost +=

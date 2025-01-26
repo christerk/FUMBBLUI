@@ -1,0 +1,168 @@
+@import url("@style/fumbbl");
+
+@IceBlue: #9aa8f7;
+
+.pageheader :deep(a) {
+  font-size: 1rem;
+  line-height: 1rem;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+#rules {
+  font-size: 1.2rem;
+
+  :deep(.content) {
+    padding: 0 2rem;
+  }
+}
+
+#standings {
+  table {
+    width: 100%;
+    .columns {
+      font-weight: bold;
+      th {
+        vertical-align: bottom;
+      }
+    }
+    tr {
+      &.self {
+        font-weight: bold;
+        background: @OffWhite;
+      }
+      &.coach {
+        td {
+          border-top-color: @Forest;
+          cursor: pointer;
+          &.self {
+            font-weight: bold;
+            color: #6c6;
+          }
+        }
+
+        &.friend {
+          td.name {
+            color: blue;
+          }
+        }
+      }
+      td {
+        border-top: 1px solid @Quicksilver;
+
+        &.pos {
+          width: 1%;
+          padding-right: 0;
+          text-align: right;
+        }
+        &.disclosure {
+          width: 1%;
+          padding-right: 0;
+        }
+        &.racelead {
+          text-align: right;
+          img {
+            height: 16px;
+          }
+        }
+
+        &.rostername {
+          vertical-align: middle;
+        }
+      }
+      &.team {
+        td {
+          img {
+            height: 16px;
+          }
+
+          &.nowrap {
+            white-space: nowrap;
+          }
+        }
+      }
+    }
+  }
+
+  .toolbar {
+    width: 80%;
+    margin: 0 auto;
+    text-align: right;
+  }
+}
+
+.section {
+  border-bottom: solid 1px @Forest;
+  font-size: 110%;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.scorelist {
+  list-style: disc;
+  li.item {
+    padding: 0.1rem;
+    margin-left: 1rem;
+  }
+}
+
+.twocolumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 2rem;
+  .panel {
+    width: 100%;
+  }
+  width: 90%;
+  margin: 0 auto;
+}
+
+#trophies {
+  .section {
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+    font-weight: normal;
+    line-height: 1.2rem;
+
+    .description {
+      font-size: 0.8rem;
+      padding-left: 1rem;
+      &::before {
+        content: "(";
+      }
+      &::after {
+        content: ")";
+      }
+    }
+  }
+
+  #seasonRosters {
+    display: grid;
+    grid-template-columns: repeat(5, auto);
+    place-items: center;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  img {
+    filter: saturate(0%);
+    opacity: 50%;
+    transition: all 300ms ease;
+
+    &.achieved {
+      filter: saturate(100%);
+      opacity: 100%;
+      filter: drop-shadow(0px 0px 10px @Black);
+    }
+  }
+}
+
+.right {
+  text-align: right;
+}
+
+.frozen {
+  color: @IceBlue;
+  -webkit-text-fill-color: @IceBlue;
+  -webkit-text-stroke: 0.4px blue;
+}

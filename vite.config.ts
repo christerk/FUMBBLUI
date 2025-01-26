@@ -46,6 +46,7 @@ export default defineConfig({
         winrater: resolve(__dirname, "htdocs", "winrater.html"),
         team: resolve(__dirname, "htdocs", "team.html"),
         boxtrophy: resolve(__dirname, "htdocs", "boxtrophy.html"),
+        idt: resolve(__dirname, "htdocs", "idt.html"),
       },
       output: {
         format: "esm",
