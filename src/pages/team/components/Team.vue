@@ -2334,7 +2334,7 @@ class TeamComponent extends Vue {
 
     if (!apiResponse.isSuccessful()) {
       await this.recoverFromUnexpectedError(
-        "An error occurred firing a player.",
+        "An error occurred rehiring a player.",
         apiResponse.getErrorMessage(),
       );
     }
