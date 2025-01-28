@@ -395,9 +395,17 @@ export default class Player {
   ): number {
     let finalStat = positionStat;
     const skillIncreaseIdentifier = "+" + statTwoLetterIdentifier.toUpperCase();
-    const statIncreases = this.getSkills().filter(
-      (skill) => skill === skillIncreaseIdentifier,
-    ).length;
+    const r = /\(([^(]+)\)$/;
+    const statIncreases = this.getSkills()
+      .map((skill) => {
+        const match = r.exec(skill);
+        if (!match) {
+          return skill;
+        }
+        return match[1].split(", ");
+      })
+      .flat()
+      .filter((skill) => skill === skillIncreaseIdentifier).length;
 
     const positiveStatIncreases =
       this.rulesVersion == "2020"
