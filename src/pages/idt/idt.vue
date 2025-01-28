@@ -43,8 +43,9 @@
                 <div class="section">Restrictions</div>
                 <ul class="scorelist">
                   <li class="item">
-                    Teams must use the Blackbox scheduler, or in official tournaments. If a match is played
-                    outside of these environments, their score is frozen.
+                    Teams must use the Blackbox scheduler, or in official
+                    tournaments. If a match is played outside of these
+                    environments, their score is frozen.
                   </li>
                   <li class="item">
                     Teams are active in the trophy until they have hit three
@@ -142,7 +143,11 @@
                   <td>
                     <a :href="coachLink(team.coach)">{{ team.coach }}</a>
                   </td>
-                  <td class="roster">{{ team.roster }}</td>
+                  <td class="roster">
+                    <img :src="'https://fumbbl.com/i/' + team.logo" />{{
+                      team.roster
+                    }}
+                  </td>
                   <td class="teamName">
                     <a :href="teamLink(team)">{{ team.team }}</a>
                   </td>
