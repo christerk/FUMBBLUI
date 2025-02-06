@@ -354,10 +354,6 @@
       </div>
     </div>
 
-    <div class="center">
-      <a :href="'/p/team?id=' + team.id">Back to legacy team page</a>
-    </div>
-
     <div class="container" :class="{ showsidepanel: showSidePanel }">
       <div class="panel teamsheet" :class="{ hidden: showSidePanel }">
         <div
