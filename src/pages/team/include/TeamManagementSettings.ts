@@ -9,7 +9,7 @@ import Player from "./Player";
 import Team from "./Team";
 
 export default class TeamManagementSettings {
-  private readonly ALLOW_DISCARD_REROLL: boolean = true;
+  private readonly ALLOW_DISCARD_REROLL: boolean = false;
   private readonly JOURNEYMAN_QUANTITY_INDICATORS: number[] = [12, 16];
   private settings: SetupTeamManagementSettings;
 

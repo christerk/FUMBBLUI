@@ -177,15 +177,11 @@
                   >
                 </li>
                 <li>
-                  <a
-                    :href="`https://fumbbl.com/p/team?op=editbio&amp;team_id=${team.getId()}`"
-                    >Edit Bio</a
-                  >
+                  <a href="#" @click.prevent="editBioModal?.show()">Edit Bio</a>
                 </li>
                 <li
                   v-if="
                     accessControl.canEndSeason() &&
-                    team.getGamesPlayedInSeason() > 0 &&
                     teamManagementSettings.seasonsEnabled &&
                     team.allowEndSeason
                   "
@@ -380,15 +376,17 @@
         </div>
 
         <div class="center">
-          <div style="float: right" v-if="showBioSizeToggle" :key="bioKey">
+          <div class="bioexpander" v-if="showBioSizeToggle" :key="bioKey">
             <a
               href="#"
               v-if="bioExpanded"
               :key="bioKey"
               @click.prevent="toggleBio()"
-              >Collapse</a
+              >&#x1F781;Collapse&#x1F781;</a
             >
-            <a href="#" v-else @click.prevent="toggleBio()">Show More</a>
+            <a href="#" v-else @click.prevent="toggleBio()"
+              >&#x1F783;&ThinSpace;Show More&ThinSpace;&#x1F783;</a
+            >
           </div>
         </div>
 
@@ -949,6 +947,14 @@
       @nominate-retire-player-confirm="handleNominateRetirePlayerConfirm"
       @nominate-temporary-retire-player="handleNominateTemporaryRetirePlayer"
     ></retireplayer>
+
+    <EditBioModal
+      ref="editBioModal"
+      @confirm="handleEditBio"
+      :fumbblApi="fumbblApi"
+      :team="team"
+    >
+    </EditBioModal>
   </div>
   <div class="team" v-else>
     <div class="teamheader loading">
@@ -1022,6 +1028,7 @@ import {
   SetDedicatedFansModal,
   RenameAllPlayersModal,
   RedraftCompleteModal,
+  EditBioModal,
 } from "./modals/Modals";
 
 import {
@@ -1068,6 +1075,7 @@ import EditTeamName from "./EditTeamName.vue";
     RedraftCompleteModal,
     TeamStatus,
     SkillRoll2016,
+    EditBioModal,
   },
 })
 class TeamComponent extends Vue {
@@ -1172,6 +1180,8 @@ class TeamComponent extends Vue {
   public deleteTeamModal: InstanceType<typeof DeleteTeamModal> | undefined;
   @Ref
   public retireTeamModal: InstanceType<typeof RetireTeamModal> | undefined;
+  @Ref
+  public editBioModal: InstanceType<typeof EditBioModal> | undefined;
   @Ref
   public setTreasuryModal: InstanceType<typeof SetTreasuryModal> | undefined;
   @Ref
@@ -2542,6 +2552,12 @@ class TeamComponent extends Vue {
         apiResponse.getErrorMessage(),
       );
     }
+  }
+
+  public async handleEditBio(newBio: string) {
+    console.log(newBio);
+    await this.fumbblApi.setTeamBio(this.team.id, newBio);
+    await this.reloadTeam();
   }
 
   public async handleReadyToPlay(

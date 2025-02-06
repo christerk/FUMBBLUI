@@ -3,8 +3,152 @@
 .icon {
   display: inline-block;
   background: @OffWhite;
-  border: solid @Forest 2px;
   border-radius: 20px;
   padding: 10px;
   margin: 0.25rem;
+
+  background: rgb(27, 94, 15);
+  background: linear-gradient(
+    0deg,
+    rgb(27, 94, 15) 0%,
+    rgb(18, 51, 9) 24%,
+    rgb(103, 143, 104) 100%
+  );
+}
+
+.component {
+  display: inline-block;
+  margin: 0.25rem;
+  background: @OffWhite;
+  border: solid 1px @Forest;
+  border-radius: 10px;
+  padding: 0.5rem;
+  position: relative;
+  cursor: pointer;
+
+  &:hover {
+    background: @Quicksilver;
+  }
+
+  .componentname {
+    font-size: 1.25rem;
+    line-height: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+}
+
+.selectorwrap {
+  position: absolute;
+  top: 410px;
+  left: 0;
+  right: 0;
+  background: @OldLace;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  overflow: hidden;
+
+  .componentselectorhead {
+    display: block;
+    height: 40px;
+    text-align: center;
+    font-size: 1.2rem;
+    line-height: 2.5rem;
+  }
+
+  .componentselector {
+    display: flex;
+    justify-content: center;
+    left: 0;
+    width: 100%;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    align-items: center;
+    padding-bottom: 1rem;
+
+    .componentitem {
+      padding: 0.5rem;
+      width: 24%;
+      cursor: pointer;
+      flex-shrink: 0;
+      border-radius: 20px;
+
+      &:hover {
+        background: @Quicksilver;
+      }
+      img {
+        display: block;
+        margin: 0 auto;
+      }
+
+      &.current {
+        background: @Spring;
+      }
+    }
+  }
+}
+
+:deep(.modalbody) {
+  text-align: center;
+  overflow: visible;
+}
+
+:deep(.modal) {
+  overflow: visible !important;
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
+.themebutton {
+  display: inline-block;
+  margin: 0.5rem 1rem;
+  padding: 0.5rem;
+  border: solid 1px @Forest;
+  cursor: pointer;
+  border-radius: 10px;
+  background: @OffWhite;
+  width: 5rem;
+
+  &:hover {
+    background: @Quicksilver;
+  }
+}
+
+.submenu {
+  position: absolute;
+  background: @OffWhite;
+  padding: 0.5rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 5px @Forest;
+  border: solid 1px @Forest;
+  transition: all 0.3s ease;
+  margin-left: -2rem;
+
+  .item {
+    padding: 0.5rem 1rem;
+
+    &:hover .themebutton {
+      box-shadow: 0px 0px 5px black;
+    }
+  }
+
+  .themebutton {
+    display: block;
+    color: white;
+    font-weight: bold;
+    text-shadow:
+      black 1px 0 1px,
+      black -1px 0 1px,
+      black 0 -1px 1px,
+      black 0 1px 1px;
+    box-sizing: border-box;
+    margin: 0 0;
+  }
 }

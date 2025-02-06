@@ -11,6 +11,7 @@ import SetTreasuryModal from "./SetTreasury.vue";
 import SetDedicatedFansModal from "./SetDedicatedFans.vue";
 import RenameAllPlayersModal from "./RenameAllPlayers.vue";
 import RedraftCompleteModal from "./RedraftComplete.vue";
+import EditBioModal from "./EditBio.vue";
 
 export {
   DiscardRerollModal,
@@ -26,4 +27,5 @@ export {
   SetDedicatedFansModal,
   RenameAllPlayersModal,
   RedraftCompleteModal,
+  EditBioModal,
 };

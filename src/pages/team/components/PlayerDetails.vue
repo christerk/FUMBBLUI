@@ -1,10 +1,10 @@
 <template>
   <div class="playerdetails">
+    <a v-if="debug" class="editIcon" href="#" @click.prevent="showIconEditor"
+      >Edit icon</a
+    >
     <div class="playerdetailssection playerdetailsedit" v-if="canEdit">
       <div class="title">Edit player details</div>
-      <a v-if="debug" class="editIcon" href="#" @click.prevent="showIconEditor"
-        >Edit icon</a
-      >
       <template v-if="updatePlayerDetails">
         <div class="playername">
           <label :for="'playerName_' + player.playerNumber">Name</label>

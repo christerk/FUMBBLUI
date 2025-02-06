@@ -680,6 +680,23 @@ export default class FumbblApi {
     return await this.enqueuePost(url, data);
   }
 
+  public async getBioCode(teamId: number) {
+    const url = this.getUrl("/api/team/getBioCode/" + teamId);
+    return await this.enqueuePost(url);
+  }
+
+  public async setTeamBio(
+    teamId: number,
+    newBio: string,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl("/api/team/setBio");
+    const data = {
+      teamId: teamId,
+      bio: newBio,
+    };
+    return await this.enqueuePost(url, data);
+  }
+
   public async setTeamPriorities(teams: number[]): Promise<ApiResponse> {
     const url = this.getUrl("/api/boxtrophy/setPriorities");
     const data = {
