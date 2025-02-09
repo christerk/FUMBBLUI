@@ -47,7 +47,11 @@ class TeamBio extends Vue {
     }
   }
 
-  public async loadBio() {}
+  public async loadBio() {
+    if (typeof initializeBBCode === "function") {
+      initializeBBCode();
+    }
+  }
 }
 
 export default toNative(TeamBio);

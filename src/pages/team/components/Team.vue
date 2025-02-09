@@ -358,7 +358,8 @@
       <div class="panel teamsheet" :class="{ hidden: showSidePanel }">
         <div
           class="biowrapper"
-          v-if="
+          v-if="!showSidePanel"
+          v-show="
             !team.getTeamStatus().isRedrafting() &&
             team.bio != null &&
             team.bio.length > 0
@@ -376,7 +377,7 @@
           <div class="bioexpander" v-if="showBioSizeToggle" :key="bioKey">
             <a
               href="#"
-              v-if="bioExpanded"
+              v-if="bioExpanded && showBioSizeToggle"
               :key="bioKey"
               @click.prevent="toggleBio()"
               >&#x1F781;Collapse&#x1F781;</a
@@ -1035,6 +1036,10 @@ import {
 } from "../include/EventDataInterfaces";
 import EditTeamName from "./EditTeamName.vue";
 
+declare global {
+  function initializeBBCode(): void;
+}
+
 @Component({
   components: {
     editteamname: EditTeamNameComponent,
@@ -1304,6 +1309,25 @@ class TeamComponent extends Vue {
 
     this.redraftPlayers?.reset(this.team);
     this.loadCount++;
+
+    if (typeof initializeBBCode === "function") {
+      initializeBBCode();
+    }
+
+    this.updateTabFromUrl();
+
+    addEventListener("popstate", () => {
+      this.updateTabFromUrl();
+    });
+  }
+
+  public updateTabFromUrl() {
+    var tab = window.location.hash.substring(1);
+    if (tab.length > 0) {
+      this.showTeamPanel(tab, false);
+    } else {
+      this.showTeamPanel("main", false);
+    }
   }
 
   public async toggleBio() {
@@ -1322,7 +1346,7 @@ class TeamComponent extends Vue {
       this.bioExpanded || bioPanel.scrollHeight > bioPanel.offsetHeight;
   }
 
-  public async showTeamPanel(panel: string) {
+  public async showTeamPanel(panel: string, pushHistory: boolean = true) {
     this.menuHide();
 
     this.showSidePanel = panel != "main";
@@ -1350,6 +1374,11 @@ class TeamComponent extends Vue {
           await this.teamLog.loadLog();
         }
         break;
+      case "main":
+        if (typeof initializeBBCode === "function") {
+          initializeBBCode();
+        }
+        break;
     }
 
     this.showSidePanel = panel != "main";
@@ -1358,6 +1387,24 @@ class TeamComponent extends Vue {
 
     if (this.showSidePanel) {
       this.sidePanel = panel;
+    }
+
+    if (!pushHistory) {
+      return;
+    }
+
+    if (panel != "main") {
+      history.pushState(
+        { panel: panel },
+        "",
+        window.location.pathname + window.location.search + "#" + panel,
+      );
+    } else {
+      history.pushState(
+        { panel: panel },
+        "",
+        window.location.pathname + window.location.search,
+      );
     }
   }
 
