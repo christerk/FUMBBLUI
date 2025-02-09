@@ -363,6 +363,7 @@
             team.bio != null &&
             team.bio.length > 0
           "
+          @click="refreshBioToggle"
         >
           <div
             id="bio"
