@@ -66,6 +66,7 @@ export type ActionGrantAccessTo = {
 };
 
 export type GrantAccessTo = {
+  enabled?: boolean;
   userRoles: UserRole[];
   teamStatusValues: TeamStatusValue[];
 };

@@ -4,6 +4,7 @@ import {
   TeamStatusValue,
   UserRole,
 } from "./Interfaces";
+import TeamManagementSettings from "./TeamManagementSettings";
 
 export default class AccessControl {
   private accessRules: ActionGrantAccessTo[] = [];
@@ -14,80 +15,77 @@ export default class AccessControl {
   constructor(
     userRoles: UserRole[],
     teamStatus: TeamStatusValue,
-    isProgression: boolean,
+    teamManagementSettings: TeamManagementSettings,
   ) {
     this.userRoles = userRoles;
     this.teamStatus = teamStatus;
-    this.isProgression = isProgression;
-
-    if (this.isProgression) {
-      this.accessRules.push(
-        {
-          action: "EDIT",
-          grantAccessToList: [
-            {
-              userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
-              teamStatusValues: [
-                "NEW",
-                "POST_MATCH_SEQUENCE",
-                "SKILL_ROLLS_PENDING",
-                "REDRAFTING",
-              ],
-            },
-          ],
-        },
-        {
-          action: "HIRE_ROOKIE",
-          grantAccessToList: [
-            {
-              userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
-              teamStatusValues: [
-                "NEW",
-                "POST_MATCH_SEQUENCE",
-                "SKILL_ROLLS_PENDING",
-                "REDRAFTING",
-              ],
-            },
-          ],
-        },
-        {
-          action: "SKILL",
-          grantAccessToList: [
-            {
-              userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
-              teamStatusValues: [
-                "NEW",
-                "POST_MATCH_SEQUENCE",
-                "SKILL_ROLLS_PENDING",
-              ],
-            },
-          ],
-        },
-      );
-    } else {
-      this.accessRules.push(
-        {
-          action: "EDIT",
-          grantAccessToList: [
-            {
-              userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
-              teamStatusValues: ["NEW"],
-            },
-          ],
-        },
-        {
-          action: "HIRE_ROOKIE",
-          grantAccessToList: [
-            {
-              userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
-              teamStatusValues: ["NEW"],
-            },
-          ],
-        },
-      );
-    }
+    this.isProgression = teamManagementSettings.isProgression;
 
     this.accessRules.push(
+      {
+        action: "EDIT",
+        grantAccessToList: [
+          {
+            enabled: teamManagementSettings.isProgression,
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: [
+              "NEW",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "REDRAFTING",
+            ],
+          },
+          {
+            enabled: !teamManagementSettings.isProgression,
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["NEW"],
+          },
+          {
+            enabled: !teamManagementSettings.isProgression,
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["POST_MATCH_SEQUENCE"],
+          },
+        ],
+      },
+      {
+        action: "HIRE_ROOKIE",
+        grantAccessToList: [
+          {
+            enabled: teamManagementSettings.isProgression,
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: [
+              "NEW",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+              "REDRAFTING",
+            ],
+          },
+          {
+            enabled: !teamManagementSettings.isProgression,
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["NEW"],
+          },
+          {
+            enabled: !teamManagementSettings.isProgression,
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["POST_MATCH_SEQUENCE"],
+          },
+        ],
+      },
+      {
+        action: "SKILL",
+        grantAccessToList: [
+          {
+            enabled: teamManagementSettings.isProgression,
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: [
+              "NEW",
+              "POST_MATCH_SEQUENCE",
+              "SKILL_ROLLS_PENDING",
+            ],
+          },
+        ],
+      },
       {
         action: "CREATE",
         grantAccessToList: [
@@ -101,8 +99,14 @@ export default class AccessControl {
         action: "REMOVE_REROLL",
         grantAccessToList: [
           {
+            enabled: teamManagementSettings.seasonsEnabled,
             userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
             teamStatusValues: ["NEW", "REDRAFTING"],
+          },
+          {
+            enabled: !teamManagementSettings.seasonsEnabled,
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["NEW", "POST_MATCH_SEQUENCE"],
           },
         ],
       },
@@ -330,12 +334,11 @@ export default class AccessControl {
         grantAccessToList: [
           {
             userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
-            teamStatusValues: [
-              "ACTIVE",
-            ],
+            teamStatusValues: ["ACTIVE"],
           },
         ],
-      },      {
+      },
+      {
         action: "VIEW_HISTORY",
         grantAccessToList: [
           {
@@ -429,6 +432,10 @@ export default class AccessControl {
       }
 
       for (const grantAccessTo of actionGrantAccessTo.grantAccessToList) {
+        if (grantAccessTo.enabled === false) {
+          continue;
+        }
+
         if (!grantAccessTo.teamStatusValues.includes(this.teamStatus)) {
           continue;
         }

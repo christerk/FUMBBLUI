@@ -398,10 +398,7 @@ export default class TeamManagementSettings {
           team.getRerolls() < this.settings.rerolls.max &&
           team.canAfford(rerollCost),
         remove:
-          team.getRerolls() > 0 &&
-          (this.ALLOW_DISCARD_REROLL ||
-            team.getTeamStatus().isNew() ||
-            team.getTeamStatus().isRedrafting()),
+          team.getRerolls() > 0,
       },
       assistantCoaches: {
         add:

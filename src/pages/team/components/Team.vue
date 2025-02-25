@@ -588,9 +588,9 @@
               <addremove
                 :current-value="team.getRerolls().toString()"
                 :can-edit="accessControl.canEdit()"
-                :can-remove-immediately="accessControl.canRemoveReroll()"
+                :can-remove-immediately="accessControl.canRemoveReroll() && (team.getTeamStatus().isNew() || team.getTeamStatus().isRedrafting())"
                 :can-add="addRemovePermissions.rerolls.add"
-                :can-remove="addRemovePermissions.rerolls.remove"
+                :can-remove="addRemovePermissions.rerolls.remove && accessControl.canRemoveReroll()"
                 :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
                 :label-remove="
                   accessControl.canRemoveReroll() ? 'Remove' : 'Discard'
@@ -1445,7 +1445,7 @@ class TeamComponent extends Vue {
       this.dataAccessControl = new AccessControl(
         this.userRoles,
         this.team.getTeamStatus().getStatus(),
-        this.teamManagementSettings.isProgression,
+        this.teamManagementSettings,
       );
       this.loadCount++;
     } else {
