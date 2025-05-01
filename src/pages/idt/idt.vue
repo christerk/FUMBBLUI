@@ -257,16 +257,19 @@ class Idt extends Vue {
 
     this.$nextTick(async () => {
 
+      let season = await this.fumbblApi?.getSeasonConfig(0);
+      await this.loadSeasons();
+
       let requestSeason = parseInt(document
       .getElementsByClassName("idtpage")[0]
       .getAttribute("season") ?? "0");
 
-      let season = await this.fumbblApi?.getSeasonConfig(0);
-      await this.loadSeasons();
-
       if (requestSeason > 0) {
         season = this.seasons.find((s:any) => s.season == requestSeason);
+      } else {
+        season = season?.data;
       }
+
       await this.loadSeasonData(season);
 
       if (window.location.hash && window.location.hash.length > 0) {
