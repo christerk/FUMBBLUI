@@ -256,9 +256,18 @@ class Idt extends Vue {
       .getAttribute("coach");
 
     this.$nextTick(async () => {
+
+      let requestSeason = parseInt(document
+      .getElementsByClassName("idtpage")[0]
+      .getAttribute("season") ?? "0");
+
       let season = await this.fumbblApi?.getSeasonConfig(0);
       await this.loadSeasons();
-      await this.loadSeasonData(season?.data);
+
+      if (requestSeason > 0) {
+        season = this.seasons.find((s:any) => s.season == requestSeason);
+      }
+      await this.loadSeasonData(season);
 
       if (window.location.hash && window.location.hash.length > 0) {
         const c = window.location.hash.substring(1);
@@ -395,7 +404,7 @@ class Idt extends Vue {
   }
 
   public isFrozen(team: any): boolean {
-    return team.losses + team.ties / 2 >= 3;
+    return team.state == "frozen" || (team.losses + team.ties / 2 >= 3);
   }
   public hasTrophy(team: any): boolean {
     return team.wins >= 10;

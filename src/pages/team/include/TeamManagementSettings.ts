@@ -340,7 +340,6 @@ export default class TeamManagementSettings {
         ),
       false,
     );
-
     const journeymenToAdd =
       this.settings.ruleset.minPlayers -
       (team.getRosteredPlayers().length - team.getMissNextGamePlayers().length);
@@ -356,6 +355,7 @@ export default class TeamManagementSettings {
     const potentialCtvs = this.journeymanPositions.map(
       (pos) => preReadyCtv + pos.cost * journeymenToAdd,
     );
+
     const uniqCtvs: number[] = potentialCtvs
       .filter((value, index, arr) => index === arr.indexOf(value))
       .sort((a, b) => a - b);
@@ -397,8 +397,7 @@ export default class TeamManagementSettings {
         add:
           team.getRerolls() < this.settings.rerolls.max &&
           team.canAfford(rerollCost),
-        remove:
-          team.getRerolls() > 0,
+        remove: team.getRerolls() > 0,
       },
       assistantCoaches: {
         add:
