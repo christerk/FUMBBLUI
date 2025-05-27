@@ -50,15 +50,15 @@ class SerializedApiRunner {
 abstract class CategoryBase {
     protected runner: SerializedApiRunner;
     protected abstract categoryPath: string;
-    protected static readonly apiBase = import.meta.env.VITE_API_URL + "/api";
+    protected apiBase = ""; 
 
-    private enableOauth: boolean = import.meta.env.VITE_ENABLE_OAUTH == "true";
+    private enableOauth: boolean = false;
     private accessToken: string = "";
     private tokenExpiry: number = 0;
 
-
     constructor(runner: SerializedApiRunner) {
-        this.enableOauth = 
+        this.enableOauth = import.meta.env.VITE_ENABLE_OAUTH == "true";
+        this.apiBase = import.meta.env.VITE_API_URL + "/api";
         this.runner = runner;
         return new Proxy(this, {
             get(target, prop, receiver) {
