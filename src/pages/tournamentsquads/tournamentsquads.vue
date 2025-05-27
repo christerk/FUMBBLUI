@@ -1,77 +1,225 @@
 <template>
-  <div class="container" id="vuecontent">
-    <PageHeader :navItems="navItems" defaultPage="squads" @setPage="setPage">
-      <template #pagename>Tournament Squad Manager</template>
-      <template #center>
-        <div>Some other stuff</div>
-      </template>
-    </PageHeader>
+    <div class="container" id="vuecontent">
+        <PageHeader ref="pageHeader" :navItems="navItems" :defaultPage="defaultPage" @setPage="initPage">
+            <template #pagename>Tournament Squads</template>
+            <template #center>
+                <div></div>
+            </template>
+        </PageHeader>
 
-    <div v-if="page == 'squads'">
-      <template v-for="squad in squads" :key="squad.id">
-        <TitledPanel id="squads">
-          <template #header>
-            <div class="groupname">{{ squad.name }}</div>
-            <div class="tournament">{{ squad.tournament }}</div>
-          </template>
-          <template #content>
-            <div class="squad">
-              <div class="members">
-                <div
-                  v-for="member in squad.members"
-                  :key="member.id"
-                  class="member"
-                >
-                  <div class="coach">
-                    <span
-                      class="captainMarker"
-                      v-if="member.coach == squad.captain"
-                      >&#9733; </span
-                    >{{ member.coach }}
-                  </div>
-                  <div class="teamname">{{ member.name }}</div>
-                  <div class="teamroster">{{ member.roster }}</div>
-                  <div class="teamlogo">
-                    <img :src="'https://fumbbl.com/i/' + member.logo" />
-                  </div>
-                </div>
-              </div>
-              <div class="squadfooter">
-                <div class="inviteWrap" v-if="coachName == squad.captain">
-                  <div class="settingsButton" @click="toggleSettings(squad)">
-                    <img src="https://fumbbl.com/i/718507" />
-                  </div>
-                  <div
-                    class="inviteInfo"
-                    v-if="squad.numInvited + squad.numRequested > 0"
-                  >
-                    <div class="invited" v-if="squad.numInvited > 0">
-                      Invites: {{ squad.numInvited }}
+        <div v-if="page == 'createSquad'">
+            <TitledPanel id="createSquad">
+                <template #header>
+                    <div class="groupname">Create Squad</div>
+                </template>
+                <template #content>
+
+                    <div :class="{ createsquad: true, error: showErrors }">
+                        <div class="wide">
+                            <input ref="squadname" type="text" id="squadname" class="squadname" placeholder="Squad Name"
+                                minlength="1" required />
+                            <div class="requirements">Must provide a squad name</div>
+                        </div>
+                        <div class="narrow">
+                            <input v-model="memberCount" type="number" min="1" max="16" id="membercount"
+                                class="membercount" placeholder="Member count (1-16)" required />
+                            <div class="requirements">Must have 1-16 members</div>
+                        </div>
+                        <div class="narrow">
+                            <input v-model="reserveCount" type="number" min="0" max="16" id="reservecount"
+                                class="membercount" placeholder="Reserve count (0-16)" />
+                            <div class="requirements">Must have 0-16 reserves</div>
+                        </div>
                     </div>
-                    <div class="requested" v-if="squad.numRequested > 0">
-                      Requests: {{ squad.numRequested }}
+                    <div class="controls tcenter">
+                        <button class="CreateButton" @click="createSquad">Create Squad</button>
                     </div>
-                  </div>
+                </template>
+            </TitledPanel>
+        </div>
+        <div v-if="page == 'squads'">
+            <template v-if="squads.length === 0">
+                <div class="no-squads-message tcenter">
+                    <p class="title">No squads found.</p>
+                    <p>
+                        Use the tabs above to create or join a tournament squad.
+                    </p>
                 </div>
-                <div v-if="coachName != squad.captain"></div>
-                <div class="memberWrap">
-                  Members:
-                  <div class="memberCount">
-                    <div class="accepted">{{ squad.numAccepted }}</div>
-                    &#x2571;
-                    <div class="cap">{{ squad.memberCap }}</div>
-                  </div>
-                </div>
-                <div v-if="squad.settingsVisible" class="squadsettings">
-                  Settings
-                </div>
-              </div>
-            </div>
-          </template>
-        </TitledPanel>
-      </template>
+            </template>
+            <template v-else v-for="squad in squads" :key="squad.id">
+                <TitledPanel id="squads">
+                    <template #header>
+                        <div class="groupname">{{ squad.name }}</div>
+                        <div class="tournament" v-if="squad.tournament != null">{{ squad.tournament.name }}</div>
+                    </template>
+                    <template #content>
+                        <div class="squad">
+                            <div class="sectionheader">Team Members</div>
+                            <div class="members">
+                                <div v-for="member in squad.members" :key="member.id" class="member">
+                                    <div class="coach">
+                                        <span class="captainMarker" v-if="isCoachCaptain(squad, member.coach)">&#9733;
+                                        </span><a href="#">{{ member.coach }}</a>
+                                    </div>
+                                    <div class="teamname">{{ member.name }}</div>
+                                    <div class="teamlogo">
+                                        <img :src="'https://fumbbl.com/i/' + member.logo" :alt="member.roster"
+                                            :title="member.roster" />
+                                    </div>
+                                </div>
+                                <template v-if="squad.limits.maxMembers - squad.members.length > 0">
+                                    <div class="member empty">
+                                        {{ openSpotString(squad.limits.maxMembers - squad.members.length) }}
+                                    </div>
+                                </template>
+                            </div>
+                            <div v-if="squad.limits.maxReserves > 0">
+                                <div class="sectionheader">Reserves</div>
+                                <div class="reserves">
+                                    <div v-for="member in squad.reserves" :key="member.id" class="member">
+                                        <div class="coach">
+                                            <span class="captainMarker"
+                                                v-if="isCoachCaptain(squad, member.coach)">&#9733;
+                                            </span><a href="#">{{ member.coach }}</a>
+                                        </div>
+                                        <div class="teamname">{{ member.name }}</div>
+                                        <div class="teamlogo">
+                                            <img :src="'https://fumbbl.com/i/' + member.logo" :alt="member.roster"
+                                                :title="member.roster" />
+                                        </div>
+                                    </div>
+                                    <template v-if="squad.limits.maxReserves - squad.reserves.length > 0">
+                                        <div class="member empty">
+                                            {{ openSpotString(squad.limits.maxReserves - squad.reserves.length) }}
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="squadfooter">
+                                <div class="inviteWrap">
+                                    <div class="settingsButton" @click="toggleSettings(squad)">
+                                        <img src="https://fumbbl.com/i/718507" />
+                                    </div>
+                                    <div class="inviteInfo"
+                                        v-if="isCoachCaptain(squad, coachName) && squad.requests.length > 0">
+                                        Requests: {{ squad.requests.length }}
+                                    </div>
+                                </div>
+                                <div class="memberWrap">
+                                    <span>
+                                        Members:
+                                        <div class="memberCount">
+                                            <div class="accepted">{{ squad.members.length }}</div>
+                                            &#x2571;
+                                            <div class="cap">{{ squad.limits.maxMembers }}</div>
+                                        </div>
+                                    </span>
+                                    <span v-if="squad.limits.maxReserves > 0">
+                                        Reserves:
+                                        <div class="memberCount">
+                                            <div class="accepted">{{ squad.reserves.length }}</div>
+                                            &#x2571;
+                                            <div class="cap">{{ squad.limits.maxReserves }}</div>
+                                        </div>
+                                    </span>
+                                </div>
+                                <div v-if="squad.settingsVisible" class="squadsettings">
+                                    <div class="pendingRequestsList">
+                                        <div v-for="request in squad.requests" :key="request.team.id"
+                                            class="squad-request">
+                                            <div class="request-coach">{{ request.team.name }}</div>
+                                            <div class="request-team">({{ request.coach.name }})</div>
+                                            <div class="request-controls">
+                                                <button class="accept-btn" @click="acceptRequestMember(request, squad)"
+                                                    :disabled="squad.members.length >= squad.limits.maxMembers">Accept
+                                                    as member</button>
+                                                <button class="accept-btn" @click="acceptRequestReserve(request, squad)"
+                                                    :disabled="squad.reserves.length >= squad.limits.maxReserves">Accept
+                                                    as reserve</button>
+                                                <button @click="declineRequest(request, squad)"
+                                                    class="decline-btn">Decline</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="controls">
+                                        <button class="DisbandButton" v-if="isCoachCaptain(squad, coachName)"
+                                            @click="disbandSquad(squad)">Disband
+                                            Squad</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </TitledPanel>
+            </template>
+        </div>
+        <div v-if="page == 'requests'">
+            <TitledPanel id="pendingRequests">
+                <template #header>
+                    <div class="groupname">Join a Squad</div>
+                </template>
+                <template #content>
+                    <div class="search">
+                        <div class="search-form">
+                            <input class="rounded-input" v-model="searchQuery" type="text" placeholder="Search"
+                                @keyup.enter="searchSquads" @keyup.escape="clearSearch()" />
+                            <button @click="searchSquads">Search</button>
+                        </div>
+                        <div class="search-backdrop" v-if="searchPerformed">
+                            <div class="search-results" v-if="searchResults.length === 0 && searchPerformed">
+                                <div class="search-result">No squads found.</div>
+                            </div>
+                            <div class="search-results" v-else-if="searchResults.length > 0">
+                                <div v-for="squad in searchResults" :key="squad.id" class="search-result"
+                                    @click="requestToJoin(squad)">
+                                    <span>{{ squad.name }}</span>
+                                    <span class="captain"> (Captain: {{ squad.captain }})</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="section" v-if="pendingRequests.length > 0">
+                            <div class="sectionheader">Pending Requests</div>
+                            <div class="pendingrequests">
+                                <div v-for="request in pendingRequests" :key="request.id" class="pending-request">
+                                    <div>{{ request.squadName }} <span class="captain">(Captain: {{
+                                        getSquadCaptain(request.squadName) }})</span></div>
+                                    <div class="team">{{ request.team }}</div>
+                                    <a href="#" @click.prevent="cancelRequest(request)">Cancel</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </TitledPanel>
+        </div>
+
+
     </div>
-  </div>
+
+    <ConfirmModal ref="confirmModal" :button-settings="{
+        cancel: { enabled: true, label: 'Close' },
+        confirm: { enabled: true, label: 'Disband' },
+    }" />
+
+    <Modal ref="joinModal" :button-settings="{
+        cancel: { enabled: true, label: 'Cancel' },
+        confirm: { enabled: true, label: 'Send Request' },
+    }" @confirm="sendJoinRequest" @cancel="cancelJoinRequest">
+        <template #header>
+            <div class="groupname">Join Squad</div>
+        </template>
+        <template #body>
+            <div class="joinSquadModal">
+                <div>Select a team to join <b>{{ joinModalSquad?.name }}</b>:</div>
+                <div v-if="userTeams.length === 0">No teams available.</div>
+                <div v-else>
+                    <select v-model="selectedJoinTeam">
+                        <option v-for="team in userTeams" :key="team.id" :value="team">{{ team.name }}</option>
+                    </select>
+                </div>
+            </div>
+        </template>
+    </Modal>
 </template>
 
 <style scoped>
@@ -79,111 +227,270 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue, toNative } from "vue-facing-decorator";
+import { Component, Vue, toNative, Ref } from "vue-facing-decorator";
 
-import { PageHeader, TitledPanel } from "@components/fumbblcomponents";
+import { PageHeader, TitledPanel, Modal, ConfirmModal } from "@components/fumbblcomponents";
+import FumbblApi from "@api/fumbbl";
 
 @Component({
-  components: {
-    PageHeader,
-    TitledPanel,
-  },
+    components: {
+        PageHeader,
+        TitledPanel,
+        ConfirmModal,
+        Modal,
+    },
 })
 class TournamentSquads extends Vue {
-  public apiBase: string = "";
-  public coachName: string | null = null;
-  public page: string = "squads";
+    public apiBase: string = "";
+    public coachName: string | null = null;
+    public defaultPage: string = "squads";
+    public page: string = "squads";
+    private fumbbl: FumbblApi = new FumbblApi();
 
-  public navItems: any = [
-    { label: "Some Label", page: "squads" },
-    { label: "Another page", page: "something" },
-  ];
+    public showErrors: boolean = false;
 
-  public squads: any = [];
+    @Ref
+    pageHeader!: InstanceType<typeof PageHeader>;
 
-  public changed() {}
+    @Ref
+    squadname!: any;
 
-  public mounted() {
-    if (window.location.host.indexOf("dev.") !== 0) {
-      this.apiBase = "https://" + window.location.host;
-    }
+    public memberCount: number | null = null;
+    public reserveCount: number | null = null;
 
-    this.coachName = document
-      .getElementsByClassName("tournamentsquadspage")[0]
-      .getAttribute("coach");
+    @Ref confirmModal!: InstanceType<typeof ConfirmModal>;
+    @Ref joinModal!: InstanceType<typeof Modal>;
 
-    if (window.location.hash) {
-      const c = window.location.hash.substring(1);
-      this.setPage(c);
-    } else {
-      this.setPage(this.page);
-    }
-  }
-
-  public setPage(newPage: string) {
-    this.page = newPage;
-
-    switch (newPage) {
-      case "squads":
-        this.loadSquads();
-        break;
-      default:
-        break;
-    }
-  }
-
-  public toggleSettings(squad: any) {
-    squad.settingsVisible = !squad.settingsVisible;
-  }
-
-  public loadSquads() {
-    this.squads = [
-      {
-        id: 1234,
-        tournament: "Awesome Group Tournament",
-        name: "Best Squad",
-        captain: "Christer",
-        members: [
-          {
-            id: 1,
-            coach: "Christer",
-            teamId: 1234,
-            name: "Skitter Skitter",
-            roster: "Skaven",
-            logo: 486338,
-          },
-          {
-            id: 2,
-            coach: "Coach1",
-            teamId: 1235,
-            name: "Orclin Rouge",
-            roster: "Orc",
-            logo: 486332,
-          },
-          {
-            id: 3,
-            coach: "AnotherCoach",
-            teamId: 1236,
-            name: "Sucky Vampires",
-            roster: "Vampire",
-            logo: 486350,
-          },
-          {
-            id: 4,
-            coach: "ThirdCoach",
-            teamId: 1237,
-            name: "Grubby Goblins",
-            roster: "Goblin",
-            logo: 486272,
-          },
-        ],
-        numAccepted: 4,
-        numInvited: 2,
-        numRequested: 1,
-        memberCap: 6,
-      },
+    public navItems: any = [
+        { label: "Create Squad", page: "createSquad" },
+        { label: "My Squads", page: "squads" },
+        { label: "Join a Squad", page: "requests" },
     ];
-  }
+
+    public squads: any = [];
+    // New state for requests/search
+    public pendingRequests: any[] = [];
+    public searchQuery: string = "";
+    public searchResults: any[] = [];
+    public searchPerformed: boolean = false;
+
+    // Modal state for join request
+    public joinModalSquad: any = null;
+    public userTeams: any[] = [
+        { id: 1, name: "Skitter Skitter" },
+        { id: 2, name: "Orclin Rouge" },
+        { id: 3, name: "Sucky Vampires" },
+    ];
+    public selectedJoinTeam: any = null;
+
+    public created() {
+        if (window.location.hash) {
+            const c = window.location.hash.substring(1);
+            this.defaultPage = c;
+        }
+    }
+
+    public changed() { }
+
+    public mounted() {
+        if (window.location.host.indexOf("dev.") !== 0) {
+            this.apiBase = "https://" + window.location.host;
+        }
+
+        this.coachName = document
+            .getElementsByClassName("tournamentsquadspage")[0]
+            .getAttribute("coach");
+
+        document.addEventListener("click", (event) => {
+            if (!this.$refs.joinModal || !this.$refs.joinModal.isVisible) {
+                this.clearSearch();
+            }
+        });
+    }
+
+    public setPage(newPage: string) {
+        if (this.pageHeader) {
+            this.pageHeader.setPage(newPage);
+        }
+    }
+
+    public initPage(newPage: string) {
+        this.page = newPage;
+
+        switch (newPage) {
+            case "squads":
+                this.loadSquads();
+                break;
+            case "createSquad":
+                this.memberCount = null;
+                this.reserveCount = null;
+                this.showErrors = false;
+                this.$nextTick(() => {
+                    this.squadname.focus();
+                });
+                break;
+            case "requests":
+                this.clearSearch();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    public createSquad() {
+        if (document.querySelector(":invalid") != null) {
+            this.showErrors = true;
+            return;
+        }
+
+        // Todo: Add API call to create squad
+
+        this.squads.push({
+            id: Math.floor(Math.random() * 10000),
+            limits: {
+                maxMembers: this.memberCount,
+                maxReserves: this.reserveCount,
+            },
+            tournament: null,
+            name: this.squadname.value,
+            captain: this.coachName,
+            members: [],
+            reserves: [],
+            requests: [],
+        });
+
+        this.pageHeader.setPage("squads");
+    }
+
+    public disbandSquad(squad: any) {
+        this.$refs.confirmModal.show({
+            title: "Disband Squad?",
+            text: `Are you sure you want to disband the squad "${squad.name}"?`,
+            confirm: () => {
+                console.log("Squad disbanded:", squad.name);
+                this.squads = this.squads.filter((s: any) => s.id !== squad.id);
+                this.loadSquads();
+            }
+        });
+    }
+
+    public toggleSettings(squad: any) {
+        squad.settingsVisible = !squad.settingsVisible;
+    }
+
+    public async loadSquads() {
+        this.squads = await this.fumbbl.TournamentSquads.list();
+    }
+
+    public isCoachCaptain(squad: any, coachName: string): boolean {
+        return squad.captain === coachName;
+    }
+
+    public openSpotString(num: number): string {
+        if (num === 1) {
+            return "1 open spot";
+        } else {
+            return `${num} open spots`;
+        }
+    }
+
+    // New methods for requests/search
+    public cancelRequest(request: any) {
+        this.pendingRequests = this.pendingRequests.filter(r => r.id !== request.id);
+    }
+
+    public searchSquads() {
+        // Placeholder: filter squads by name
+        this.searchResults = this.squads.filter((s: any) =>
+            s.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+        );
+        this.searchPerformed = true;
+    }
+
+    public clearSearch() {
+        this.searchQuery = "";
+        this.searchResults = [];
+        this.searchPerformed = false;
+    }
+
+    public requestToJoin(squad: any) {
+        this.joinModalSquad = squad;
+        this.selectedJoinTeam = this.userTeams.length > 0 ? this.userTeams[0] : null;
+        this.$refs.joinModal.show();
+    }
+
+    public sendJoinRequest() {
+        if (!this.selectedJoinTeam || !this.joinModalSquad) return;
+        if (!this.pendingRequests.some(r => r.squadName === this.joinModalSquad.name && r.team === this.selectedJoinTeam.name)) {
+            this.pendingRequests.push({
+                id: Math.floor(Math.random() * 10000),
+                squadName: this.joinModalSquad.name,
+                team: this.selectedJoinTeam.name,
+            });
+        }
+        // Add request to the squad's requests list
+        if (this.joinModalSquad.requests) {
+            this.joinModalSquad.requests.push({
+                coach: { name: this.coachName },
+                team: {
+                    name: this.selectedJoinTeam.name,
+                    id: this.selectedJoinTeam.id,
+                    logo: this.selectedJoinTeam.logo || 0,
+                },
+            });
+        }
+        this.joinModalSquad = null;
+        this.selectedJoinTeam = null;
+        if (this.$refs.joinModal) {
+            this.$refs.joinModal.hide();
+        }
+        this.searchQuery = "";
+        this.clearSearch();
+    }
+
+    public cancelJoinRequest() {
+        if (this.$refs.joinModal) {
+            this.$refs.joinModal.hide();
+        }
+        this.joinModalSquad = null;
+        this.selectedJoinTeam = null;
+        this.searchPerformed = true;
+    }
+
+    public getSquadCaptain(squadName: string): string {
+        const squad = this.squads.find((s: any) => s.name === squadName);
+        return squad ? squad.captain : "Unknown";
+    }
+
+    public acceptRequestMember(request: any, squad: any) {
+        // Move request.team to members, remove from requests
+        squad.members.push({
+            id: request.team.id,
+            coach: request.coach.name,
+            teamId: request.team.id,
+            name: request.team.name,
+            roster: "", // Add roster if available
+            logo: request.team.logo,
+        });
+        squad.requests = squad.requests.filter((r: any) => r !== request);
+    }
+
+    public acceptRequestReserve(request: any, squad: any) {
+        // Move request.team to reserves, remove from requests
+        squad.reserves.push({
+            id: request.team.id,
+            coach: request.coach.name,
+            teamId: request.team.id,
+            name: request.team.name,
+            roster: "", // Add roster if available
+            logo: request.team.logo,
+        });
+        squad.requests = squad.requests.filter((r: any) => r !== request);
+    }
+    public declineRequest(request: any, squad: any) {
+        squad.requests = squad.requests.filter((r: any) => r !== request);
+    }
 }
 
 export default toNative(TournamentSquads);

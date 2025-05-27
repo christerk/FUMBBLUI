@@ -6,6 +6,7 @@ import Spinner from "./spinner/spinner.vue";
 import Modal from "./modal/modal.vue";
 import Trinary from "./trinary/trinary.vue";
 import ErrorModal from "./modals/Error.vue";
+import ConfirmModal from "./modals/Confirm.vue";
 
 export {
   Die,
@@ -16,4 +17,5 @@ export {
   Modal,
   Trinary,
   ErrorModal,
+  ConfirmModal,
 };

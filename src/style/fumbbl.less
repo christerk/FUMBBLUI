@@ -14,38 +14,50 @@
 @LightSilver: #d8d8d8;
 
 button {
-  background: lighten(@Forest, 10%);
-  border-color: darken(@Forest, 2%);
-  border-radius: 0.75rem;
-  border-style: solid;
-  color: white;
-  transition: all ease-in-out 0.15s;
-  cursor: pointer;
-  padding: 0.25rem 1rem;
-  margin: 0 0.5rem;
-
-  &:hover {
-    border-color: lighten(@Forest, 30%);
-  }
-
-  &.light {
     background: lighten(@Forest, 10%);
-    border-color: lighten(@Forest, 8%);
+    border-color: darken(@Forest, 2%);
+    border-radius: 0.75rem;
+    border-style: solid;
+    color: white;
+    transition: all ease-in-out 0.15s;
+    cursor: pointer;
+    padding: 0.25rem 1rem;
+    margin: 0 0.5rem;
 
     &:hover {
-      border-color: lighten(@Forest, 30%);
+        border-color: lighten(@Forest, 30%);
     }
-  }
+
+    &.light {
+        background: lighten(@Forest, 10%);
+        border-color: lighten(@Forest, 8%);
+
+        &:hover {
+            border-color: lighten(@Forest, 30%);
+        }
+    }
 }
 
 .tag {
-  font-size: 8px;
-  display: inline-block;
-  line-height: 100%;
-  vertical-align: middle;
-  margin: 0 5px;
-  background: @Eggshell;
-  padding: 3px;
-  border-radius: 6px;
-  color: @Forest;
+    font-size: 8px;
+    display: inline-block;
+    line-height: 100%;
+    vertical-align: middle;
+    margin: 0 5px;
+    background: @Eggshell;
+    padding: 3px;
+    border-radius: 6px;
+    color: @Forest;
+}
+
+.tcenter {
+    text-align: center;
+}
+
+.tleft {
+    text-align: left;
+}
+
+.tright {
+    text-align: right;
 }

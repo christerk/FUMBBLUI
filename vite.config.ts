@@ -31,6 +31,7 @@ export default defineConfig({
       "@style": resolve(__dirname, "src", "style"),
       "@pages": resolve(__dirname, "src", "pages"),
       "@components": resolve(__dirname, "src", "components"),
+      "@api": resolve(__dirname, "src", "api"),
     },
   },
   publicDir: "../public",
