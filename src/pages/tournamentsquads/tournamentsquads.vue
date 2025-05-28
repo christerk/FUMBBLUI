@@ -53,10 +53,13 @@
                         <div class="tournament" v-if="squad.tournament != null">{{ squad.tournament.name }}</div>
                     </template>
                     <template #content>
-                        <div class="squad">
+                        <div :class="{ squad: true, allowEdit: isCoachCaptain(squad, coachName) }">
                             <div class="sectionheader">Team Members</div>
-                            <div class="members">
-                                <div v-for="member in squad.members" :key="member.id" class="member">
+                            <div class="members" @dragover.prevent @drop.prevent="onDropMember($event, squad, false)">
+                                <div v-for="member in squad.members" :key="member.id" :teamid="member.teamId"
+                                    class="member" draggable="true"
+                                    @click.prevent="openRemoveMemberModal(member, squad)"
+                                    @dragstart="onDragStart($event, member, squad, false)">
                                     <div class="coach">
                                         <span class="captainMarker" v-if="isCoachCaptain(squad, member.coach)">&#9733;
                                         </span><a href="#">{{ member.coach }}</a>
@@ -68,15 +71,20 @@
                                     </div>
                                 </div>
                                 <template v-if="squad.limits.maxMembers - squad.members.length > 0">
-                                    <div class="member empty">
+                                    <div class="member empty" @dragover.prevent
+                                        @drop.prevent="onDropEmpty($event, squad, false)">
                                         {{ openSpotString(squad.limits.maxMembers - squad.members.length) }}
                                     </div>
                                 </template>
                             </div>
                             <div v-if="squad.limits.maxReserves > 0">
                                 <div class="sectionheader">Reserves</div>
-                                <div class="reserves">
-                                    <div v-for="member in squad.reserves" :key="member.id" class="member">
+                                <div class="reserves" @dragover.prevent
+                                    @drop.prevent="onDropMember($event, squad, true)">
+                                    <div v-for="member in squad.reserves" :key="member.id" :teamid="member.teamId"
+                                        class="member" draggable="true"
+                                        @click.prevent="openRemoveMemberModal(member, squad)"
+                                        @dragstart="onDragStart($event, member, squad, true)">
                                         <div class="coach">
                                             <span class="captainMarker"
                                                 v-if="isCoachCaptain(squad, member.coach)">&#9733;
@@ -89,7 +97,8 @@
                                         </div>
                                     </div>
                                     <template v-if="squad.limits.maxReserves - squad.reserves.length > 0">
-                                        <div class="member empty">
+                                        <div class="member empty" @dragover.prevent
+                                            @drop.prevent="onDropEmpty($event, squad, true)">
                                             {{ openSpotString(squad.limits.maxReserves - squad.reserves.length) }}
                                         </div>
                                     </template>
@@ -220,6 +229,24 @@
             </div>
         </template>
     </Modal>
+
+    <Modal ref="removeMemberModal" :button-settings="{
+        cancel: { enabled: true, label: 'Cancel' },
+        confirm: { enabled: true, label: 'Remove' },
+    }" @confirm="confirmRemoveMember" @cancel="cancelRemoveMember">
+        <template #header>
+            <div class="groupname">Remove Member</div>
+        </template>
+        <template #body>
+            <div class="removeMemberModal">
+                <div v-if="removeMemberTarget">
+                    Are you sure you want to remove
+                    <b>{{ removeMemberTarget.member.name }}</b>
+                    from squad <b>{{ removeMemberTarget.squad.name }}</b>?
+                </div>
+            </div>
+        </template>
+    </Modal>
 </template>
 
 <style scoped>
@@ -260,6 +287,7 @@ class TournamentSquads extends Vue {
 
     @Ref confirmModal!: InstanceType<typeof ConfirmModal>;
     @Ref joinModal!: InstanceType<typeof Modal>;
+    @Ref removeMemberModal!: InstanceType<typeof Modal>;
 
     public navItems: any = [
         { label: "Create Squad", page: "createSquad" },
@@ -278,6 +306,8 @@ class TournamentSquads extends Vue {
     public joinModalSquad: any = null;
     public userTeams: any[] = [];
     public selectedJoinTeam: any = null;
+    public removeMemberTarget: { member: any, squad: any } | null = null;
+
 
     public created() {
         if (window.location.hash) {
@@ -508,7 +538,82 @@ class TournamentSquads extends Vue {
         await this.fumbbl.TournamentSquads.declineRequest(squad.id, request.team.id);
         squad.requests = squad.requests.filter((r: any) => r !== request);
     }
-}
+    // Drag and drop logic for swapping members/reserves
+    private dragData: any = null;
 
+    public onDragStart(event: DragEvent, member: any, squad: any, isReserve: boolean) {
+        this.dragData = {
+            member,
+            squad,
+            isReserve
+        };
+        if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", JSON.stringify({
+                teamId: member.id,
+                squadId: squad.id,
+                isReserve
+            }));
+        }
+    }
+
+    public async onDropMember(event: DragEvent, squad: any, targetIsReserve: boolean) {
+        if (!this.dragData || this.dragData.squad.id !== squad.id) return;
+        const fromIsReserve = this.dragData.isReserve;
+        if (fromIsReserve === targetIsReserve) return; // Only allow cross-category
+
+        // If dropped on a member, swap with that member
+        const targetElem = (event.target as HTMLElement).closest('.member:not(.empty)');
+        if (targetElem) {
+            const targetId = targetElem.getAttribute('teamid') || targetElem.getAttribute('data-key');
+            let targetMember = null;
+            if (targetIsReserve) {
+                targetMember = squad.reserves.find((m: any) => m.teamId == targetId);
+            } else {
+                targetMember = squad.members.find((m: any) => m.teamId == targetId);
+            }
+            if (targetMember) {
+                await this.swapTeam(squad.id, this.dragData.member.teamId, targetMember.teamId);
+                this.dragData = null;
+                await this.loadSquads();
+                return;
+            }
+        }
+    }
+
+    public async onDropEmpty(event: DragEvent, squad: any, targetIsReserve: boolean) {
+        if (!this.dragData || this.dragData.squad.id !== squad.id) return;
+        const fromIsReserve = this.dragData.isReserve;
+        if (fromIsReserve === targetIsReserve) return; // Only allow cross-category
+
+        // Move to other category (no swap)
+        await this.swapTeam(squad.id, this.dragData.member.teamId, null);
+        this.dragData = null;
+        await this.loadSquads();
+    }
+
+    // Call swapTeam API
+    public async swapTeam(squadId: number, teamId: number, otherTeamId: number | null) {
+        await this.fumbbl.TournamentSquads.swapTeam(squadId, teamId, otherTeamId);
+    }
+    public async openRemoveMemberModal(member: any, squad: any) {
+        this.removeMemberTarget = { member, squad };
+        (this.$refs.removeMemberModal as any).show();
+    }
+
+    public async confirmRemoveMember() {
+        if (!this.removeMemberTarget) return;
+        const { member, squad } = this.removeMemberTarget;
+        await this.fumbbl.TournamentSquads.removeMember(squad.id, member.teamId);
+        squad.members = squad.members.filter((m: any) => m.teamId !== member.teamId);
+        this.removeMemberTarget = null;
+        (this.$refs.removeMemberModal as any).hide();
+    }
+
+    public cancelRemoveMember() {
+        this.removeMemberTarget = null;
+        (this.$refs.removeMemberModal as any).hide();
+    }
+}
 export default toNative(TournamentSquads);
 </script>

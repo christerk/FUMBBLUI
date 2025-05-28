@@ -437,3 +437,14 @@
         border-color: lighten(@Carmine, 10%);
     }
 }
+
+.allowEdit {
+    .member:not(.empty):hover {
+        cursor: move;
+        box-shadow: 0 0 1rem @Forest;
+    }
+}
+
+.removeMemberModal {
+    padding: 1rem;
+}

@@ -74,7 +74,9 @@ abstract class CategoryBase {
     private tokenExpiry: number = 0;
 
     constructor(runner: SerializedApiRunner) {
-        this.apiBase = import.meta.env.VITE_API_URL + "/api";
+        const siteUrl = import.meta.env.VITE_API_URL || "https://fumbbl.com";
+        this.apiBase = siteUrl + "/api";
+
         if (import.meta.env.VITE_ENABLE_OAUTH == "true") {
             this.enableOauth = true;
         } else {
@@ -171,6 +173,10 @@ class TournamentSquads extends CategoryBase {
         return this.post(this.categoryPath, "pendingRequests").then(res => res.data);
     }
 
+    public removeMember(squadId: number, teamId: number) {
+        return this.post(this.categoryPath, "remove", { squadId: squadId, teamId: teamId }).then(res => res.data);
+    }
+
     public cancelRequest(squadId: number, teamId: number) {
         return this.post(this.categoryPath, "cancelRequest", { squadId: squadId, teamId: teamId }).then(res => res.data);
     }
@@ -193,6 +199,10 @@ class TournamentSquads extends CategoryBase {
 
     public declineRequest(squadId: number, teamId: number) {
         return this.post(this.categoryPath, "rejectRequest", { squadId: squadId, teamId: teamId }).then(res => res.data);
+    }
+
+    public swapTeam(squadId: number, teamId: number, otherTeamId: number | null) {
+        return this.post(this.categoryPath, "swapTeam", { squadId: squadId, teamId: teamId, otherTeamId: otherTeamId }).then(res => res.data);
     }
 }
 
