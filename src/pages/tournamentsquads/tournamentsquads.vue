@@ -162,18 +162,18 @@
                     <div class="search">
                         <div class="search-form">
                             <input class="rounded-input" v-model="searchQuery" type="text" placeholder="Search"
-                                @keyup.enter="searchSquads" @keyup.escape="clearSearch()" />
+                                @keyup.enter="searchSquads" @keyup.escape="clearSearch" />
                             <button @click="searchSquads">Search</button>
                         </div>
                         <div class="search-backdrop" v-if="searchPerformed">
-                            <div class="search-results" v-if="searchResults.length === 0 && searchPerformed">
+                            <div class="search-results" v-if="searchResults.length === 0">
                                 <div class="search-result">No squads found.</div>
                             </div>
                             <div class="search-results" v-else-if="searchResults.length > 0">
                                 <div v-for="squad in searchResults" :key="squad.id" class="search-result"
                                     @click="requestToJoin(squad)">
-                                    <span>{{ squad.name }}</span>
                                     <span class="captain"> (Captain: {{ squad.captain }})</span>
+                                    <span>{{ squad.name }}</span>
                                 </div>
                             </div>
                         </div>
@@ -181,9 +181,9 @@
                             <div class="sectionheader">Pending Requests</div>
                             <div class="pendingrequests">
                                 <div v-for="request in pendingRequests" :key="request.id" class="pending-request">
-                                    <div>{{ request.squadName }} <span class="captain">(Captain: {{
-                                        getSquadCaptain(request.squadName) }})</span></div>
-                                    <div class="team">{{ request.team }}</div>
+                                    <div>{{ request.squad.name }} <span class="captain">(Captain: {{
+                                        request.squad.captain }})</span></div>
+                                    <div class="team">{{ request.team.name }}</div>
                                     <a href="#" @click.prevent="cancelRequest(request)">Cancel</a>
                                 </div>
                             </div>
@@ -227,7 +227,7 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue, toNative, Ref } from "vue-facing-decorator";
+import { Component, Vue, toNative, Ref, Watch } from "vue-facing-decorator";
 
 import { PageHeader, TitledPanel, Modal, ConfirmModal } from "@components/fumbblcomponents";
 import FumbblApi from "@api/fumbbl";
@@ -270,17 +270,13 @@ class TournamentSquads extends Vue {
     public squads: any = [];
     // New state for requests/search
     public pendingRequests: any[] = [];
+    public searchPerformed: boolean = false;
     public searchQuery: string = "";
     public searchResults: any[] = [];
-    public searchPerformed: boolean = false;
-
+    private searchDebounceTimer: any = null;
     // Modal state for join request
     public joinModalSquad: any = null;
-    public userTeams: any[] = [
-        { id: 1, name: "Skitter Skitter" },
-        { id: 2, name: "Orclin Rouge" },
-        { id: 3, name: "Sucky Vampires" },
-    ];
+    public userTeams: any[] = [];
     public selectedJoinTeam: any = null;
 
     public created() {
@@ -330,7 +326,9 @@ class TournamentSquads extends Vue {
                 });
                 break;
             case "requests":
+                this.loadTeams();
                 this.clearSearch();
+                this.loadRequests();
                 break;
 
             default:
@@ -338,22 +336,26 @@ class TournamentSquads extends Vue {
         }
     }
 
-    public createSquad() {
+    public async createSquad() {
         if (document.querySelector(":invalid") != null) {
             this.showErrors = true;
             return;
         }
 
-        // Todo: Add API call to create squad
+        let createdSquad = await this.fumbbl.TournamentSquads.create({
+            name: this.squadname.value,
+            maxMembers: this.memberCount,
+            maxReserves: this.reserveCount,
+        });
 
         this.squads.push({
-            id: Math.floor(Math.random() * 10000),
+            id: createdSquad.id,
             limits: {
-                maxMembers: this.memberCount,
-                maxReserves: this.reserveCount,
+                maxMembers: createdSquad.maxMembers,
+                maxReserves: createdSquad.maxReserves,
             },
             tournament: null,
-            name: this.squadname.value,
+            name: createdSquad.name,
             captain: this.coachName,
             members: [],
             reserves: [],
@@ -368,7 +370,7 @@ class TournamentSquads extends Vue {
             title: "Disband Squad?",
             text: `Are you sure you want to disband the squad "${squad.name}"?`,
             confirm: () => {
-                console.log("Squad disbanded:", squad.name);
+                this.fumbbl.TournamentSquads.disband(squad.id);
                 this.squads = this.squads.filter((s: any) => s.id !== squad.id);
                 this.loadSquads();
             }
@@ -379,8 +381,16 @@ class TournamentSquads extends Vue {
         squad.settingsVisible = !squad.settingsVisible;
     }
 
+    public async loadTeams() {
+        this.userTeams = (await this.fumbbl.Coach.activeTeams(this.coachName || "")).teams;
+    }
+
     public async loadSquads() {
         this.squads = await this.fumbbl.TournamentSquads.list();
+    }
+
+    public async loadRequests() {
+        this.pendingRequests = await this.fumbbl.TournamentSquads.getPendingRequests();
     }
 
     public isCoachCaptain(squad: any, coachName: string): boolean {
@@ -397,21 +407,40 @@ class TournamentSquads extends Vue {
 
     // New methods for requests/search
     public cancelRequest(request: any) {
-        this.pendingRequests = this.pendingRequests.filter(r => r.id !== request.id);
+        this.fumbbl.TournamentSquads.cancelRequest(request.squad.id, request.team.id);
+        this.pendingRequests = this.pendingRequests.filter(r => r.squad.id !== request.squad.id || r.team.id !== request.team.id);
     }
 
-    public searchSquads() {
-        // Placeholder: filter squads by name
-        this.searchResults = this.squads.filter((s: any) =>
-            s.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-        );
+    public async searchSquads() {
+        this.searchResults = await this.fumbbl.TournamentSquads.search(this.searchQuery.trim());
         this.searchPerformed = true;
     }
+
 
     public clearSearch() {
         this.searchQuery = "";
         this.searchResults = [];
         this.searchPerformed = false;
+        if (this.searchDebounceTimer) {
+            clearTimeout(this.searchDebounceTimer);
+            this.searchDebounceTimer = null;
+        }
+    }
+
+    @Watch("searchQuery")
+    onSearchQueryChanged() {
+        if (this.searchDebounceTimer) {
+            clearTimeout(this.searchDebounceTimer);
+            this.searchDebounceTimer = null;
+        }
+        if (!this.searchQuery.trim()) {
+            this.searchResults = [];
+            this.searchPerformed = false;
+            return;
+        }
+        this.searchDebounceTimer = setTimeout(() => {
+            this.searchSquads();
+        }, 350);
     }
 
     public requestToJoin(squad: any) {
@@ -422,31 +451,15 @@ class TournamentSquads extends Vue {
 
     public sendJoinRequest() {
         if (!this.selectedJoinTeam || !this.joinModalSquad) return;
-        if (!this.pendingRequests.some(r => r.squadName === this.joinModalSquad.name && r.team === this.selectedJoinTeam.name)) {
-            this.pendingRequests.push({
-                id: Math.floor(Math.random() * 10000),
-                squadName: this.joinModalSquad.name,
-                team: this.selectedJoinTeam.name,
-            });
-        }
-        // Add request to the squad's requests list
-        if (this.joinModalSquad.requests) {
-            this.joinModalSquad.requests.push({
-                coach: { name: this.coachName },
-                team: {
-                    name: this.selectedJoinTeam.name,
-                    id: this.selectedJoinTeam.id,
-                    logo: this.selectedJoinTeam.logo || 0,
-                },
-            });
-        }
-        this.joinModalSquad = null;
-        this.selectedJoinTeam = null;
+
+        this.fumbbl.TournamentSquads.sendJoinRequest(this.joinModalSquad.id, this.selectedJoinTeam.id);
+
         if (this.$refs.joinModal) {
             this.$refs.joinModal.hide();
         }
         this.searchQuery = "";
         this.clearSearch();
+        this.loadRequests();
     }
 
     public cancelJoinRequest() {
@@ -463,7 +476,8 @@ class TournamentSquads extends Vue {
         return squad ? squad.captain : "Unknown";
     }
 
-    public acceptRequestMember(request: any, squad: any) {
+    public async acceptRequestMember(request: any, squad: any) {
+        await this.fumbbl.TournamentSquads.acceptRequestMember(squad.id, request.team.id);
         // Move request.team to members, remove from requests
         squad.members.push({
             id: request.team.id,
@@ -476,7 +490,8 @@ class TournamentSquads extends Vue {
         squad.requests = squad.requests.filter((r: any) => r !== request);
     }
 
-    public acceptRequestReserve(request: any, squad: any) {
+    public async acceptRequestReserve(request: any, squad: any) {
+        await this.fumbbl.TournamentSquads.acceptRequestReserve(squad.id, request.team.id);
         // Move request.team to reserves, remove from requests
         squad.reserves.push({
             id: request.team.id,
@@ -488,7 +503,9 @@ class TournamentSquads extends Vue {
         });
         squad.requests = squad.requests.filter((r: any) => r !== request);
     }
-    public declineRequest(request: any, squad: any) {
+
+    public async declineRequest(request: any, squad: any) {
+        await this.fumbbl.TournamentSquads.declineRequest(squad.id, request.team.id);
         squad.requests = squad.requests.filter((r: any) => r !== request);
     }
 }

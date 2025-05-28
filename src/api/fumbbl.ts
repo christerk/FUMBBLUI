@@ -9,16 +9,21 @@ interface SerializedApiRunnerOptions {
 class SerializedApiRunner {
     private queue: Array<() => Promise<void>> = [];
     private running = false;
-    private rateLimitMs: number;
+    private maxRequests: number;
+    private windowMs: number;
+    private requestTimestamps: number[] = [];
 
     constructor(options: SerializedApiRunnerOptions = {}) {
-        this.rateLimitMs = options.rateLimitMs ?? 1000;
+        // Default: 5 requests per 1000ms
+        this.maxRequests = options.maxRequests ?? 5;
+        this.windowMs = options.windowMs ?? 1000;
     }
 
     public async run<T>(apiCall: ApiCall<T>): Promise<T> {
         return new Promise<T>((resolve, reject) => {
             this.queue.push(async () => {
                 try {
+                    await this.ensureRateLimit();
                     const result = await apiCall();
                     resolve(result);
                 } catch (err) {
@@ -36,10 +41,22 @@ class SerializedApiRunner {
             const task = this.queue.shift();
             if (task) {
                 await task();
-                await this.delay(this.rateLimitMs);
             }
         }
         this.running = false;
+    }
+
+    private async ensureRateLimit() {
+        const now = Date.now();
+        // Remove timestamps outside the window
+        this.requestTimestamps = this.requestTimestamps.filter(ts => now - ts < this.windowMs);
+        if (this.requestTimestamps.length >= this.maxRequests) {
+            const waitTime = this.windowMs - (now - this.requestTimestamps[0]);
+            await this.delay(waitTime);
+            // After waiting, clean up again
+            return this.ensureRateLimit();
+        }
+        this.requestTimestamps.push(Date.now());
     }
 
     private async delay(ms: number) {
@@ -57,8 +74,12 @@ abstract class CategoryBase {
     private tokenExpiry: number = 0;
 
     constructor(runner: SerializedApiRunner) {
-        this.enableOauth = import.meta.env.VITE_ENABLE_OAUTH == "true";
         this.apiBase = import.meta.env.VITE_API_URL + "/api";
+        if (import.meta.env.VITE_ENABLE_OAUTH == "true") {
+            this.enableOauth = true;
+        } else {
+            this.enableOauth = false;
+        }
         this.runner = runner;
         return new Proxy(this, {
             get(target, prop, receiver) {
@@ -102,12 +123,28 @@ abstract class CategoryBase {
     
     protected async get<T>(category: string, endpoint: string): Promise<T> {
         const headers = await this.getAuthHeaders();
-        return axios.get(`${CategoryBase.apiBase}/${category}/${endpoint}`, headers);
+        return axios.get(`${this.apiBase}/${category}/${endpoint}`, headers);
     }
 
     protected async post<T>(category: string, endpoint: string, data: any): Promise<T> {
         const headers = await this.getAuthHeaders();
-        return axios.post(`${CategoryBase.apiBase}/${category}/${endpoint}`, data, headers);
+        return axios.post(`${this.apiBase}/${category}/${endpoint}`, data, headers);
+    }
+}
+
+class Coach extends CategoryBase {
+    protected categoryPath = "coach";
+
+    constructor(runner: SerializedApiRunner) {
+        super(runner);
+    }
+
+    public teams(coach: string) {
+        return this.get(this.categoryPath, "teams/"+coach).then(res => res.data);
+    }
+
+    public activeTeams(coach: string) {
+        return this.get(this.categoryPath, "activeteams/"+coach).then(res => res.data);
     }
 }
 
@@ -121,15 +158,53 @@ class TournamentSquads extends CategoryBase {
     public list() {
         return this.get(this.categoryPath, "list").then(res => res.data);
     }
+
+    public create(data: { name: string; maxMembers: number; maxReserves: number }) {
+        return this.post(this.categoryPath, "create", data).then(res => res.data);
+    }
+
+    public disband(id: number) {
+        return this.post(this.categoryPath, "disband", { squadId: id }).then(res => res.data);
+    }
+
+    public getPendingRequests() {
+        return this.post(this.categoryPath, "pendingRequests").then(res => res.data);
+    }
+
+    public cancelRequest(squadId: number, teamId: number) {
+        return this.post(this.categoryPath, "cancelRequest", { squadId: squadId, teamId: teamId }).then(res => res.data);
+    }
+
+    public sendJoinRequest(squadId: number, teamId: number) {
+        return this.post(this.categoryPath, "joinRequest", { squadId: squadId, teamId: teamId }).then(res => res.data);
+    }
+
+    public search(query: string) {
+        return this.get(this.categoryPath, "search/" + encodeURIComponent(query)).then(res => res.data);
+    }
+
+    public acceptRequestMember(squadId: number, teamId: number) {
+        return this.post(this.categoryPath, "acceptRequest", { squadId: squadId, teamId: teamId, isReserve: false }).then(res => res.data);
+    }
+
+    public acceptRequestReserve(squadId: number, teamId: number) {
+        return this.post(this.categoryPath, "acceptRequest", { squadId: squadId, teamId: teamId, isReserve: true }).then(res => res.data);
+    }
+
+    public declineRequest(squadId: number, teamId: number) {
+        return this.post(this.categoryPath, "rejectRequest", { squadId: squadId, teamId: teamId }).then(res => res.data);
+    }
 }
 
 export default class FumbblApi {
     public TournamentSquads: TournamentSquads;
+    public Coach: Coach;
 
     private runner: SerializedApiRunner;
 
     constructor() {
         this.runner = new SerializedApiRunner();
         this.TournamentSquads = new TournamentSquads(this.runner);
+        this.Coach = new Coach(this.runner);
     }
 }
