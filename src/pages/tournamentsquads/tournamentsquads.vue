@@ -54,7 +54,7 @@
                     </template>
                     <template #content>
                         <div :class="{ squad: true, allowEdit: isCoachCaptain(squad, coachName) }">
-                            <div class="sectionheader">Team Members</div>
+                            <div class="sectionheader">Members</div>
                             <div class="members" @dragover.prevent @drop.prevent="onDropMember($event, squad, false)">
                                 <div v-for="member in squad.members" :key="member.id" :teamid="member.teamId"
                                     class="member" draggable="true"
@@ -150,7 +150,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="controls">
+                                    <div class="controls" v-if="isCoachCaptain(squad, coachName)">
+                                        <button class="RenameButton" @click="openRenameModal(squad)">Rename
+                                            Squad</button>
+                                        <div class="spacer"></div>
                                         <button class="DisbandButton" v-if="isCoachCaptain(squad, coachName)"
                                             @click="disbandSquad(squad)">Disband
                                             Squad</button>
@@ -230,6 +233,23 @@
         </template>
     </Modal>
 
+    <Modal ref="renameModal" :button-settings="{
+        cancel: { enabled: true, label: 'Cancel' },
+        confirm: { enabled: true, label: 'Rename' },
+    }" @confirm="confirmRenameSquad" @cancel="cancelRenameSquad">
+        <template #header>
+            <div class="groupname">Rename Squad</div>
+        </template>
+        <template #body>
+            <div class="renameSquadModal">
+                <div>
+                    <input class="rounded-input" id="renameSquadInput" ref="renameSquadInput" v-model="renameSquadName"
+                        type="text" minlength="1" required @keyup.enter="confirmRenameSquad"
+                        @keyup.escape="cancelRenameSquad" />
+                </div>
+            </div>
+        </template>
+    </Modal>
     <Modal ref="removeMemberModal" :button-settings="{
         cancel: { enabled: true, label: 'Cancel' },
         confirm: { enabled: true, label: 'Remove' },
@@ -305,9 +325,8 @@ class TournamentSquads extends Vue {
     // Modal state for join request
     public joinModalSquad: any = null;
     public userTeams: any[] = [];
-    public selectedJoinTeam: any = null;
-    public removeMemberTarget: { member: any, squad: any } | null = null;
-
+    public renameModalSquad: any = null;
+    public renameSquadName: string = "";
 
     public created() {
         if (window.location.hash) {
@@ -613,6 +632,35 @@ class TournamentSquads extends Vue {
     public cancelRemoveMember() {
         this.removeMemberTarget = null;
         (this.$refs.removeMemberModal as any).hide();
+    }
+
+    public openRenameModal(squad: any) {
+        this.renameModalSquad = squad;
+        this.renameSquadName = squad.name;
+        (this.$refs.renameModal as any).show();
+        this.$nextTick(() => {
+            const input = (this.$refs.renameSquadInput as HTMLInputElement | undefined);
+            if (input) {
+                input.focus();
+                input.select();
+            }
+        });
+    }
+
+    public async confirmRenameSquad() {
+        if (!this.renameModalSquad || !this.renameSquadName.trim()) return;
+        await this.fumbbl.TournamentSquads.rename(this.renameModalSquad.id, this.renameSquadName.trim());
+        this.renameModalSquad.name = this.renameSquadName.trim();
+        (this.$refs.renameModal as any).hide();
+        this.renameModalSquad = null;
+        this.renameSquadName = "";
+        await this.loadSquads();
+    }
+
+    public cancelRenameSquad() {
+        this.renameModalSquad = null;
+        this.renameSquadName = "";
+        (this.$refs.renameModal as any).hide();
     }
 }
 export default toNative(TournamentSquads);

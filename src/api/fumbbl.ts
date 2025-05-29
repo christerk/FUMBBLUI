@@ -204,6 +204,10 @@ class TournamentSquads extends CategoryBase {
     public swapTeam(squadId: number, teamId: number, otherTeamId: number | null) {
         return this.post(this.categoryPath, "swapTeam", { squadId: squadId, teamId: teamId, otherTeamId: otherTeamId }).then(res => res.data);
     }
+
+    public rename(squadId: number, newName: string) {
+        return this.post(this.categoryPath, "rename", { squadId: squadId, name: newName }).then(res => res.data);
+    }
 }
 
 export default class FumbblApi {
