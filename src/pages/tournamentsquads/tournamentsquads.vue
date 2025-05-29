@@ -386,7 +386,7 @@ class TournamentSquads extends Vue {
     }
 
     public async createSquad() {
-        if (document.querySelector(":invalid") != null) {
+        if (document.querySelector(".createsquad :invalid") != null) {
             this.showErrors = true;
             return;
         }
