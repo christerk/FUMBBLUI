@@ -1,0 +1,28 @@
+@import '@style/fumbbl.less';
+
+.skill-selection-table {
+    width: 100%;
+    font-size: 14pt;
+    margin: 0;
+
+    th {
+        font-size: 10pt;
+        font-weight: bold;
+    }
+
+    td,
+    th {
+        border-bottom: 1px solid @Jet;
+        padding: 0.5rem;
+        text-align: right;
+
+        &:first-child {
+            text-align: left;
+        }
+
+    }
+
+    tr:last-child td {
+        border: 0;
+    }
+}

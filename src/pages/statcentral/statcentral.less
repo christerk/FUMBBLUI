@@ -1,0 +1,132 @@
+@import "@style/fumbbl.less";
+
+.statcentral {
+    .description {
+        background-color: @OldLace;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        text-align: center;
+        border-bottom: 1px solid rgb(188, 178, 157);
+
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-gap: 0.5rem;
+
+        position: sticky;
+        top: 0px;
+        z-index: 2;
+
+        &.cols2 {
+            grid-template-columns: auto auto;
+        }
+
+        &.cols6 {
+            grid-template-columns: repeat(6, auto);
+        }
+
+        .span2 {
+            grid-column: span 2;
+        }
+
+        .span3 {
+            grid-column: span 3;
+        }
+
+        .start {
+            place-self: start;
+        }
+
+        .end {
+            place-self: end;
+        }
+    }
+
+    :deep(.panel) {
+        width: 100%;
+        grid-template-rows: auto 1fr;
+    }
+
+    .pill {
+        border-width: 2px;
+        border-style: solid;
+        margin: 0;
+        display: inline-block;
+        border-left-width: 0;
+        border-right-width: 0;
+        border-radius: 0;
+        background-color: #e6ddc7;
+        border-color: #d2ccaf;
+        color: @Jet;
+        padding: 0.5rem 1rem;
+
+        &.label {
+            background-color: @OffWhite;
+            font-weight: bold;
+            cursor: default;
+        }
+
+        &.active {
+            background-color: @Spring;
+            color: @Jet;
+            cursor: default;
+        }
+
+        &:hover:not(.active):not(.label) {
+            background-color: lighten(#e6ddc7, 5%);
+
+        }
+
+        &:first-child {
+            border-left-width: 2px;
+            border-top-left-radius: 1rem;
+            border-bottom-left-radius: 1rem;
+        }
+
+        &:last-child {
+            border-right-width: 2px;
+            border-top-right-radius: 1rem;
+            border-bottom-right-radius: 1rem;
+        }
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1rem;
+    width: 100%;
+}
+
+#dashboard {
+
+    #dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .section_title {
+        text-align: center;
+        font-size: 14pt;
+    }
+
+    .panel.roster-results {
+        grid-column: e('1 / 3');
+    }
+
+
+    :deep(#apexchartsMatches .apexcharts-text.apexcharts-xaxis-label) {
+        display: none;
+
+        &:first-child {
+            text-anchor: start;
+            display: block;
+        }
+
+        &:last-child {
+            text-anchor: end;
+            display: block;
+        }
+    }
+
+}

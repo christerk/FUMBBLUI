@@ -735,4 +735,10 @@ export default class FumbblApi {
 
     return await this.enqueuePost(url);
   }
+
+  public async getDashboardData(): Promise<ApiResponse> {
+    const url = this.getUrl("/api/clickhouse/dashboardData");
+
+    return await this.enqueuePost(url);
+  }
 }
