@@ -165,6 +165,20 @@ class Coach extends CategoryBase {
   }
 }
 
+class Roster extends CategoryBase {
+  protected categoryPath = "roster";
+
+  constructor(runner: SerializedApiRunner) {
+    super(runner);
+  }
+
+  public list(ruleset: number) {
+    return this.get(this.categoryPath, "list/" + ruleset).then(
+      (res) => res.data,
+    );
+  }
+}
+
 class Clickhouse extends CategoryBase {
   protected categoryPath = "clickhouse";
 
@@ -205,6 +219,24 @@ class Clickhouse extends CategoryBase {
     };
 
     return this.post(this.categoryPath, `skillSelection`, opts).then(
+      (res) => res.data,
+    );
+  }
+
+  public versusStats(
+    year = null,
+    month = null,
+    type = "All",
+    includeLegacy = false,
+  ) {
+    const opts: any = {
+      year: year != "All" ? year : null,
+      month: month != "All" ? month : null,
+      type: type,
+      includeLegacy: includeLegacy,
+    };
+
+    return this.post(this.categoryPath, "versusStats", opts).then(
       (res) => res.data,
     );
   }
@@ -312,6 +344,7 @@ export default class FumbblApi {
   public TournamentSquads: TournamentSquads;
   public Coach: Coach;
   public Clickhouse: Clickhouse;
+  public Roster: Roster;
 
   private runner: SerializedApiRunner;
 
@@ -320,5 +353,6 @@ export default class FumbblApi {
     this.TournamentSquads = new TournamentSquads(this.runner);
     this.Coach = new Coach(this.runner);
     this.Clickhouse = new Clickhouse(this.runner);
+    this.Roster = new Roster(this.runner);
   }
 }

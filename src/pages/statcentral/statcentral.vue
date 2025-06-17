@@ -198,7 +198,102 @@
     </div>
 
     <div class="panel" id="rosters" v-if="page == 'rosters'">
-      <div class="description">Not implemented yet</div>
+      <div class="description cols6">
+        <div class="row span2 end">
+          <button class="pill label">Period</button>
+          <select
+            v-model="selectedYear"
+            @change="loadVersusStats()"
+            class="pill"
+          >
+            <option value="All">All</option>
+            <template
+              v-for="year in Array.from(
+                { length: new Date().getFullYear() - 2003 + 1 },
+                (_, i) => 2003 + i,
+              ).reverse()"
+              :key="year"
+            >
+              <option :value="year">{{ year }}</option>
+            </template>
+          </select>
+          <select
+            v-if="selectedYear !== 'All'"
+            class="pill"
+            v-model="selectedMonth"
+            @change="loadVersusStats()"
+          >
+            <option value="All">All Months</option>
+            <option
+              v-for="month in [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
+              ]"
+              :key="month"
+              :value="month"
+            >
+              {{ month }}
+            </option>
+          </select>
+        </div>
+        <div class="row span2">
+          <button class="pill label">Type</button>
+          <button
+            :class="{ pill: true, active: selectedType == 'all' }"
+            @click="
+              selectedType = 'all';
+              loadVersusStats();
+            "
+          >
+            All
+          </button>
+          <button
+            :class="{ pill: true, active: selectedType == 'open' }"
+            @click="
+              selectedType = 'open';
+              loadVersusStats();
+            "
+          >
+            Open
+          </button>
+          <button
+            :class="{ pill: true, active: selectedType == 'blackbox' }"
+            @click="
+              selectedType = 'blackbox';
+              loadVersusStats();
+            "
+          >
+            Blackbox
+          </button>
+        </div>
+        <div class="row span2 start">
+          <button class="pill label">Include Legacy</button>
+          <button
+            :class="{ pill: true, active: includeLegacy == true }"
+            @click="setIncludeLegacy(true)"
+          >
+            Yes
+          </button>
+          <button
+            :class="{ pill: true, active: includeLegacy == false }"
+            @click="setIncludeLegacy(false)"
+          >
+            No
+          </button>
+        </div>
+      </div>
+
+      <VersusStatsChart ref="versusStats" />
     </div>
 
     <div class="panel" id="skills" v-if="page == 'skills'">
@@ -269,6 +364,7 @@ import WeekdayChart from "./charts/weekday.vue";
 import HourChart from "./charts/hour.vue";
 import SkillSelectionChart from "./charts/skillselection.vue";
 import SkillChoiceChart from "./charts/skillchoice.vue";
+import VersusStatsChart from "./charts/versusstats.vue";
 
 import {
   PageHeader,
@@ -295,6 +391,7 @@ import {
     HourChart,
     SkillSelectionChart,
     SkillChoiceChart,
+    VersusStatsChart,
   },
 })
 class StatCentral extends Vue {
@@ -313,6 +410,10 @@ class StatCentral extends Vue {
   public selectedRoster: string = "All";
   public selectedPosition: string = "All";
   public mirrors: boolean = true;
+  public selectedYear: string = "All";
+  public selectedMonth: string = "All";
+  public includeLegacy: boolean = false;
+  public selectedType: string = "all";
 
   public rosters: string[] = [];
   public positions: string[] = [];
@@ -325,6 +426,7 @@ class StatCentral extends Vue {
   @Ref("hourChart") public hourChart!: HourChart;
   @Ref("skillSelection") public skillSelection!: SkillSelectionChart;
   @Ref("skillChoice") public skillChoice!: SkillChoiceChart;
+  @Ref("versusStats") public versusStats!: VersusStatsChart;
 
   public async mounted() {}
 
@@ -340,6 +442,9 @@ class StatCentral extends Vue {
         break;
       case "results":
         this.loadResults();
+        break;
+      case "rosters":
+        this.loadVersusStats();
         break;
       case "skills":
         this.loadSkills();
@@ -366,6 +471,11 @@ class StatCentral extends Vue {
   private updateRoster() {
     this.selectedPosition = "All";
     this.loadSkills();
+  }
+
+  private setIncludeLegacy(include: boolean) {
+    this.includeLegacy = include;
+    this.loadVersusStats();
   }
 
   private loadSkills() {
@@ -414,6 +524,20 @@ class StatCentral extends Vue {
         },
       );
     }
+  }
+
+  private loadVersusStats() {
+    if (this.selectedYear === "All") {
+      this.selectedMonth = "All";
+    }
+    this.fumbblApi.Clickhouse.versusStats(
+      this.selectedYear,
+      this.selectedMonth,
+      this.selectedType,
+      this.includeLegacy,
+    ).then((data: any) => {
+      this.versusStats.load(data);
+    });
   }
 
   private rosterChanged() {

@@ -1,0 +1,80 @@
+@import '@style/fumbbl.less';
+
+.versus-stats-chart {
+    display: grid;
+    grid-auto-columns: 30px;
+    grid-template-rows: repeat(auto-fit, 30px);
+    grid-gap: 0;
+
+    .icon {
+        overflow: hidden;
+
+        img {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+        }
+    }
+
+    .row {
+        display: grid;
+        grid-auto-columns: 30px;
+        grid-template-rows: subgrid;
+        grid-column: e('1 / -1');
+        place-items: center;
+
+        .col {
+            position: relative;
+            text-align: center;
+            place-content: center;
+            width: 30px;
+            height: 30px;
+            background-color: #e3e394;
+            line-height: 30px;
+            cursor: default;
+
+            .bg {
+                z-index: 1;
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+
+                &.red {
+                    background-color: #db7772;
+                }
+
+                &.green {
+                    background-color: #68d96d;
+                }
+            }
+
+            .val {
+                z-index: 2;
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+
+            }
+        }
+    }
+}
+
+:deep([data-tippy-root]) {
+    margin-bottom: 1rem !important;
+    display: block;
+    padding: 1rem;
+}
+
+:deep(.tippy-box[data-theme="fumbbl"]) {
+    padding: 0.75rem;
+    background: @OffWhite;
+    opacity: 0.9;
+    color: black;
+    border-radius: 0.5rem;
+    margin-top: -1rem;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.4);
+}
