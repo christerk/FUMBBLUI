@@ -1,0 +1,56 @@
+@import "@style/fumbbl.less";
+
+.pillwrapper {
+    display: inline-block;
+
+    .pill {
+        border-width: 2px;
+        border-style: solid;
+        margin: 0;
+        display: inline-block;
+        border-left-width: 0;
+        border-right-width: 0;
+        border-radius: 0;
+        background-color: #e6ddc7;
+        border-color: #d2ccaf;
+        color: @Jet;
+        padding: 0.5rem 1rem;
+        border-color: rgb(210, 204, 175);
+
+        &.label {
+            background-color: @OffWhite;
+            font-weight: bold;
+            cursor: default;
+        }
+
+        &.active {
+            background-color: @Spring;
+            color: @Jet;
+            cursor: default;
+        }
+
+        &:hover:not(.active):not(.label) {
+            background-color: lighten(#e6ddc7, 5%);
+
+        }
+
+        &:first-child {
+            border-left-width: 2px;
+            border-top-left-radius: 1rem;
+            border-bottom-left-radius: 1rem;
+        }
+
+
+        &:last-child {
+            border-right-width: 2px;
+            border-top-right-radius: 1rem;
+            border-bottom-right-radius: 1rem;
+        }
+    }
+
+    &.unwrap .pill:first-child {
+        border-left-width: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+}

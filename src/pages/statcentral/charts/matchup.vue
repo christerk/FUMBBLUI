@@ -17,26 +17,38 @@
 </template>
 
 <style scoped>
-@import "./rosterresults.less";
+@import "./matchup.less";
 </style>
 
 <script lang="ts">
-import { Component, Vue, toNative, Ref } from "vue-facing-decorator";
+import {
+  Component,
+  Vue,
+  toNative,
+  Ref,
+  Emit,
+  Prop,
+} from "vue-facing-decorator";
 import FumbblApi from "@api/fumbbl";
 import VueApexCharts from "vue3-apexcharts";
+import { Tippy, setDefaultProps } from "vue-tippy";
+import { directive as VTippy } from "vue-tippy";
+import "tippy.js/themes/light.css";
 
 @Component({
   components: {
     apexchart: VueApexCharts,
   },
 })
-class MatchesChart extends Vue {
+class MatchupChart extends Vue {
   public loaded: boolean = false;
+  public matchup: any = null;
+
   public resultOptions: any = {
     chart: {
       id: "RosterResults",
       show: false,
-      height: "300",
+      height: "300px",
     },
     yaxis: [
       {
@@ -55,7 +67,7 @@ class MatchesChart extends Vue {
       chart: {
         id: "RosterVolume",
         show: false,
-        height: "200",
+        height: "200px",
       },
     },
   ];
@@ -63,7 +75,9 @@ class MatchesChart extends Vue {
   public volumeOptions: any = {};
   public volumeSeries: any = [];
 
-  public load(resultData: any): void {
+  public async load(data: any): void {
+    this.matchup = data.data;
+
     var results = [
       {
         name: "Wins",
@@ -225,18 +239,18 @@ class MatchesChart extends Vue {
       },
     };
 
-    for (const series of resultData) {
-      var wins = series.win_rate;
-      var losses = series.loss_rate;
-      var ties = series.tie_rate;
+    for (const series of data.data) {
+      var wins = series.win_rate_percentage;
+      var losses = series.loss_rate_percentage;
+      var ties = series.tie_rate_percentage;
       results[0].data.push(wins);
       results[1].data.push(ties);
       results[2].data.push(losses);
       results[3].data.push((wins + ties / 2).toFixed(2));
-      resultOptions.xaxis.categories.push(series.roster1 ?? series.interval);
+      resultOptions.xaxis.categories.push(series.ctv1_bucket / 1000 + "k");
 
-      volume.data.push(series.matches_played ?? series.total_games ?? 0);
-      volumeOptions.xaxis.categories.push(series.roster1 ?? series.interval);
+      volume.data.push(series.total_matches ?? 0);
+      volumeOptions.xaxis.categories.push(series.ctv1_bucket / 1000 + "k");
     }
     this.resultSeries = results;
     this.resultOptions = resultOptions;
@@ -246,7 +260,11 @@ class MatchesChart extends Vue {
 
     this.loaded = true;
   }
+
+  public getIcon(roster: string): string {
+    return "https://fumbbl.com/i/" + (this.rosterIcons[roster] || "486370");
+  }
 }
 
-export default toNative(MatchesChart);
+export default toNative(MatchupChart);
 </script>

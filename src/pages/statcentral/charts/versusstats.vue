@@ -22,9 +22,15 @@
             <div
               class="col"
               v-tippy="{
-                content: cell.vs + '<br>' + 'Games: ' + cell.total_matches,
+                content:
+                  cell.vs +
+                  '<br>' +
+                  'Games: ' +
+                  cell.total_matches +
+                  '<div>(Click for more)</div>',
               }"
               :style="{ 'grid-column': index + 2 }"
+              @click="() => selectMatchup(cell.roster, cell.opponent)"
             >
               <div
                 :class="{
@@ -69,7 +75,7 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue, toNative, Ref } from "vue-facing-decorator";
+import { Component, Vue, toNative, Ref, Emit } from "vue-facing-decorator";
 import FumbblApi from "@api/fumbbl";
 import VueApexCharts from "vue3-apexcharts";
 import { Tippy, setDefaultProps } from "vue-tippy";
@@ -92,6 +98,14 @@ class VersusStatsChart extends Vue {
   public chartSeries: any[] = [];
 
   public rosterIcons: { [key: string]: string } = {};
+
+  @Emit("selectMatchup")
+  public selectMatchup(roster: string, opponent: string): void {
+    return {
+      roster: roster,
+      opponent: opponent,
+    };
+  }
 
   public async load(data: any): void {
     setDefaultProps({
@@ -155,6 +169,8 @@ class VersusStatsChart extends Vue {
           return {
             win_rate: opp.win_rate.toFixed(0),
             total_matches: opp.total_matches,
+            roster: order[roster],
+            opponent: opponent,
             vs: order[roster] + " vs " + opponent,
           };
         }),

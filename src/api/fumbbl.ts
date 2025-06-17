@@ -240,6 +240,28 @@ class Clickhouse extends CategoryBase {
       (res) => res.data,
     );
   }
+
+  public matchupData(
+    roster1: string,
+    roster2: string,
+    year = null,
+    month = null,
+    type = "All",
+    includeLegacy = false,
+  ) {
+    const opts: any = {
+      year: year != "All" ? year : null,
+      month: month != "All" ? month : null,
+      type: type,
+      includeLegacy: includeLegacy,
+    };
+
+    return this.post(this.categoryPath, "matchupData", {
+      roster1: roster1,
+      roster2: roster2,
+      ...opts,
+    }).then((res) => res.data);
+  }
 }
 
 class TournamentSquads extends CategoryBase {

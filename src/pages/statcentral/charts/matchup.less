@@ -1,0 +1,11 @@
+.chart {
+    display: grid;
+    grid-template-columns: repeat(9, auto);
+    text-align: right;
+
+    .row {
+        display: grid;
+        grid-column: e('1 / -1');
+        grid-template-columns: subgrid;
+    }
+}

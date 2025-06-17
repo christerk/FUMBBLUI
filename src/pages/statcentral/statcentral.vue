@@ -12,39 +12,18 @@
 
     <div class="panel" id="dashboard" v-if="page == 'dashboard'">
       <div class="description">
-        <div>
-          <button class="pill label">Time Period</button>
-          <button
-            :class="{ pill: true, active: range == '30d' }"
-            @click="setRange('30d')"
-          >
-            30 days
-          </button>
-          <button
-            :class="{ pill: true, active: range == '30w' }"
-            @click="setRange('30w')"
-          >
-            30 weeks
-          </button>
-          <button
-            :class="{ pill: true, active: range == '30m' }"
-            @click="setRange('30m')"
-          >
-            30 months
-          </button>
-          <button
-            :class="{ pill: true, active: range == '30q' }"
-            @click="setRange('30q')"
-          >
-            30 quarters
-          </button>
-          <button
-            :class="{ pill: true, active: range == 'all' }"
-            @click="setRange('all')"
-          >
-            All
-          </button>
-        </div>
+        <Pill
+          label="Time Period"
+          :values="[
+            { name: '30d', label: '30 days' },
+            { name: '30w', label: '30 weeks' },
+            { name: '30m', label: '30 months' },
+            { name: '30q', label: '30 quarters' },
+            { name: 'all', label: 'All' },
+          ]"
+          v-model="dashboardRange"
+          @change="reloadPage"
+        />
       </div>
 
       <div id="dashboard-grid">
@@ -80,114 +59,63 @@
 
     <div class="panel" id="results" v-if="page == 'results'">
       <div class="description cols6">
-        <div class="row span3 start">
-          <button class="pill label">Time Period</button>
-          <button
-            :class="{ pill: true, active: range == '30d' }"
-            @click="loadResults('30d', type, ctvRange, mirrors)"
-          >
-            30 days
-          </button>
-          <button
-            :class="{ pill: true, active: range == '30w' }"
-            @click="loadResults('30w', type, ctvRange, mirrors)"
-          >
-            30 weeks
-          </button>
-          <button
-            :class="{ pill: true, active: range == '30m' }"
-            @click="loadResults('30m', type, ctvRange, mirrors)"
-          >
-            30 months
-          </button>
-          <button
-            :class="{ pill: true, active: range == '30q' }"
-            @click="loadResults('30q', type, ctvRange, mirrors)"
-          >
-            30 quarters
-          </button>
-          <button
-            :class="{ pill: true, active: range == 'all' }"
-            @click="loadResults('all', type, ctvRange, mirrors)"
-          >
-            All
-          </button>
-        </div>
-        <div class="row span3 end">
-          <button class="pill label">Match Type</button>
-          <button
-            :class="{ pill: true, active: type == 'all' }"
-            @click="loadResults(range, 'all', ctvRange, mirrors)"
-          >
-            Combined
-          </button>
-          <button
-            :class="{ pill: true, active: type == 'open' }"
-            @click="loadResults(range, 'open', ctvRange, mirrors)"
-          >
-            Open
-          </button>
-          <button
-            :class="{ pill: true, active: type == 'blackbox' }"
-            @click="loadResults(range, 'blackbox', ctvRange, mirrors)"
-          >
-            Blackbox
-          </button>
-        </div>
-        <div class="row span2 start">
-          <button class="pill label">CTV Range</button>
+        <Pill
+          class="row span3 start"
+          label="Time Period"
+          :values="[
+            { name: '30d', label: '30 days' },
+            { name: '30w', label: '30 weeks' },
+            { name: '30m', label: '30 months' },
+            { name: '30q', label: '30 quarters' },
+            { name: 'all', label: 'All' },
+          ]"
+          v-model="resultsRange"
+          @change="reloadPage"
+        />
+        <Pill
+          class="row span3 end"
+          label="Match Type"
+          :values="[
+            { name: 'all', label: 'Combined' },
+            { name: 'open', label: 'Open' },
+            { name: 'blackbox', label: 'Blackbox' },
+          ]"
+          v-model="resultsType"
+          @change="reloadPage"
+        />
 
-          <button
-            :class="{ pill: true, active: ctvRange == 'all' }"
-            @click="loadResults(range, type, 'all', mirrors)"
-          >
-            All
-          </button>
-          <button
-            :class="{ pill: true, active: ctvRange == 'low' }"
-            @click="loadResults(range, type, 'low', mirrors)"
-          >
-            &lt; 1300k
-          </button>
-          <button
-            :class="{ pill: true, active: ctvRange == 'mid' }"
-            @click="loadResults(range, type, 'mid', mirrors)"
-          >
-            1300k - 1500k
-          </button>
-          <button
-            :class="{ pill: true, active: ctvRange == 'high' }"
-            @click="loadResults(range, type, 'high', mirrors)"
-          >
-            &gt; 1500k
-          </button>
-        </div>
-        <div class="row span2">
-          <button class="pill label">Mirrors</button>
-          <button
-            :class="{ pill: true, active: mirrors == true }"
-            @click="loadResults(range, type, ctvRange, true)"
-          >
-            Yes
-          </button>
-          <button
-            :class="{ pill: true, active: mirrors == false }"
-            @click="loadResults(range, type, ctvRange, false)"
-          >
-            No
-          </button>
-        </div>
-        <div class="row span2 end">
-          <button class="pill label">Roster</button>
-          <select v-model="selectedRoster" @change="rosterChanged" class="pill">
-            <option>All</option>
-            <template v-for="roster in rosters" :key="roster">
-              <option :value="roster">
-                {{ roster }}
-              </option>
-            </template>
-          </select>
-        </div>
+        <Pill
+          class="row span2 start"
+          label="CTV Range"
+          :values="[
+            { name: 'all', label: 'All' },
+            { name: 'low', label: '< 1300k' },
+            { name: 'mid', label: '1300k - 1500k' },
+            { name: 'high', label: '> 1500k' },
+          ]"
+          v-model="resultsCtvRange"
+          @change="reloadPage"
+        />
+
+        <Pill
+          class="row span2"
+          label="Mirrors"
+          :values="[
+            { name: true, label: 'Yes' },
+            { name: false, label: 'No' },
+          ]"
+          v-model="resultsMirrors"
+          @change="reloadPage"
+        />
+
+        <Pill
+          class="row span2 end"
+          label="Roster"
+          type="select"
+          :values="rosterData"
+          v-model="resultsSelectedRoster"
+          @change="reloadPage"
+        />
       </div>
       <TitledPanel class="roster-results">
         <template #header>Roster Results</template>
@@ -199,33 +127,30 @@
 
     <div class="panel" id="rosters" v-if="page == 'rosters'">
       <div class="description cols6">
-        <div class="row span2 end">
-          <button class="pill label">Period</button>
-          <select
-            v-model="selectedYear"
-            @change="loadVersusStats()"
-            class="pill"
-          >
-            <option value="All">All</option>
-            <template
-              v-for="year in Array.from(
-                { length: new Date().getFullYear() - 2003 + 1 },
-                (_, i) => 2003 + i,
-              ).reverse()"
-              :key="year"
-            >
-              <option :value="year">{{ year }}</option>
-            </template>
-          </select>
-          <select
-            v-if="selectedYear !== 'All'"
-            class="pill"
-            v-model="selectedMonth"
-            @change="loadVersusStats()"
-          >
-            <option value="All">All Months</option>
-            <option
-              v-for="month in [
+        <Pill
+          class="row span2 end"
+          type="select"
+          label="Period"
+          :values="[
+            { name: 'All', label: 'All' },
+            ...Array.from(
+              { length: new Date().getFullYear() - 2003 + 1 },
+              (_, i) => ({
+                name: (2003 + i).toString(),
+                label: (2003 + i).toString(),
+              }),
+            ).reverse(),
+          ]"
+          v-model="rostersSelectedYear"
+          @change="reloadPage"
+        >
+          <Pill
+            v-if="rostersSelectedYear !== 'All'"
+            type="select"
+            :unwrap="true"
+            :values="[
+              { name: 'All', label: 'All Months' },
+              ...[
                 'January',
                 'February',
                 'March',
@@ -238,97 +163,84 @@
                 'October',
                 'November',
                 'December',
-              ]"
-              :key="month"
-              :value="month"
-            >
-              {{ month }}
-            </option>
-          </select>
-        </div>
-        <div class="row span2">
-          <button class="pill label">Type</button>
-          <button
-            :class="{ pill: true, active: selectedType == 'all' }"
-            @click="
-              selectedType = 'all';
-              loadVersusStats();
-            "
-          >
-            All
-          </button>
-          <button
-            :class="{ pill: true, active: selectedType == 'open' }"
-            @click="
-              selectedType = 'open';
-              loadVersusStats();
-            "
-          >
-            Open
-          </button>
-          <button
-            :class="{ pill: true, active: selectedType == 'blackbox' }"
-            @click="
-              selectedType = 'blackbox';
-              loadVersusStats();
-            "
-          >
-            Blackbox
-          </button>
-        </div>
-        <div class="row span2 start">
-          <button class="pill label">Include Legacy</button>
-          <button
-            :class="{ pill: true, active: includeLegacy == true }"
-            @click="setIncludeLegacy(true)"
-          >
-            Yes
-          </button>
-          <button
-            :class="{ pill: true, active: includeLegacy == false }"
-            @click="setIncludeLegacy(false)"
-          >
-            No
-          </button>
-        </div>
+              ].map((month) => ({ name: month, label: month })),
+            ]"
+            v-model="rostersSelectedMonth"
+            @change="reloadPage"
+          />
+        </Pill>
+
+        <Pill
+          class="row span2"
+          label="Match Type"
+          :values="[
+            { name: 'all', label: 'All' },
+            { name: 'open', label: 'Open' },
+            { name: 'blackbox', label: 'Blackbox' },
+          ]"
+          v-model="rostersSelectedType"
+          @change="reloadPage"
+        />
+
+        <Pill
+          class="row span2 start"
+          label="Include Legacy"
+          :values="[
+            { name: true, label: 'Yes' },
+            { name: false, label: 'No' },
+          ]"
+          v-model="rostersIncludeLegacy"
+          @change="reloadPage"
+        />
       </div>
 
-      <VersusStatsChart ref="versusStats" />
+      <VersusStatsChart
+        ref="versusStats"
+        v-show="showMatchup === null"
+        @selectMatchup="selectMatchup"
+      />
+
+      <div v-show="showMatchup !== null">
+        <button class="back" @click="showMatchup = null">&lt;&lt; Back</button>
+        <TitledPanel>
+          <template #header>
+            <span v-if="showMatchup"
+              >Results per CTV bracket - Matchup: {{ showMatchup.roster }} vs
+              {{ showMatchup.opponent }}
+            </span></template
+          >
+          <template #content>
+            <MatchupChart ref="matchupChart" />
+          </template>
+        </TitledPanel>
+      </div>
     </div>
 
-    <div class="panel" id="skills" v-if="page == 'skills'">
+    <div class="panel" id="skills" v-show="page == 'skills'">
       <div class="description cols2">
-        <div class="row end">
-          <button class="pill label">Roster</button>
-          <select
-            v-model="selectedRoster"
-            @change="updateRoster()"
-            class="pill"
-          >
-            <option>All</option>
-            <template v-for="roster in rosters" :key="roster">
-              <option :value="roster">
-                {{ roster }}
-              </option>
-            </template>
-          </select>
-        </div>
+        <Pill
+          class="row end"
+          type="select"
+          label="Roster"
+          :values="rosterData"
+          v-model="skillsSelectedRoster"
+        />
 
-        <div class="row start" v-show="selectedRoster !== 'All'">
-          <button class="pill label">Position</button>
-          <select
-            v-model="selectedPosition"
-            @change="loadSkills()"
-            class="pill"
-          >
-            <option>All</option>
-            <template v-for="position in positions" :key="position">
-              <option :value="position">
-                {{ position }}
-              </option>
-            </template>
-          </select>
-        </div>
+        <Pill
+          v-show="skillsSelectedRoster !== 'All'"
+          class="row start"
+          label="Position"
+          type="select"
+          :values="[
+            { name: 'All', label: 'All' },
+            ...positions.map((position) => ({
+              name: position,
+              label: position,
+            })),
+          ]"
+          v-model="skillsSelectedPosition"
+          @change="reloadPage"
+        />
       </div>
 
       <div class="grid">
@@ -354,7 +266,7 @@
 </style>
 
 <script lang="ts">
-import { Component, Vue, toNative, Ref } from "vue-facing-decorator";
+import { Component, Vue, toNative, Ref, Watch } from "vue-facing-decorator";
 import FumbblApi from "@api/fumbbl";
 import VueApexCharts from "vue3-apexcharts";
 import MatchesChart from "./charts/matches.vue";
@@ -365,6 +277,7 @@ import HourChart from "./charts/hour.vue";
 import SkillSelectionChart from "./charts/skillselection.vue";
 import SkillChoiceChart from "./charts/skillchoice.vue";
 import VersusStatsChart from "./charts/versusstats.vue";
+import MatchupChart from "./charts/matchup.vue";
 
 import {
   PageHeader,
@@ -373,6 +286,7 @@ import {
   Trinary,
   ErrorModal,
   SortableTable,
+  Pill,
 } from "@components/fumbblcomponents";
 
 @Component({
@@ -392,6 +306,8 @@ import {
     SkillSelectionChart,
     SkillChoiceChart,
     VersusStatsChart,
+    MatchupChart,
+    Pill,
   },
 })
 class StatCentral extends Vue {
@@ -399,24 +315,33 @@ class StatCentral extends Vue {
   public navItems: any = [
     { label: "Dashboard", page: "dashboard" },
     { label: "Results", page: "results" },
-    { label: "Rosters", page: "rosters" },
+    { label: "Versus", page: "rosters" },
     { label: "Skills", page: "skills" },
   ];
   public page: string = "dashboard";
 
-  public range: string = "30d";
-  public type: string = "all";
-  public ctvRange: string = "all";
-  public selectedRoster: string = "All";
-  public selectedPosition: string = "All";
-  public mirrors: boolean = true;
-  public selectedYear: string = "All";
-  public selectedMonth: string = "All";
-  public includeLegacy: boolean = false;
-  public selectedType: string = "all";
-
-  public rosters: string[] = [];
+  public dashboardRange: string = "30d";
+  public resultsRange: string = "30d";
+  public resultsType: string = "all";
+  public resultsCtvRange: string = "all";
+  public resultsSelectedRoster: string = "All";
+  public resultsSelectedPosition: string = "All";
+  public resultsMirrors: boolean = true;
+  public rostersSelectedYear: string = "All";
+  public rostersSelectedMonth: string = "All";
+  public rostersIncludeLegacy: boolean = false;
+  public rostersSelectedType: string = "all";
+  public skillsSelectedRoster: string = "All";
+  public skillsSelectedPosition: string = "All";
+  public showMatchup: any | null = null;
   public positions: string[] = [];
+  public rosterData: { [key: string]: any }[] = [];
+
+  @Watch("skillsSelectedRoster")
+  public onSelectedRosterChange() {
+    this.skillsSelectedPosition = "All";
+    this.reloadPage();
+  }
 
   @Ref("matchesChart") public matchesChart!: MatchesChart;
   @Ref("activeCoachesChart") public activeCoachesChart!: ActiveCoachesChart;
@@ -427,8 +352,36 @@ class StatCentral extends Vue {
   @Ref("skillSelection") public skillSelection!: SkillSelectionChart;
   @Ref("skillChoice") public skillChoice!: SkillChoiceChart;
   @Ref("versusStats") public versusStats!: VersusStatsChart;
+  @Ref("matchupChart") public matchupChart!: MatchupChart;
 
-  public async mounted() {}
+  public mounted() {
+    this.$nextTick(async () => {
+      var rosters = await this.fumbblApi.Roster.list(4);
+      var rosterData = [];
+
+      rosterData.push({
+        name: "All",
+        label: "All",
+        icon: 0,
+      });
+
+      for (var i = 0; i < rosters.length; i++) {
+        if (rosters[i].playable == "0") {
+          continue; // Skip rosters that are not playable
+        }
+        rosterData.push({
+          name: rosters[i].name,
+          label: rosters[i].name,
+          icon: rosters[i].logos["32"],
+        });
+      }
+      this.rosterData.push(...rosterData);
+    });
+  }
+
+  public reloadPage() {
+    this.setPage(this.page);
+  }
 
   public setPage(page: string) {
     if (this.fumbblApi === undefined) {
@@ -436,31 +389,44 @@ class StatCentral extends Vue {
     }
     this.page = page;
 
-    switch (page) {
-      case "dashboard":
-        this.loadDashboard();
-        break;
-      case "results":
-        this.loadResults();
-        break;
-      case "rosters":
-        this.loadVersusStats();
-        break;
-      case "skills":
-        this.loadSkills();
-        break;
-    }
+    this.$nextTick(() => {
+      switch (page) {
+        case "dashboard":
+          this.loadDashboard();
+          break;
+        case "results":
+          this.loadResults();
+          break;
+        case "rosters":
+          this.loadVersusStats();
+          break;
+        case "skills":
+          this.loadSkills();
+          break;
+      }
+    });
   }
 
-  public setRange(range: string) {
-    this.range = range;
-    this.loadDashboard(range);
+  public selectMatchup(match: any) {
+    this.fumbblApi.Clickhouse.matchupData(
+      match.roster,
+      match.opponent,
+
+      this.selectedYear,
+      this.selectedMonth,
+      this.selectedType,
+      this.includeLegacy,
+    ).then((data: any) => {
+      this.matchupChart.load(data);
+    });
+    this.showMatchup = match;
   }
 
-  private loadDashboard(range: string = "30d") {
+  private loadDashboard() {
+    const range = this.dashboardRange || "30d";
     this.fumbblApi.Clickhouse.dashboardData(range).then(
       (dashboardData: any) => {
-        this.matchesChart.load(dashboardData.games.history);
+        this.matchesChart?.load(dashboardData.games.history);
         this.activeCoachesChart.load(dashboardData.coaches);
         this.weekdayChart.load(dashboardData.games.weekday);
         this.hourChart.load(dashboardData.games.hours);
@@ -468,23 +434,15 @@ class StatCentral extends Vue {
     );
   }
 
-  private updateRoster() {
-    this.selectedPosition = "All";
-    this.loadSkills();
-  }
-
-  private setIncludeLegacy(include: boolean) {
-    this.includeLegacy = include;
-    this.loadVersusStats();
-  }
-
   private loadSkills() {
-    const roster = this.selectedRoster !== "All" ? this.selectedRoster : null;
+    const roster =
+      this.skillsSelectedRoster !== "All" ? this.skillsSelectedRoster : null;
     const position =
-      this.selectedPosition !== "All" ? this.selectedPosition : null;
+      this.skillsSelectedPosition !== "All"
+        ? this.skillsSelectedPosition
+        : null;
     this.fumbblApi.Clickhouse.skillSelection(roster, position).then(
       (skillData: any) => {
-        this.rosters = skillData.rosters.map((r) => r.roster).sort();
         this.positions = skillData.positions.map((p) => p.position).sort();
         this.skillSelection.load(skillData.skills);
         this.skillChoice.load(skillData.choices);
@@ -492,57 +450,43 @@ class StatCentral extends Vue {
     );
   }
 
-  private loadResults(
-    range: string = "30d",
-    type: string = "all",
-    ctvRange: string = "all",
-    mirrors: boolean = true,
-  ) {
-    this.range = range;
-    this.type = type;
-    this.ctvRange = ctvRange;
-    this.mirrors = mirrors;
-
+  private loadResults() {
     var opts = {
-      type: this.type,
-      ctvRange: this.ctvRange,
-      mirrors: this.mirrors,
+      type: this.resultsType,
+      ctvRange: this.resultsCtvRange,
+      mirrors: this.resultsMirrors,
     };
 
-    if (this.selectedRoster !== "All") {
-      opts.roster = this.selectedRoster;
-      this.fumbblApi.Clickhouse.rosterResults(this.range, opts).then(
+    if (this.resultsSelectedRoster !== "All") {
+      opts.roster = this.resultsSelectedRoster;
+      this.fumbblApi.Clickhouse.rosterResults(this.resultsRange, opts).then(
         (data: any) => {
           this.rosterAnalysisChart.load(data.data);
         },
       );
     } else {
-      this.fumbblApi.Clickhouse.competitiveResults(this.range, opts).then(
-        (data: any) => {
-          this.rosters = data.data.map((r: any) => r.roster1).sort();
-          this.rosterAnalysisChart.load(data.data);
-        },
-      );
+      this.fumbblApi.Clickhouse.competitiveResults(
+        this.resultsRange,
+        opts,
+      ).then((data: any) => {
+        this.rosters = data.data.map((r: any) => r.roster1).sort();
+        this.rosterAnalysisChart.load(data.data);
+      });
     }
   }
 
   private loadVersusStats() {
-    if (this.selectedYear === "All") {
-      this.selectedMonth = "All";
-    }
     this.fumbblApi.Clickhouse.versusStats(
-      this.selectedYear,
-      this.selectedMonth,
-      this.selectedType,
-      this.includeLegacy,
+      this.rostersSelectedYear,
+      this.rostersSelectedMonth,
+      this.rostersSelectedType,
+      this.rostersIncludeLegacy,
     ).then((data: any) => {
       this.versusStats.load(data);
     });
-  }
-
-  private rosterChanged() {
-    this.loadResults(this.range, this.type, this.ctvRange);
-    this.selectedPosition = "All";
+    if (this.showMatchup !== null) {
+      this.selectMatchup(this.showMatchup);
+    }
   }
 }
 
