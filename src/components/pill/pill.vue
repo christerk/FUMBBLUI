@@ -76,10 +76,9 @@ export default class Pill extends Vue {
   onSelectChanged(event: Event) {
     const target = event.target as HTMLSelectElement;
     const value = target.value;
-    if (value !== this.currentValue) {
-      this.currentValue = value;
-      this.emitChange(value);
-    }
+
+    this.currentValue = value;
+    this.emitChange(value);
   }
 }
 </script>

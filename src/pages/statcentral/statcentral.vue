@@ -13,6 +13,7 @@
     <div class="panel" id="dashboard" v-if="page == 'dashboard'">
       <div class="description">
         <Pill
+          class="row center"
           label="Time Period"
           :values="[
             { name: '30d', label: '30 days' },
