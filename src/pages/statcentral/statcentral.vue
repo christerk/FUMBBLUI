@@ -413,11 +413,12 @@ class StatCentral extends Vue {
       match.roster,
       match.opponent,
 
-      this.selectedYear,
-      this.selectedMonth,
-      this.selectedType,
-      this.includeLegacy,
+      this.rostersSelectedYear,
+      this.rostersSelectedMonth,
+      this.rostersSelectedType,
+      this.rostersIncludeLegacy,
     ).then((data: any) => {
+      console.log("Matchup data loaded", data);
       this.matchupChart.load(data);
     });
     this.showMatchup = match;
