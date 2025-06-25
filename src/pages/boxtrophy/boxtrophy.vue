@@ -5,6 +5,7 @@
       :navItems="navItems"
       defaultPage="squadStandings"
       @setPage="setPage"
+      :enableUrlNav="true"
     >
       <template #pagename
         >Blackbox Trophy

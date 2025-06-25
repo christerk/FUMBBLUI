@@ -5,6 +5,7 @@
       :navItems="navItems"
       :defaultPage="defaultPage"
       @setPage="initPage"
+      :enableUrlNav="true"
     >
       <template #pagename>Tournament Squads</template>
       <template #center>

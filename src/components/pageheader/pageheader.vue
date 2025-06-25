@@ -42,23 +42,58 @@ class PageHeader extends Vue {
   @Prop
   defaultPage: string = "";
 
+  @Prop
+  enableUrlNav: boolean = true;
+
   public page: string = "";
   public pageMarkerPosition: number = 0;
 
   public mounted() {
-    this.setPage(this.defaultPage);
+    var startPage = this.defaultPage;
+
+    if (this.enableUrlNav) {
+      var initialTabMatch = window.location.pathname.match(
+        "^/p/([^/]+)/([^/]+)$",
+      );
+      if (initialTabMatch != null && initialTabMatch.length > 2) {
+        startPage = initialTabMatch[2];
+      }
+    }
+
+    this.setPage(startPage);
+
+    addEventListener("popstate", () => {
+      const tabMatch = window.location.pathname.match("^/p/([^/]+)/?([^/]+)?$");
+      const page = tabMatch != null ? tabMatch[1] : undefined;
+      const tab = tabMatch != null ? tabMatch[2] : undefined;
+
+      var requestedTab = tab || startPage;
+
+      this.setPage(requestedTab, false);
+    });
   }
 
   @Emit
-  public setPage(newPage: string) {
+  public setPage(newPage: string, setHistory: boolean = true) {
     this.page = newPage;
 
+    // Set page marker tick position
     const element = document.getElementById("nav-" + newPage);
-
     if (element != null) {
       this.pageMarkerPosition =
         element.offsetLeft + element.offsetWidth / 2 - 9;
     }
+
+    if (this.enableUrlNav && setHistory) {
+      const tabMatch = window.location.pathname.match("^/p/([^/]+)/?([^/]+)?$");
+      const page = tabMatch != null ? tabMatch[1] : undefined;
+
+      const url =
+        newPage != this.defaultPage ? `/p/${page}/${newPage}` : `/p/${page}`;
+
+      window.history.pushState({}, "", url);
+    }
+
     return newPage;
   }
 

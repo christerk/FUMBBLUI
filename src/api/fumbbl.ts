@@ -177,6 +177,12 @@ class Roster extends CategoryBase {
       (res) => res.data,
     );
   }
+
+  public getRoster(rosterId: number) {
+    return this.get(this.categoryPath, "get/" + rosterId).then(
+      (res) => res.data,
+    );
+  }
 }
 
 class Clickhouse extends CategoryBase {
@@ -261,6 +267,19 @@ class Clickhouse extends CategoryBase {
       roster2: roster2,
       ...opts,
     }).then((res) => res.data);
+  }
+
+  public topList(stat, type, division, roster, position) {
+    const opts: any = {
+      stat: stat,
+      type: type,
+      division: division,
+      roster: roster,
+      position: position,
+    };
+    return this.post(this.categoryPath, "topList", opts).then(
+      (res) => res.data,
+    );
   }
 }
 

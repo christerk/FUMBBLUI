@@ -49,6 +49,7 @@ export default defineConfig({
         boxtrophy: resolve(__dirname, "htdocs", "boxtrophy.html"),
         idt: resolve(__dirname, "htdocs", "idt.html"),
         statcentral: resolve(__dirname, "htdocs", "statcentral.html"),
+        toplist: resolve(__dirname, "htdocs", "toplist.html"),
       },
       output: {
         format: "esm",

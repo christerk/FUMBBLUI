@@ -1,0 +1,88 @@
+@import "@style/fumbbl.less";
+
+#toplist {
+    :deep(.panel) {
+        margin-top: 0.5rem;
+        width: 100%;
+    }
+}
+
+.toplist :deep(.pageheader) {
+    height: auto;
+
+    .left {
+        display: none;
+    }
+
+    .right {
+        display: none;
+    }
+}
+
+
+.controls {
+    background: @OldLace;
+    padding: 1rem;
+
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    grid-template-rows: auto;
+    grid-gap: 0.5rem;
+
+    .span-3 {
+        grid-column: span 3;
+    }
+
+    .cols2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 0.5rem;
+        align-items: center;
+    }
+
+    .start {
+        justify-self: start;
+    }
+
+    .center {
+        justify-self: center;
+    }
+
+    .end {
+        justify-self: end;
+    }
+}
+
+.rows {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) 8rem 8rem;
+    grid-gap: 0 0.5rem;
+    align-items: right;
+    padding: 0 0.5rem;
+    font-size: 14pt;
+    line-height: 1.6;
+
+    .row {
+        display: grid;
+        grid-template-columns: subgrid;
+        grid-column: e('1 / -1');
+        text-align: right;
+        border-bottom: 1px solid @Forest;
+        place-items: right;
+        text-align: right;
+
+        .left {
+            place-self: start;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        &.header {
+            font-size: 14pt;
+            font-weight: bold;
+        }
+    }
+}

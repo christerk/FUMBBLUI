@@ -5,6 +5,7 @@
       :navItems="navItems"
       defaultPage="dashboard"
       @setPage="setPage"
+      :enableUrlNav="true"
     >
       <template #pagename>Statistics Central </template>
       <template #center> </template>
@@ -126,7 +127,7 @@
       </TitledPanel>
     </div>
 
-    <div class="panel" id="rosters" v-if="page == 'rosters'">
+    <div class="panel" id="versus" v-if="page == 'versus'">
       <div class="description cols6">
         <Pill
           class="row span2 end"
@@ -316,7 +317,7 @@ class StatCentral extends Vue {
   public navItems: any = [
     { label: "Dashboard", page: "dashboard" },
     { label: "Results", page: "results" },
-    { label: "Versus", page: "rosters" },
+    { label: "Versus", page: "versus" },
     { label: "Skills", page: "skills" },
   ];
   public page: string = "dashboard";
@@ -398,7 +399,7 @@ class StatCentral extends Vue {
         case "results":
           this.loadResults();
           break;
-        case "rosters":
+        case "versus":
           this.loadVersusStats();
           break;
         case "skills":

@@ -5,6 +5,7 @@
       :navItems="navItems"
       defaultPage="standings"
       @setPage="setPage"
+      :enableUrlNav="true"
     >
       <template #pagename
         >IRONDWARF Trophy
@@ -256,16 +257,16 @@ class Idt extends Vue {
       .getAttribute("coach");
 
     this.$nextTick(async () => {
-
       let season = await this.fumbblApi?.getSeasonConfig(0);
       await this.loadSeasons();
 
-      let requestSeason = parseInt(document
-      .getElementsByClassName("idtpage")[0]
-      .getAttribute("season") ?? "0");
+      let requestSeason = parseInt(
+        document.getElementsByClassName("idtpage")[0].getAttribute("season") ??
+          "0",
+      );
 
       if (requestSeason > 0) {
-        season = this.seasons.find((s:any) => s.season == requestSeason);
+        season = this.seasons.find((s: any) => s.season == requestSeason);
       } else {
         season = season?.data;
       }
@@ -407,7 +408,7 @@ class Idt extends Vue {
   }
 
   public isFrozen(team: any): boolean {
-    return team.state == "frozen" || (team.losses + team.ties / 2 >= 3);
+    return team.state == "frozen" || team.losses + team.ties / 2 >= 3;
   }
   public hasTrophy(team: any): boolean {
     return team.wins >= 10;
