@@ -20,22 +20,6 @@ export default abstract class CategoryBase {
       this.enableOauth = false;
     }
     this.runner = runner;
-    return new Proxy(this, {
-      get(target, prop, receiver) {
-        const value = Reflect.get(target, prop, receiver);
-        // Only wrap public methods (not constructor, not starting with _)
-        if (
-          typeof value === "function" &&
-          prop !== "constructor" &&
-          typeof prop === "string" &&
-          !prop.startsWith("_")
-        ) {
-          return (...args: any[]) =>
-            runner.run(() => value.apply(target, args));
-        }
-        return value;
-      },
-    });
   }
 
   protected async getAccessToken(): Promise<string> {
@@ -50,7 +34,7 @@ export default abstract class CategoryBase {
       this.enableOauth = true;
       const tokenData = result.data;
 
-      this.tokenExpiry = Date.now() + tokenData.expires_in * 1000 - 10;
+      this.tokenExpiry = Date.now() + tokenData.expires_in * 1000 - 100;
       this.accessToken = tokenData.access_token;
     }
     return this.accessToken;
@@ -67,7 +51,9 @@ export default abstract class CategoryBase {
 
   protected async get<T>(category: string, endpoint: string): Promise<T> {
     const headers: any = await this.getAuthHeaders();
-    return axios.get(`${this.apiBase}/${category}/${endpoint}`, headers);
+    return this.runner.run(() =>
+      axios.get(`${this.apiBase}/${category}/${endpoint}`, headers),
+    );
   }
 
   protected async post<T>(
@@ -76,6 +62,8 @@ export default abstract class CategoryBase {
     data: any | null = null,
   ): Promise<T> {
     const headers: any = await this.getAuthHeaders();
-    return axios.post(`${this.apiBase}/${category}/${endpoint}`, data, headers);
+    return this.runner.run(() =>
+      axios.post(`${this.apiBase}/${category}/${endpoint}`, data, headers),
+    );
   }
 }

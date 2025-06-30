@@ -107,7 +107,7 @@ class VersusStatsChart extends Vue {
     };
   }
 
-  public async load(data: any): void {
+  public async load(data: any, rosters: any): void {
     setDefaultProps({
       theme: "fumbbl",
       placement: "top",
@@ -179,8 +179,6 @@ class VersusStatsChart extends Vue {
 
     this.chartSeries = series;
 
-    var fumbblApi = new FumbblApi();
-    var rosters = await fumbblApi.Roster.list(4);
     for (var i = 0; i < rosters.length; i++) {
       this.rosterIcons[rosters[i].name] = rosters[i].logos["32"];
     }

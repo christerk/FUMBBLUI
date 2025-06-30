@@ -338,6 +338,7 @@ class StatCentral extends Vue {
   public showMatchup: any | null = null;
   public positions: string[] = [];
   public rosterData: { [key: string]: any }[] = [];
+  public rawRosters: any = {};
 
   @Watch("skillsSelectedRoster")
   public onSelectedRosterChange() {
@@ -359,6 +360,7 @@ class StatCentral extends Vue {
   public mounted() {
     this.$nextTick(async () => {
       var rosters = await this.fumbblApi.Roster.list(4);
+      this.rawRosters = rosters;
       var rosterData = [];
 
       rosterData.push({
@@ -485,7 +487,7 @@ class StatCentral extends Vue {
       this.rostersSelectedType,
       this.rostersIncludeLegacy,
     ).then((data: any) => {
-      this.versusStats.load(data);
+      this.versusStats.load(data, this.rawRosters);
     });
     if (this.showMatchup !== null) {
       this.selectMatchup(this.showMatchup);
