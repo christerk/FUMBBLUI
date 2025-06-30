@@ -1,4 +1,5 @@
 import axios from "axios";
+import SerializedApiRunner from "./serializedApiRunner";
 
 export default abstract class CategoryBase {
   protected runner: SerializedApiRunner;
@@ -45,7 +46,7 @@ export default abstract class CategoryBase {
         client_secret: import.meta.env.VITE_CLIENT_SECRET,
       };
       this.enableOauth = false;
-      const result = await this.post("oauth", "token", data);
+      const result: any = await this.post("oauth", "token", data);
       this.enableOauth = true;
       const tokenData = result.data;
 
@@ -56,7 +57,7 @@ export default abstract class CategoryBase {
   }
 
   protected async getAuthHeaders(): Promise<string | undefined> {
-    let headers = {};
+    let headers: any = {};
     if (this.enableOauth) {
       const token = await this.getAccessToken();
       headers = { headers: { Authorization: "Bearer " + token } };
@@ -65,16 +66,16 @@ export default abstract class CategoryBase {
   }
 
   protected async get<T>(category: string, endpoint: string): Promise<T> {
-    const headers = await this.getAuthHeaders();
+    const headers: any = await this.getAuthHeaders();
     return axios.get(`${this.apiBase}/${category}/${endpoint}`, headers);
   }
 
   protected async post<T>(
     category: string,
     endpoint: string,
-    data: any,
+    data: any | null = null,
   ): Promise<T> {
-    const headers = await this.getAuthHeaders();
+    const headers: any = await this.getAuthHeaders();
     return axios.post(`${this.apiBase}/${category}/${endpoint}`, data, headers);
   }
 }

@@ -1,4 +1,5 @@
-import CategoryBase from "./CategoryBase";
+import CategoryBase from "./categoryBase";
+import SerializedApiRunner from "./serializedApiRunner";
 
 export default class Clickhouse extends CategoryBase {
   protected categoryPath = "clickhouse";
@@ -7,49 +8,54 @@ export default class Clickhouse extends CategoryBase {
     super(runner);
   }
 
-  public dashboardData(range: "30d" | "30w" | "30m" | "30q" | "all") {
+  public async dashboardData(
+    range: "30d" | "30w" | "30m" | "30q" | "all",
+  ): Promise<any> {
     return this.get(this.categoryPath, "dashboardData/" + range).then(
-      (res) => res.data,
+      (res: any) => res.data,
     );
   }
 
-  public competitiveResults(
+  public async competitiveResults(
     range: "30d" | "30w" | "30m" | "30q" | "all",
     opts: any = {},
-  ) {
+  ): Promise<any> {
     return this.post(
       this.categoryPath,
       "competitiveResults/" + range,
       opts,
-    ).then((res) => res.data);
+    ).then((res: any) => res.data);
   }
 
-  public rosterResults(
+  public async rosterResults(
     range: "30d" | "30w" | "30m" | "30q" | "all",
     opts: any = {},
-  ) {
+  ): Promise<any> {
     return this.post(this.categoryPath, "rosterResults/" + range, opts).then(
-      (res) => res.data,
+      (res: any) => res.data,
     );
   }
 
-  public skillSelection(roster: String | null, position: String | null) {
+  public async skillSelection(
+    roster: String | null,
+    position: String | null,
+  ): Promise<any> {
     const opts: any = {
       roster: roster,
       position: position,
     };
 
     return this.post(this.categoryPath, `skillSelection`, opts).then(
-      (res) => res.data,
+      (res: any) => res.data,
     );
   }
 
-  public versusStats(
+  public async versusStats(
     year = null,
     month = null,
     type = "All",
     includeLegacy = false,
-  ) {
+  ): Promise<any> {
     const opts: any = {
       year: year != "All" ? year : null,
       month: month != "All" ? month : null,
@@ -58,18 +64,18 @@ export default class Clickhouse extends CategoryBase {
     };
 
     return this.post(this.categoryPath, "versusStats", opts).then(
-      (res) => res.data,
+      (res: any) => res.data,
     );
   }
 
-  public matchupData(
+  public async matchupData(
     roster1: string,
     roster2: string,
     year = null,
     month = null,
     type = "All",
     includeLegacy = false,
-  ) {
+  ): Promise<any> {
     const opts: any = {
       year: year != "All" ? year : null,
       month: month != "All" ? month : null,
@@ -81,10 +87,16 @@ export default class Clickhouse extends CategoryBase {
       roster1: roster1,
       roster2: roster2,
       ...opts,
-    }).then((res) => res.data);
+    }).then((res: any) => res.data);
   }
 
-  public topList(stat, type, division, roster, position) {
+  public async topList(
+    stat: String,
+    type: String,
+    division: String,
+    roster: String,
+    position: String,
+  ): Promise<any> {
     const opts: any = {
       stat: stat,
       type: type,
@@ -93,7 +105,7 @@ export default class Clickhouse extends CategoryBase {
       position: position,
     };
     return this.post(this.categoryPath, "topList", opts).then(
-      (res) => res.data,
+      (res: any) => res.data,
     );
   }
 }

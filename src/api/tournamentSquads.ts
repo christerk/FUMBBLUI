@@ -1,4 +1,5 @@
-import CategoryBase from "./CategoryBase";
+import CategoryBase from "./categoryBase";
+import SerializedApiRunner from "./serializedApiRunner";
 
 export default class TournamentSquads extends CategoryBase {
   protected categoryPath = "tournamentsquads";
@@ -7,93 +8,105 @@ export default class TournamentSquads extends CategoryBase {
     super(runner);
   }
 
-  public list() {
-    return this.get(this.categoryPath, "list").then((res) => res.data);
+  public async list() {
+    return this.get(this.categoryPath, "list").then((res: any) => res.data);
   }
 
-  public create(data: {
+  public async create(data: {
     name: string;
     maxMembers: number;
     maxReserves: number;
   }) {
-    return this.post(this.categoryPath, "create", data).then((res) => res.data);
+    return this.post(this.categoryPath, "create", data).then(
+      (res: any) => res.data,
+    );
   }
 
-  public disband(id: number) {
+  public async disband(id: number) {
     return this.post(this.categoryPath, "disband", { squadId: id }).then(
-      (res) => res.data,
+      (res: any) => res.data,
     );
   }
 
-  public getPendingRequests() {
+  public async getPendingRequests(): Promise<any> {
     return this.post(this.categoryPath, "pendingRequests").then(
-      (res) => res.data,
+      (res: any) => res.data,
     );
   }
 
-  public removeMember(squadId: number, teamId: number) {
+  public async removeMember(squadId: number, teamId: number): Promise<any> {
     return this.post(this.categoryPath, "remove", {
       squadId: squadId,
       teamId: teamId,
-    }).then((res) => res.data);
+    }).then((res: any) => res.data);
   }
 
-  public cancelRequest(squadId: number, teamId: number) {
+  public async cancelRequest(squadId: number, teamId: number): Promise<any> {
     return this.post(this.categoryPath, "cancelRequest", {
       squadId: squadId,
       teamId: teamId,
-    }).then((res) => res.data);
+    }).then((res: any) => res.data);
   }
 
-  public sendJoinRequest(squadId: number, teamId: number) {
+  public async sendJoinRequest(squadId: number, teamId: number): Promise<any> {
     return this.post(this.categoryPath, "joinRequest", {
       squadId: squadId,
       teamId: teamId,
-    }).then((res) => res.data);
+    }).then((res: any) => res.data);
   }
 
-  public search(query: string) {
+  public async search(query: string): Promise<any> {
     return this.get(
       this.categoryPath,
       "search/" + encodeURIComponent(query),
-    ).then((res) => res.data);
+    ).then((res: any) => res.data);
   }
 
-  public acceptRequestMember(squadId: number, teamId: number) {
+  public async acceptRequestMember(
+    squadId: number,
+    teamId: number,
+  ): Promise<any> {
     return this.post(this.categoryPath, "acceptRequest", {
       squadId: squadId,
       teamId: teamId,
       isReserve: false,
-    }).then((res) => res.data);
+    }).then((res: any) => res.data);
   }
 
-  public acceptRequestReserve(squadId: number, teamId: number) {
+  public async acceptRequestReserve(
+    squadId: number,
+    teamId: number,
+  ): Promise<any> {
     return this.post(this.categoryPath, "acceptRequest", {
       squadId: squadId,
       teamId: teamId,
       isReserve: true,
-    }).then((res) => res.data);
+    }).then((res: any) => res.data);
   }
 
-  public declineRequest(squadId: number, teamId: number) {
+  public async declineRequest(squadId: number, teamId: number): Promise<any> {
     return this.post(this.categoryPath, "rejectRequest", {
       squadId: squadId,
       teamId: teamId,
-    }).then((res) => res.data);
+    }).then((res: any) => res.data);
   }
 
-  public swapTeam(squadId: number, teamId: number, otherTeamId: number | null) {
+  public async swapTeam(
+    squadId: number,
+    teamId: number,
+    otherTeamId: number | null,
+  ): Promise<any> {
     return this.post(this.categoryPath, "swapTeam", {
       squadId: squadId,
       teamId: teamId,
       otherTeamId: otherTeamId,
-    }).then((res) => res.data);
+    }).then((res: any) => res.data);
   }
 
-  public rename(squadId: number, newName: string) {
+  public async rename(squadId: number, newName: string): Promise<any> {
     return this.post(this.categoryPath, "rename", {
       squadId: squadId,
       name: newName,
-    }).then((res) => res.data);
+    }).then((res: any) => res.data);
   }
 }

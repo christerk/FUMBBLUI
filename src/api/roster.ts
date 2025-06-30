@@ -1,4 +1,5 @@
-import CategoryBase from "./CategoryBase";
+import CategoryBase from "./categoryBase";
+import SerializedApiRunner from "./serializedApiRunner";
 
 export default class Roster extends CategoryBase {
   protected categoryPath = "roster";
@@ -7,15 +8,15 @@ export default class Roster extends CategoryBase {
     super(runner);
   }
 
-  public list(ruleset: number) {
+  public async list(ruleset: number): Promise<any> {
     return this.get(this.categoryPath, "list/" + ruleset).then(
-      (res) => res.data,
+      (res: any) => res.data,
     );
   }
 
-  public getRoster(rosterId: number) {
+  public async getRoster(rosterId: number): Promise<any> {
     return this.get(this.categoryPath, "get/" + rosterId).then(
-      (res) => res.data,
+      (res: any) => res.data,
     );
   }
 }

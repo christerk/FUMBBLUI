@@ -1,4 +1,5 @@
-import CategoryBase from "./CategoryBase";
+import CategoryBase from "./categoryBase";
+import SerializedApiRunner from "./serializedApiRunner";
 
 export default class Coach extends CategoryBase {
   protected categoryPath = "coach";
@@ -7,15 +8,15 @@ export default class Coach extends CategoryBase {
     super(runner);
   }
 
-  public teams(coach: string) {
+  public async teams(coach: string): Promise<any> {
     return this.get(this.categoryPath, "teams/" + coach).then(
-      (res) => res.data,
+      (res: any) => res.data,
     );
   }
 
-  public activeTeams(coach: string) {
+  public async activeTeams(coach: string) {
     return this.get(this.categoryPath, "activeteams/" + coach).then(
-      (res) => res.data,
+      (res: any) => res.data,
     );
   }
 }

@@ -1,3 +1,9 @@
+type ApiCall<T> = () => Promise<T>;
+interface SerializedApiRunnerOptions {
+  maxRequests?: number;
+  windowMs?: number;
+}
+
 export default class SerializedApiRunner {
   private queue: Array<() => Promise<void>> = [];
   private running = false;
@@ -38,7 +44,7 @@ export default class SerializedApiRunner {
     this.running = false;
   }
 
-  private async ensureRateLimit() {
+  private async ensureRateLimit(): Promise<void> {
     const now = Date.now();
     // Remove timestamps outside the window
     this.requestTimestamps = this.requestTimestamps.filter(

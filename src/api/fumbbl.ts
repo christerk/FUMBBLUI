@@ -1,15 +1,9 @@
-import SerializedApiRunner from "./SerializedApiRunner";
+import SerializedApiRunner from "./serializedApiRunner";
 
-import Coach from "./Coach";
-import Roster from "./Roster";
-import Clickhouse from "./Clickhouse";
-import TournamentSquads from "./TournamentSquads";
-
-type ApiCall<T> = () => Promise<T>;
-interface SerializedApiRunnerOptions {
-  maxRetries?: number;
-  rateLimitMs?: number;
-}
+import Coach from "./coach";
+import Roster from "./roster";
+import Clickhouse from "./clickhouse";
+import TournamentSquads from "./tournamentSquads";
 
 export default class FumbblApi {
   public TournamentSquads: TournamentSquads;
@@ -21,9 +15,9 @@ export default class FumbblApi {
 
   constructor() {
     this._runner = new SerializedApiRunner();
-    this.TournamentSquads = new TournamentSquads(this.runner);
-    this.Coach = new Coach(this.runner);
-    this.Clickhouse = new Clickhouse(this.runner);
-    this.Roster = new Roster(this.runner);
+    this.TournamentSquads = new TournamentSquads(this._runner);
+    this.Coach = new Coach(this._runner);
+    this.Clickhouse = new Clickhouse(this._runner);
+    this.Roster = new Roster(this._runner);
   }
 }
