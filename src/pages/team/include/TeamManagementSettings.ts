@@ -130,7 +130,8 @@ export default class TeamManagementSettings {
     const cleanSkills: string[] = [];
     for (const skill of skills) {
       if (skill.includes(" (")) {
-        const cleanSkill = skill.substring(0, skill.indexOf(" ("));
+        let cleanSkill = skill.replace(";", ", ");
+        cleanSkill = cleanSkill.replace(/\d+\|\|/, ""); // Fix rendering of positional definitions
         cleanSkills.push(cleanSkill);
       } else {
         cleanSkills.push(skill);

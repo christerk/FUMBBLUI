@@ -2,6 +2,7 @@
   <div class="preload">
     <img v-if="type == 'd6'" src="https://fumbbl.com/i/562665" />
     <img v-if="type == 'd8'" src="https://fumbbl.com/i/562717" />
+    <img v-if="type == 'd16'" src="https://fumbbl.com/i/769115" />
   </div>
   <div
     v-show="number > 0"
@@ -27,6 +28,7 @@ class Die extends Vue {
 
   private d6Targets: number[][][] = [];
   private d8Targets: number[][][] = [];
+  private d16Targets: number[][][] = [];
   public bgx: number = 0;
   public bgy: number = 0;
   private targetX: number = 0;
@@ -37,6 +39,8 @@ class Die extends Vue {
   private startX: number = 0;
   private startY: number = 0;
   public rotate: number = 0;
+  private sizeX: number = 0;
+  private sizeY: number = 0;
 
   public mounted() {
     this.d6Targets = [
@@ -106,15 +110,42 @@ class Die extends Vue {
         [0, 16, 180],
       ],
     ];
+
+    this.d16Targets = [
+      [],
+      [[0, 0, 0]], //1
+      [[12, 10, 0]], //2
+      [[12, 0, 0]], //3
+      [[21, 0, 0]], //4
+      [[21, 10, 0]], //5
+      [[6, 10, 0]], //6
+      [[9, 10, 0]], //7
+      [[18, 10, 0]], //8
+      [[15, 0, 0]], //9
+      [[6, 0, 0]], //10
+      [[3, 0, 0]], //11
+      [[18, 0, 0]], //12
+      [[0, 10, 0]], //13
+      [[15, 10, 0]], //14
+      [[9, 0, 0]], //15
+      [[3, 10, 0]], //16
+    ];
   }
 
   public roll(result: number) {
     let t: number[][];
 
+    this.sizeX = 20;
+    this.sizeY = 19;
+
     if (this.type == "d6") {
       t = this.d6Targets[result];
     } else if (this.type == "d8") {
       t = this.d8Targets[result];
+    } else if (this.type == "d16") {
+      t = this.d16Targets[result];
+      this.sizeX = 24;
+      this.sizeY = 20;
     } else {
       return;
     }
@@ -147,7 +178,6 @@ class Die extends Vue {
   public tick() {
     const animTime = performance.now() - this.time;
     const pct = this.ease(Math.min(1, animTime / this.animationTime));
-
     if (pct < 1) {
       window.requestAnimationFrame(() => this.tick());
     } else {
@@ -161,8 +191,11 @@ class Die extends Vue {
       (this.targetY + (1 - pct) * (this.targetY - this.startY)) / 50,
     );
 
-    this.bgx = ((2000 + currentX) % 20) * 50;
-    this.bgy = ((1900 + currentY) % 19) * 50;
+    const sizeX = this.sizeX;
+    const sizeY = this.sizeY;
+
+    this.bgx = ((sizeX * 100 + currentX) % sizeX) * 50;
+    this.bgy = ((sizeY * 100 + currentY) % sizeY) * 50;
   }
 
   public ease(t: number) {

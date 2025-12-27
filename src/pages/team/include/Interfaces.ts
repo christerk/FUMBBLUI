@@ -79,7 +79,7 @@ export type PlayerGender = "FEMALE" | "MALE" | "NEUTRAL" | "NONBINARY";
 
 export type PlayerSkillStatus = "NONE" | "CAN_SKILL" | "MUST_SKILL";
 
-export type RulesetVersion = "UNKNOWN" | "2016" | "2020";
+export type RulesetVersion = "UNKNOWN" | "2016" | "2020" | "2025";
 export type SkillProgression =
   | "UNKNOWN"
   | "NONE"

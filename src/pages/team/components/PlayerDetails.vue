@@ -63,46 +63,48 @@
     <div class="playerdetailssection playerdetailsrecord">
       <a
         v-if="player && canEdit"
-        :href="`https://fumbbl.com/p/player?player_id=${player.id}`"
+        :href="`/p/player?player_id=${player.id}`"
         style="float: right"
         >Manage player</a
       >
       <a
         v-if="player && !canEdit"
-        :href="`https://fumbbl.com/p/player?player_id=${player.id}`"
+        :href="`/p/player?player_id=${player.id}`"
         style="float: right"
         >Player Details</a
       >
       <div class="title">Details</div>
       <table class="playerstats">
-        <tr>
-          <td>{{ player ? player.getRecord().games : "0" }}</td>
-          <td>Games played</td>
-        </tr>
-        <tr>
-          <td>{{ player ? player.getRecord().completions : "0" }}</td>
-          <td>Completions</td>
-        </tr>
-        <tr>
-          <td>{{ player ? player.getRecord().touchdowns : "0" }}</td>
-          <td>Touchdowns</td>
-        </tr>
-        <tr>
-          <td>{{ player ? player.getRecord().deflections : "0" }}</td>
-          <td>Deflections</td>
-        </tr>
-        <tr>
-          <td>{{ player ? player.getRecord().interceptions : "0" }}</td>
-          <td>Interceptions</td>
-        </tr>
-        <tr>
-          <td>{{ player ? player.getRecord().casualties : "0" }}</td>
-          <td>Casualties</td>
-        </tr>
-        <tr>
-          <td>{{ player ? player.getRecord().mvps : "0" }}</td>
-          <td>MVPs</td>
-        </tr>
+        <tbody>
+          <tr>
+            <td>{{ player ? player.getRecord().games : "0" }}</td>
+            <td>Games played</td>
+          </tr>
+          <tr>
+            <td>{{ player ? player.getRecord().completions : "0" }}</td>
+            <td>Completions</td>
+          </tr>
+          <tr>
+            <td>{{ player ? player.getRecord().touchdowns : "0" }}</td>
+            <td>Touchdowns</td>
+          </tr>
+          <tr>
+            <td>{{ player ? player.getRecord().deflections : "0" }}</td>
+            <td>Deflections</td>
+          </tr>
+          <tr>
+            <td>{{ player ? player.getRecord().interceptions : "0" }}</td>
+            <td>Interceptions</td>
+          </tr>
+          <tr>
+            <td>{{ player ? player.getRecord().casualties : "0" }}</td>
+            <td>Casualties</td>
+          </tr>
+          <tr>
+            <td>{{ player ? player.getRecord().mvps : "0" }}</td>
+            <td>MVPs</td>
+          </tr>
+        </tbody>
       </table>
     </div>
     <modal

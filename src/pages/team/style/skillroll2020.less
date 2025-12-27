@@ -1,0 +1,215 @@
+@import url("@style/fumbbl");
+
+.skillroll {
+    display: flex;
+    place-content: center;
+}
+
+.skillrollcomponent {
+    width: 800px;
+    height: 500px;
+    padding: 1rem;
+
+    :deep(.panel .content) {
+        background: @OffWhite;
+    }
+
+    .rollContainer {
+        margin-left: 10px;
+    }
+}
+
+
+#debug {
+    margin: 2em;
+    width: 600px;
+    border: solid #030 2px;
+    border-radius: 5px;
+    padding: 0;
+    background: #fffcf0;
+    border-bottom-left-radius: 0;
+    display: none;
+}
+
+.sppProgress {
+    position: relative;
+    border: solid #030 1px;
+    background-color: rgba(0, 51, 0, 0.5);
+    margin: 5px 0;
+
+    .progressBar {
+        position: absolute;
+        height: 100%;
+        width: 0%;
+        background-color: #030;
+
+        .projectedCost {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background-color: #300;
+        }
+    }
+
+    .sppText {
+        color: white;
+        text-align: center;
+        position: relative;
+    }
+}
+
+.advancements {
+    display: grid;
+    grid-template-columns: 183.5px 183.5px 183.5px 183.5px 0px;
+    column-gap: 10px;
+    transition: all 0.5s ease;
+    overflow-x: hidden;
+
+    &.sel1 {
+        grid-template-columns: 183.5px 0 0 0 auto;
+        transition: all 0.5s ease;
+        column-gap: 0;
+    }
+
+    &.sel2 {
+        grid-template-columns: 0 183.5px 0 0 auto;
+        transition: all 0.5s ease;
+        column-gap: 0;
+    }
+
+    &.sel3 {
+        grid-template-columns: 0 0 183.5px 0 auto;
+        transition: all 0.5s ease;
+        column-gap: 0;
+    }
+
+    &.sel4 {
+        grid-template-columns: 0 0 0 183.5px auto;
+        transition: all 0.5s ease;
+        column-gap: 0;
+    }
+
+    .advancement {
+        position: relative;
+        color: white;
+        background-color: #030;
+        border-radius: 5px;
+        padding: 5px;
+        text-align: center;
+        border: solid 2px #030;
+        padding-bottom: 2em;
+        height: 9em;
+        transition: all 0.5s ease;
+        overflow: hidden;
+        opacity: 0;
+
+        &.show {
+            opacity: 1;
+        }
+
+        .cost {
+            font-size: 120%;
+            font-weight: bold;
+            border-bottom: dotted 2px white;
+            margin-bottom: 5px;
+            padding-bottom: 3px;
+            width: 169.5px;
+        }
+
+        .title {
+            width: 169.5px;
+
+            .line {
+                font-size: 110%;
+                white-space: nowrap;
+            }
+        }
+
+        .tv {
+            width: 169.5px;
+            position: absolute;
+            bottom: 0px;
+            left: 5px;
+            right: 5px;
+            font-size: 120%;
+            font-weight: bold;
+            border-top: dotted 2px white;
+        }
+
+        &.unavailable {
+            background-color: rgba(0, 51, 0, 0.5);
+            border: 0;
+        }
+
+        &.available:hover {
+            background-color: #141;
+            cursor: pointer;
+        }
+    }
+
+}
+
+.button {
+    text-align: center;
+    background-color: #030;
+    color: white;
+    cursor: pointer;
+    margin-top: 5px;
+    margin-right: 5px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    transition: all 0.5s ease;
+
+    &.narrow {
+        width: auto !important;
+    }
+
+    &:hover {
+        background-color: #141;
+    }
+}
+
+#selectSkillButton,
+#rollSkillButton {
+    margin-top: 5px;
+}
+
+.backButton {
+    width: 183.5px;
+}
+
+.diceRolls {
+    display: grid;
+    width: 80%;
+
+    .roll {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 10px;
+        place-items: center;
+    }
+
+    .statrollpanel {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        margin-top: 5px;
+    }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: all .5s ease;
+    overflow-y: hidden;
+    height: auto;
+}
+
+.fade-enter,
+.fade-leave-to
+
+/* .fade-leave-active below version 2.1.8 */
+    {
+    opacity: 0;
+    height: 0;
+}

@@ -32,6 +32,12 @@ export default class RosterIconManager {
       });
 
     try {
+      if (positionIconId === 0) {
+        return {
+          size: 0,
+          iconRowVersionPositions: [],
+        };
+      }
       const dimensions = await imageDimensions(
         `https://fumbbl.com/i/${positionIconId}`,
       );

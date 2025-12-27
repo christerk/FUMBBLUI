@@ -716,6 +716,21 @@ export default class FumbblApi {
     return await this.enqueuePost(url);
   }
 
+  public async listSkills(rulesVersion: string): Promise<ApiResponse> {
+    const url = this.getUrl("/api/skill/list/" + rulesVersion);
+    return await this.enqueuePost(url);
+  }
+
+  public async rollSkill2020(
+    playerId: number,
+    category: string,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl(
+      "/api/player/rollskill/" + playerId + "/" + category,
+    );
+    return await this.enqueuePost(url, {});
+  }
+
   public async selectSkill2016(
     playerId: number,
     skillTypeId: number,
@@ -728,6 +743,11 @@ export default class FumbblApi {
     };
 
     return await this.enqueuePost(url, data);
+  }
+
+  public async rollCharacteristic(playerId: number): Promise<ApiResponse> {
+    const url = this.getUrl("/api/player/rollcharacteristic/" + playerId);
+    return await this.enqueuePost(url, {});
   }
 
   public async getIconData(positionId: number): Promise<ApiResponse> {

@@ -741,7 +741,9 @@
 
     <template v-slot:body>
       <div v-if="selectedSeason != null" class="seasonHeader">
-        Season {{ selectedSeason.season }}
+        Season {{ selectedSeason.season }} (Total cost: {{ totalRosterCost }} --
+        Max Squads:
+        {{ Math.ceil(totalRosterCost / selectedSeason.totalTeamCost) }})
       </div>
 
       <drop
@@ -860,6 +862,7 @@ class BoxTrophy extends Vue {
   public checkedTeams: any[] = [];
   public teamPriority: number = 0;
   public recentMatches: any[] = [];
+  public totalRosterCost: number = 0;
 
   @Ref
   public errorModal: InstanceType<typeof ErrorModal> | undefined;
@@ -1000,6 +1003,7 @@ class BoxTrophy extends Vue {
 
     this.nextCostUp = 0;
     this.nextCostDown = 99;
+    this.totalRosterCost = 0;
 
     for (var roster of data) {
       var tier = roster.tier;
@@ -1010,6 +1014,9 @@ class BoxTrophy extends Vue {
       if (cost <= this.nextCostDown) {
         this.nextCostDown = cost - 1;
       }
+
+      this.totalRosterCost += cost;
+
       var rosterName = roster.roster;
       var id = roster.id;
       var logo = roster.logo;

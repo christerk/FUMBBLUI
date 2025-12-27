@@ -1,124 +1,124 @@
 @import url("@style/fumbbl");
 
 .wrap {
-  margin-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .header {
-  display: grid;
-  width: 100%;
-  grid-template-areas:
-    "portrait name name"
-    "portrait position position"
-    "portrait stats skills"
-    "portrait stats injuries";
-  grid-template-rows: auto auto 1fr;
-  grid-template-columns: auto auto 1fr;
-  grid-gap: 0.25rem;
-
-  &.narrow {
+    display: grid;
+    width: 100%;
     grid-template-areas:
-      "name name"
-      "position position"
-      "portrait stats"
-      "portrait skills"
-      "portrait injuries";
+        "portrait stats name"
+        "portrait stats position"
+        "portrait injuries skills"
+        "portrait injuries skills";
+    grid-template-rows: auto auto 1fr;
+    grid-template-columns: auto auto 1fr;
+    grid-gap: 0.25rem;
 
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto auto auto 1fr;
+    &.narrow {
+        grid-template-areas:
+            "name name"
+            "position position"
+            "portrait stats"
+            "portrait skills"
+            "portrait injuries";
+
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto auto auto 1fr;
+
+        .name {
+            font-size: 24px;
+        }
+    }
+
+    .portrait {
+        grid-area: portrait;
+        max-width: 95px;
+        max-height: 147px;
+    }
 
     .name {
-      font-size: 24px;
-    }
-  }
-
-  .portrait {
-    grid-area: portrait;
-    max-width: 95px;
-    max-height: 147px;
-  }
-
-  .name {
-    grid-area: name;
-    text-align: center;
-    font-size: 30px;
-  }
-
-  .position {
-    grid-area: position;
-    text-align: center;
-  }
-
-  .stats {
-    grid-area: stats;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    column-gap: 5px;
-    place-self: start center;
-    grid-row-gap: 0.25rem;
-
-    &.hasPass {
-      grid-template-columns: repeat(5, 1fr);
+        grid-area: name;
+        text-align: left;
+        font-size: 30px;
     }
 
-    .stat {
-      position: relative;
-      width: 30px;
-      height: 40px;
-      border: solid 1px #030;
-      text-align: center;
-      font-size: 15px;
-
-      .title {
-        position: absolute;
-        background: @Forest;
-        color: white;
-        top: 0;
-        left: 0;
-        width: 100%;
-      }
-
-      .val {
-        background: white;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-      }
-    }
-  }
-
-  .skills {
-    grid-area: skills;
-    border: solid 1px @Forest;
-  }
-
-  .injuries {
-    grid-area: injuries;
-    border: solid 1px @Forest;
-  }
-
-  .skills,
-  .injuries {
-    min-height: 2.5rem;
-    .title {
-      background: @Forest;
-      color: white;
-      font-size: 15px;
-      padding: 0 5px;
+    .position {
+        grid-area: position;
+        text-align: left;
     }
 
-    .positionSkills {
-      font-size: 8pt;
-      font-style: italic;
-      padding: 3px;
+    .stats {
+        grid-area: stats;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        column-gap: 5px;
+        place-self: start center;
+        grid-row-gap: 0.25rem;
+
+        &.hasPass {
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        .stat {
+            position: relative;
+            width: 30px;
+            height: 40px;
+            border: solid 1px #030;
+            text-align: center;
+            font-size: 15px;
+
+            .title {
+                position: absolute;
+                background: @Forest;
+                color: white;
+                top: 0;
+                left: 0;
+                width: 100%;
+            }
+
+            .val {
+                background: white;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+            }
+        }
     }
 
-    .playerSkills {
-      padding: 3px;
+    .skills {
+        grid-area: skills;
+        border: solid 1px @Forest;
     }
-  }
 
-  &.narrow {
-  }
+    .injuries {
+        grid-area: injuries;
+        border: solid 1px @Forest;
+    }
+
+    .skills,
+    .injuries {
+        min-height: 2.5rem;
+
+        .title {
+            background: @Forest;
+            color: white;
+            font-size: 15px;
+            padding: 0 5px;
+        }
+
+        .positionSkills {
+            font-size: 8pt;
+            font-style: italic;
+            padding: 3px;
+        }
+
+        .playerSkills {
+            padding: 3px;
+        }
+    }
+
+    &.narrow {}
 }

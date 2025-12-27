@@ -103,7 +103,7 @@
         </div>
       </div>
       <template v-if="!compactView && !player.IsEmpty">
-        <template v-if="rulesetVersion == '2020'">
+        <template v-if="rulesetVersion == '2020' || rulesetVersion == '2025'">
           <div class="cell statma center">
             <span
               :class="{

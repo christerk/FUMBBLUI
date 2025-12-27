@@ -588,9 +588,16 @@
               <addremove
                 :current-value="team.getRerolls().toString()"
                 :can-edit="accessControl.canEdit()"
-                :can-remove-immediately="accessControl.canRemoveReroll() && (team.getTeamStatus().isNew() || team.getTeamStatus().isRedrafting())"
+                :can-remove-immediately="
+                  accessControl.canRemoveReroll() &&
+                  (team.getTeamStatus().isNew() ||
+                    team.getTeamStatus().isRedrafting())
+                "
                 :can-add="addRemovePermissions.rerolls.add"
-                :can-remove="addRemovePermissions.rerolls.remove && accessControl.canRemoveReroll()"
+                :can-remove="
+                  addRemovePermissions.rerolls.remove &&
+                  accessControl.canRemoveReroll()
+                "
                 :label-add="accessControl.canCreate() ? 'Add' : 'Buy'"
                 :label-remove="
                   accessControl.canRemoveReroll() ? 'Remove' : 'Discard'
@@ -850,18 +857,17 @@
         <button @click="handleSkillPlayer" class="largeclosebutton">
           <img src="https://fumbbl.com/FUMBBL/Images/cross.png" />
         </button>
-        <template v-if="skillProgressionType == 'BB2020'">
-          <iframe
-            v-if="modals.skillPlayer && skillingPlayer != null"
-            style="border-radius: 5px; width: 800px; height: 496px"
-            :src="
-              '/p/selectskill?teamId=' +
-              team.id +
-              '&playerId=' +
-              skillingPlayer.id
-            "
-            title="Select Skill"
-          ></iframe>
+        <template
+          v-if="
+            skillProgressionType == 'BB2020' || skillProgressionType == 'BB2025'
+          "
+        >
+          <SkillRoll2020
+            :fumbblApi="fumbblApi"
+            :ruleset="rulesetVersion"
+            @close="handleSkillPlayer"
+            ref="skillRoll2020"
+          ></SkillRoll2020>
         </template>
 
         <template
@@ -1011,6 +1017,7 @@ import RedraftBudget from "./modals/RedraftBudget.vue";
 import EndSeasonPanel from "./EndSeasonPanel.vue";
 import TeamStatus from "./TeamStatus.vue";
 import SkillRoll2016 from "./SkillRoll2016.vue";
+import SkillRoll2020 from "./SkillRoll2020.vue";
 
 import {
   DiscardRerollModal,
@@ -1077,6 +1084,7 @@ declare global {
     RedraftCompleteModal,
     TeamStatus,
     SkillRoll2016,
+    SkillRoll2020,
     EditBioModal,
   },
 })
@@ -1200,6 +1208,8 @@ class TeamComponent extends Vue {
     | undefined;
   @Ref
   public skillRoll2016: InstanceType<typeof SkillRoll2016> | undefined;
+  @Ref
+  public skillRoll2020: InstanceType<typeof SkillRoll2020> | undefined;
 
   private readonly MODIFICATION_RELOAD_DELAY: number = 5000;
   public loadCount: number = 0;
@@ -1538,18 +1548,26 @@ class TeamComponent extends Vue {
       const skillProgressionMap: { [key: string]: SkillProgression } = {
         standard: "BB2016",
         bb2020: "BB2020",
+        bb2025: "BB2025",
         none: "NONE",
         "custom-spp": "CUSTOMSPP",
         predetermined: "PREDETERMINED",
       };
       this.skillProgressionType =
         skillProgressionMap[skillProgressionType] ?? "UNKNOWN";
-
+      console.log(
+        `Ruleset version: ${this.rulesetVersion}, Skill progression type: ${this.skillProgressionType}`,
+      );
       if (
-        !["2016", "2020"].includes(this.rulesetVersion) ||
-        !["BB2016", "BB2020", "PREDETERMINED", "CUSTOMSPP", "NONE"].includes(
-          this.skillProgressionType,
-        )
+        !["2016", "2020", "2025"].includes(this.rulesetVersion) ||
+        ![
+          "BB2016",
+          "BB2020",
+          "BB2025",
+          "PREDETERMINED",
+          "CUSTOMSPP",
+          "NONE",
+        ].includes(this.skillProgressionType)
       ) {
         this.supportedTeam();
       }
@@ -2340,6 +2358,12 @@ class TeamComponent extends Vue {
 
     this.modals.skillPlayer = true;
     this.skillRoll2016?.setPlayer(player);
+    this.skillRoll2020?.setPlayer(
+      player,
+      this.teamManagementSettings.settings.players.positions.find(
+        (pos) => pos.id === player.position.id,
+      )!,
+    );
   }
 
   public async handleSkillPlayer() {

@@ -60,7 +60,9 @@
         <div class="positionSkills" :key="serial">
           {{ player.getPositionSkills().join(", ") }}
         </div>
-        <div class="playerSkills">{{ player.getSkills().join(", ") }}</div>
+        <div class="playerSkills" :key="serial">
+          {{ player.getSkills().join(", ") }}
+        </div>
       </div>
       <div class="injuries">
         <div class="title">Injuries</div>
@@ -93,6 +95,7 @@ class PlayerCard extends Vue {
 
   public setPlayer(player: Player) {
     this.player = player;
+    this.serial++;
   }
 
   public async rollsComplete() {}
