@@ -3,7 +3,7 @@
     <PlayerCard ref="card" />
 
     <div class="sppProgress" v-if="initialized">
-      <div class="progressBar" v-bind:style="{ width: getSppProgress() }">
+      <div class="progressBar" :style="{ width: getSppProgress() }">
         <div
           class="projectedCost"
           v-bind:style="{ width: projectedCost + '%' }"
@@ -53,7 +53,7 @@
               @lockCategory="lockCategory"
               @skillAdded="skillAdded"
               @chooseSecondary="chooseSecondary"
-              :playerId="player.id"
+              :playerId="player?.id"
               :skillStatus="category != '' ? skillStatus : null"
               :playerSkills="[...positionSkills, ...playerSkills]"
               :skills="skills"
@@ -76,21 +76,21 @@
 </style>
 
 <script lang="ts">
-import Axios from "axios";
-import Vue from "vue";
-import SkillPanel from "../components/skillpanel.vue";
+import { PropType } from "vue";
+import SkillPanel from "../components/SkillPanel.vue";
 import { Die } from "@components/fumbblcomponents";
 import PlayerCard from "./PlayerCard.vue";
 import Player from "../include/Player";
+import { Position, RulesetVersion } from "../include/Interfaces";
+import FumbblApi from "../include/FumbblApi";
 
 import {
   Component,
   Vue,
-  toNative,
   Ref,
   Prop,
   Emit,
-  Watch,
+  toNative,
 } from "vue-facing-decorator";
 
 @Component({
@@ -100,7 +100,7 @@ import {
     PlayerCard,
   },
 })
-export default class SkillSelect extends Vue {
+class SkillRoll2020 extends Vue {
   @Prop({
     type: Object as PropType<FumbblApi>,
     required: true,
@@ -111,59 +111,43 @@ export default class SkillSelect extends Vue {
     type: String as PropType<RulesetVersion>,
     required: true,
   })
-  public ruleset: RulesetVersion;
+  public ruleset: RulesetVersion = "UNKNOWN";
 
   @Ref
   public card!: InstanceType<typeof PlayerCard>;
 
   public title: string = "Select Skill";
   public apiBase: string = "";
-  private playerId: number;
-  private rulesVersion: number = 2020;
-  private limits: string[];
-  private categoryTitles: { [key: string]: string } = {};
-  private categoryCosts: { [key: string]: string } = {};
-  private availableSpp: number;
-  private player: Player | null = null;
-  private position: any = {};
+  private availableSpp: number = 0;
+  public player: Player | null = null;
+  private position: Position | null = null;
 
-  private playerSkills: string[] = [];
-  private positionSkills: string[] = [];
+  public playerSkills: string[] = [];
+  public positionSkills: string[] = [];
   public playerSkillString: string = "";
-  private initialized = false;
-  private selectedAdvancement: string | null = null;
-  private projectedCost: number = 0;
-  private categories = {
-    G: "General skill",
-    A: "Agility skill",
-    P: "Passing skill",
-    M: "Mutation",
-    S: "Strength skill",
-    D: "Devious skill",
-  };
-  private selectedCategory: string | null = null;
-  private skills: { [category: string]: string[] } = {};
-  private availableCategories: string[];
-  private roll: any;
+
+  public skills: { [category: string]: string[] } = {};
+  public availableCategories: string[] = [];
   private advancementLocked: boolean = false;
   private categoryLocked: boolean = false;
-  private allowSecondaryChoice: boolean = false;
 
-  private skillStatus: any | null = null;
+  public skillStatus: any | null = null;
+
+  public initialized: boolean = false;
+  public projectedCost: number = 0;
+  public selectedCategory: string | null = null;
+  public selectedAdvancement: string | null = null;
 
   public async setPlayer(player: Player | undefined, position: Position) {
-    this.selectedSkill = 0;
     if (player == undefined) {
       this.player = null;
       return;
     }
-
-    this.card.setPlayer(player);
     this.player = player;
     this.position = position;
 
-    this.showControls = false;
     this.$nextTick(async () => {
+      this.card.setPlayer(player);
       const skillStatus: any = (
         await this.fumbblApi?.getSkillStatus(this.player!.id)
       )?.data;
@@ -186,7 +170,7 @@ export default class SkillSelect extends Vue {
       this.resetPanels();
       await this.$nextTick();
       if (skillStatus.rolls.length > 0) {
-        if (this.ruleset == 2025 && skillStatus.rolls[0].category != "") {
+        if (this.ruleset == "2025" && skillStatus.rolls[0].category != "") {
           this.selectAdvancement(skillStatus.limits[0], true);
           this.selectedCategory = "R" + skillStatus.rolls[0].category;
           this.advancementLocked = true;
@@ -213,14 +197,6 @@ export default class SkillSelect extends Vue {
     }
   }
 
-  private validateResponse(response) {
-    if (typeof response == "string" && response.startsWith("Error")) {
-      alert(response);
-      return false;
-    }
-    return true;
-  }
-
   private getProgressLength(spp: number, sppKey: string) {
     let limitCount = this.skillStatus.limits.length;
     let progress = 0;
@@ -238,7 +214,7 @@ export default class SkillSelect extends Vue {
     return progress;
   }
 
-  private getSppProgress() {
+  public getSppProgress(): string {
     let progress = this.getProgressLength(this.skillStatus.availableSpp, "spp");
 
     return Math.min(100, progress) + "%";
@@ -259,15 +235,7 @@ export default class SkillSelect extends Vue {
     return 100 * (delta / progress);
   }
 
-  private getPortrait() {
-    return this.player.portrait ? this.player.portrait : this.position.portrait;
-  }
-
-  private getStatString(val) {
-    return val > 0 ? val + "+" : "-";
-  }
-
-  private selectAdvancement(limit, force: boolean = false) {
+  public selectAdvancement(limit: any, force: boolean = false) {
     if (force || !this.advancementLocked) {
       if (!force && this.selectedAdvancement == limit["id"]) {
         limit = null;
@@ -292,31 +260,31 @@ export default class SkillSelect extends Vue {
 
     switch (this.selectedAdvancement) {
       case "randomPrimary":
-        this.position.primarySkills.forEach((c) =>
+        this.position?.primarySkills.forEach((c: string) =>
           this.availableCategories.push("R" + c),
         );
         break;
       case "chosenPrimary":
-        this.position.primarySkills.forEach((c) =>
+        this.position?.primarySkills.forEach((c: string) =>
           this.availableCategories.push("C" + c),
         );
         if (this.ruleset == "2020") {
-          this.position.secondarySkills.forEach((c) =>
+          this.position?.secondarySkills.forEach((c) =>
             this.availableCategories.push("R" + c),
           );
         }
         break;
       case "chosenSecondary":
-        this.position.secondarySkills.forEach((c) =>
+        this.position?.secondarySkills.forEach((c) =>
           this.availableCategories.push("C" + c),
         );
         break;
       case "characteristic":
         this.availableCategories.push("RC");
-        this.position.primarySkills.forEach((c) =>
+        this.position?.primarySkills.forEach((c) =>
           this.availableCategories.push("C" + c),
         );
-        this.position.secondarySkills.forEach((c) =>
+        this.position?.secondarySkills.forEach((c) =>
           this.availableCategories.push("C" + c),
         );
         break;
@@ -330,7 +298,7 @@ export default class SkillSelect extends Vue {
     }
   }
 
-  private selectCategory(category) {
+  public selectCategory(category: string | null) {
     if (!this.categoryLocked) {
       if (
         this.selectedCategory == category &&
@@ -345,20 +313,20 @@ export default class SkillSelect extends Vue {
     }
   }
 
-  private chooseSecondary() {
+  public chooseSecondary() {
     this.roll = null;
     this.selectedCategory = null;
   }
 
-  private lockAdvancement() {
+  public lockAdvancement() {
     this.advancementLocked = true;
   }
 
-  private lockCategory() {
+  public lockCategory() {
     this.categoryLocked = true;
   }
 
-  private skillAdded(skill: string) {
+  public skillAdded(skill: string) {
     this.playerSkills.push(skill);
     this.player.addSkill(skill);
     this.card.setPlayer(this.player);
@@ -366,7 +334,7 @@ export default class SkillSelect extends Vue {
     this.categoryLocked = false;
   }
 
-  private projectAdvancement(spp) {
+  public projectAdvancement(spp) {
     if (this.selectedAdvancement == null && spp <= this.availableSpp) {
       this.projectedCost = this.getProjectedCost(spp);
     }
@@ -379,4 +347,6 @@ export default class SkillSelect extends Vue {
   @Emit("close")
   public close() {}
 }
+
+export default toNative(SkillRoll2020);
 </script>

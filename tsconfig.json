@@ -1,14 +1,14 @@
 {
-  "files": [],
-  "compilerOptions": {
-    "experimentalDecorators": true
-  },
-  "references": [
-    {
-      "path": "./tsconfig.node.json"
+    "files": [],
+    "compilerOptions": {
+        "experimentalDecorators": true
     },
-    {
-      "path": "./tsconfig.app.json"
-    }
-  ]
+    "references": [
+        {
+            "path": "./tsconfig.node.json"
+        },
+        {
+            "path": "./tsconfig.app.json"
+        }
+    ]
 }

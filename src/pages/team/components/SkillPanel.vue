@@ -336,7 +336,7 @@
     <div
       v-if="
         !advancementLocked &&
-        this.rolling == false &&
+        rolling == false &&
         selectedCategory == category &&
         category[0] == 'R' &&
         category[1] != 'C'
@@ -350,7 +350,7 @@
     <div
       v-if="
         !advancementLocked &&
-        this.rolling == false &&
+        rolling == false &&
         selectedCategory == category &&
         category == 'RC' &&
         version == '2020'
@@ -364,7 +364,7 @@
     <div
       v-if="
         !advancementLocked &&
-        this.rolling == false &&
+        rolling == false &&
         selectedCategory == category &&
         category == 'RC' &&
         version == '2025'
@@ -479,8 +479,8 @@
 
 <script lang="ts">
 import Axios from "axios";
-import Vue from "vue";
 import FumbblApi from "../include/FumbblApi";
+import { PropType } from "vue";
 
 import { Die } from "@components/fumbblcomponents";
 
@@ -499,15 +499,15 @@ import {
     Die,
   },
 })
-export default class SkillPanel extends Vue {
-  @Prop({ required: true }) playerId: number;
-  @Prop({ required: true }) category: string;
-  @Prop({ required: true }) selectedCategory: string | null;
-  @Prop({ required: true }) skills: { [category: string]: string[] };
-  @Prop({ required: true }) playerSkills: string[];
-  @Prop({ required: true }) blocked: string[];
+class SkillPanel extends Vue {
+  @Prop({ required: true }) playerId: number = 0;
+  @Prop({ required: true }) category: string = "";
+  @Prop({ required: true }) selectedCategory: string | null = null;
+  @Prop({ required: true }) skills: { [category: string]: string[] } = {};
+  @Prop({ required: true }) playerSkills: string[] = [];
+  @Prop({ required: true }) blocked: string[] = [];
   @Prop({ required: true }) skillStatus: any;
-  @Prop({ required: true }) version: string;
+  @Prop({ required: true }) version: string = "";
   @Prop({
     type: Object as PropType<FumbblApi>,
     required: true,
@@ -528,10 +528,10 @@ export default class SkillPanel extends Vue {
   @Ref
   private d16Die: InstanceType<typeof Die> | undefined;
 
-  private selectedSkill: string = null;
-  private unpickableSkills: Set<String> = new Set<String>();
+  public selectedSkill: string | null = null;
+  public unpickableSkills: Set<String> = new Set<String>();
 
-  public rolledSkill: string = null;
+  public rolledSkill: string | null = null;
   public rolledSkills: string[] = [];
 
   public apiBase: string = "";
@@ -539,20 +539,20 @@ export default class SkillPanel extends Vue {
   private roll: any = null;
   public rolling: boolean = false;
 
-  private columnDieRoll: number = 0;
-  private rowDieRoll: number = 0;
-  private column2DieRoll: number = 0;
-  private row2DieRoll: number = 0;
-  private d8DieRoll: number = 0;
-  private d16DieRoll: number = 0;
+  public columnDieRoll: number = 0;
+  public rowDieRoll: number = 0;
+  public column2DieRoll: number = 0;
+  public row2DieRoll: number = 0;
+  public d8DieRoll: number = 0;
+  public d16DieRoll: number = 0;
 
-  private selectedStat: string = null;
+  public selectedStat: string | null = null;
 
-  private advancementLocked: boolean = false;
-  private categoryLocked: boolean = false;
-  private initialized: boolean = false;
+  public advancementLocked: boolean = false;
+  public categoryLocked: boolean = false;
+  public initialized: boolean = false;
 
-  private categories: any = {
+  public categories: any = {
     G: "General skill",
     A: "Agility skill",
     P: "Passing skill",
@@ -596,7 +596,10 @@ export default class SkillPanel extends Vue {
       return;
     }
 
-    if (this.skillStatus.rolls[0].roll2 == 0) {
+    if (
+      this.skillStatus.rolls.length == 0 ||
+      this.skillStatus.rolls[0].roll2 == 0
+    ) {
       return;
     }
 
@@ -621,7 +624,7 @@ export default class SkillPanel extends Vue {
     return true;
   }
 
-  public getSkillColumns(category) {
+  public getSkillColumns(category: string) {
     let list: string[] = [];
 
     for (let i = 0; i < 6; i++) {
@@ -647,7 +650,7 @@ export default class SkillPanel extends Vue {
     } else if (
       this.version == "2025" &&
       (this.rolledSkills.includes(event.target.innerText) ||
-        this.caregory != "RC")
+        this.category != "RC")
     ) {
       let skill = event.target.innerText;
       if (skill == this.selectedSkill) {
@@ -802,10 +805,10 @@ export default class SkillPanel extends Vue {
   }
 
   public showRollResult() {
-    const roll1 = parseInt(this.columnDieRoll);
-    const roll2 = parseInt(this.rowDieRoll);
-    const roll3 = parseInt(this.column2DieRoll);
-    const roll4 = parseInt(this.row2DieRoll);
+    const roll1 = this.columnDieRoll;
+    const roll2 = this.rowDieRoll;
+    const roll3 = this.column2DieRoll;
+    const roll4 = this.row2DieRoll;
 
     if (this.version == "2020") {
       this.skillAdded(
@@ -818,16 +821,6 @@ export default class SkillPanel extends Vue {
       roll3 > 0 &&
       roll4 > 0
     ) {
-      console.log(
-        "Showing roll result",
-        roll1,
-        roll2,
-        roll3,
-        roll4,
-        this.selectedCategory,
-        (roll1 > 3 ? 6 : 0) + roll2 - 1,
-        (roll3 > 3 ? 6 : 0) + roll4 - 1,
-      );
       this.rolledSkills = [
         this.skills[this.selectedCategory[1]][(roll1 > 3 ? 6 : 0) + roll2 - 1],
         this.skills[this.selectedCategory[1]][(roll3 > 3 ? 6 : 0) + roll4 - 1],
@@ -883,4 +876,6 @@ export default class SkillPanel extends Vue {
     return skill;
   }
 }
+
+export default toNative(SkillPanel);
 </script>
