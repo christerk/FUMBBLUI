@@ -483,7 +483,7 @@
                   <div class="cell statma">Ma</div>
                   <div class="cell statst">St</div>
                   <div class="cell statag">Ag</div>
-                  <div v-show="rulesetVersion == '2020'" class="cell statpa">
+                  <div v-show="rulesetVersion == '2020' || rulesetVersion == '2025'" class="cell statpa">
                     Pa
                   </div>
                   <div class="cell statav">Av</div>
