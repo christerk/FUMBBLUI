@@ -36,6 +36,8 @@ export type TeamAction =
   | "UNRETIRE_TEAM"
   | "READY_TEAM"
   | "UNREADY_TEAM"
+  | "SET_TEAM_CAPTAIN"
+  | "CLEAR_TEAM_CAPTAIN"
   | "VIEW_HISTORY"
   | "HIRE_ROOKIE"
   | "RENUMBER_PLAYERS"
@@ -86,7 +88,8 @@ export type SkillProgression =
   | "PREDETERMINED"
   | "BB2016"
   | "CUSTOMSPP"
-  | "BB2020";
+  | "BB2020"
+  | "BB2025";
 
 export interface Coach {
   id: number;

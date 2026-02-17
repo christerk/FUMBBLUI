@@ -1,15 +1,35 @@
 @import url("@style/fumbbl");
 
 .season {
-  font-size: 0.7rem;
+    font-size: 0.7rem;
 }
 
 .stat span {
-  display: inline-block;
-  padding: 2px;
-  width: 1rem;
+    display: inline-block;
+    padding: 2px;
+    width: 1rem;
 }
 
 .tempretired {
-  font-size: 0.7rem;
+    font-size: 0.7rem;
+}
+
+.teamcaptain {
+    background: url(https://fumbbl.com/FUMBBL/Images/wreath.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: 30px;
+}
+
+.allowcaptain {
+    cursor: pointer;
+
+    &:hover {
+        background: url(https://fumbbl.com/FUMBBL/Images/wreath.png);
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 30px;
+        background-blend-mode: lighten;
+        background-color: fade(@OldLace, 40%);
+    }
 }

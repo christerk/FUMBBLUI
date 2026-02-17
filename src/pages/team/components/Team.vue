@@ -116,6 +116,11 @@
                 <li v-if="accessControl.canUnreadyTeam()">
                   <a href="#" @click.prevent="unreadyTeam()">Unready</a>
                 </li>
+                <li v-if="accessControl.canClearTeamCaptain()">
+                  <a href="#" @click.prevent="clearTeamCaptain()"
+                    >Clear Team Captain</a
+                  >
+                </li>
                 <li v-if="accessControl.canRenameTeam()">
                   <a href="#" @click.prevent="renameTeam()">Rename</a>
                 </li>
@@ -483,7 +488,12 @@
                   <div class="cell statma">Ma</div>
                   <div class="cell statst">St</div>
                   <div class="cell statag">Ag</div>
-                  <div v-show="rulesetVersion == '2020' || rulesetVersion == '2025'" class="cell statpa">
+                  <div
+                    v-show="
+                      rulesetVersion == '2020' || rulesetVersion == '2025'
+                    "
+                    class="cell statpa"
+                  >
                     Pa
                   </div>
                   <div class="cell statav">Av</div>
@@ -544,6 +554,7 @@
                       @skill-player="showSkillPlayer"
                       @fold-out="handleFoldOut"
                       @show-hire-rookies="enableShowHireRookies"
+                      @set-team-captain="setTeamCaptain"
                     ></player>
                   </template>
                   <template v-else>
@@ -562,7 +573,16 @@
                   game)</span
                 >
               </div>
+              <specialrules2025
+                v-if="rulesetVersion == '2025'"
+                :fumbbl-api="fumbblApi"
+                :team-id="team.getId()"
+                :can-edit="accessControl.canCreate()"
+                :raw-api-special-rules="rawApiSpecialRules"
+                @rules-updated="handleSpecialRulesUpdated"
+              ></specialrules2025>
               <specialrules
+                v-else
                 :fumbbl-api="fumbblApi"
                 :team-id="team.getId()"
                 :can-edit="accessControl.canCreate()"
@@ -1000,6 +1020,7 @@ import HireRookiesComponent from "./HireRookies.vue";
 import RosterIconManager from "../include/RosterIconManager";
 import TeamManagementSettings from "../include/TeamManagementSettings";
 import SpecialRulesComponent from "./SpecialRules.vue";
+import SpecialRules2025Component from "./SpecialRules2025.vue";
 import AddRemoveComponent from "./AddRemove.vue";
 import ModalComponent from "./Modal.vue";
 import RetirePlayerComponent from "./RetirePlayer.vue";
@@ -1053,6 +1074,7 @@ declare global {
     player: PlayerComponent,
     hirerookies: HireRookiesComponent,
     specialrules: SpecialRulesComponent,
+    specialrules2025: SpecialRules2025Component,
     addremove: AddRemoveComponent,
     modal: ModalComponent,
     retireplayer: RetirePlayerComponent,
@@ -1931,6 +1953,19 @@ class TeamComponent extends Vue {
     this.showHireRookies = !this.showHireRookies;
   }
 
+  public async setTeamCaptain(playerId: number): Promise<any> {
+    const captain = this.team.findTeamCaptain();
+    if (captain != null) {
+      captain.clearTeamCaptain();
+    }
+
+    const player = this.team.findPlayerById(playerId);
+    player?.setTeamCaptain();
+
+    await this.fumbblApi.setTeamCaptain(this.team.id, playerId);
+    this.reloadTeamWithDelay();
+  }
+
   private getGender(defaultGender: string): PlayerGender {
     const availableGenders: PlayerGender[] = [
       "FEMALE",
@@ -2141,6 +2176,12 @@ class TeamComponent extends Vue {
   }
 
   public async interceptReadyToPlay() {
+    const errors = this.getSpecialRuleErrors(this.rawApiSpecialRules.fromTeam);
+    if (errors != null && errors.length > 0) {
+      this.createErrorModal?.show(errors);
+      return;
+    }
+
     if (
       this.willTriggerExpensiveMistakes ||
       (this.journeymanQuantityForNextGame > 0 &&
@@ -2195,6 +2236,23 @@ class TeamComponent extends Vue {
       }
     }
 
+    const insignificantPlayerCount = this.team.players.filter(
+      (p) =>
+        p.getPositionSkills().find((s) => s == "Insignificant") != undefined,
+    ).length;
+    const totalPlayerCount = this.team.players.filter((p) => !p.IsEmpty).length;
+
+    if (
+      this.team.getTeamStatus().isNew() &&
+      insignificantPlayerCount > totalPlayerCount - insignificantPlayerCount
+    ) {
+      errors.push("insignificant");
+    }
+
+    if (this.team.allowTeamCaptain && this.team.findTeamCaptain() == null) {
+      errors.push("needsTeamCaptain");
+    }
+
     return errors;
   }
 
@@ -2230,6 +2288,28 @@ class TeamComponent extends Vue {
         "An error occurred unreadying the team.",
         apiResponse.getErrorMessage(),
       );
+    }
+  }
+
+  public async clearTeamCaptain() {
+    this.menuHide();
+    const originalTeamStatus = this.team.getTeamStatus();
+    this.team.setTeamStatus("POST_MATCH_SEQUENCE");
+    this.reloadTeamWithDelay();
+    const apiResponse = await this.fumbblApi.clearTeamCaptain(
+      this.team.getId(),
+    );
+
+    if (!apiResponse.isSuccessful()) {
+      this.team.setTeamStatus(originalTeamStatus.getStatus());
+      await this.recoverFromUnexpectedError(
+        "An error occurred unreadying the team.",
+        apiResponse.getErrorMessage(),
+      );
+    } else {
+      const captain = this.team.findTeamCaptain();
+      captain?.clearTeamCaptain();
+      this.reloadTeamWithDelay();
     }
   }
 

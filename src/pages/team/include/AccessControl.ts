@@ -245,6 +245,24 @@ export default class AccessControl {
         ],
       },
       {
+        action: "SET_TEAM_CAPTAIN",
+        grantAccessToList: [
+          {
+            userRoles: ["OWNER", "LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["NEW", "REDRAFTING", "POST_MATCH_SEQUENCE"],
+          },
+        ],
+      },
+      {
+        action: "CLEAR_TEAM_CAPTAIN",
+        grantAccessToList: [
+          {
+            userRoles: ["LEAGUE_STAFF", "SITE_STAFF"],
+            teamStatusValues: ["POST_MATCH_SEQUENCE"],
+          },
+        ],
+      },
+      {
         action: "UNRETIRE_TEAM",
         grantAccessToList: [
           {
@@ -425,7 +443,8 @@ export default class AccessControl {
     );
   }
 
-  private isGranted(teamAction: TeamAction): boolean {
+  private isGranted(teamAction: TeamAction, debug: boolean = false): boolean {
+    if (debug) console.log("Testing team action", teamAction);
     for (const actionGrantAccessTo of this.accessRules) {
       if (teamAction !== actionGrantAccessTo.action) {
         continue;
@@ -486,6 +505,14 @@ export default class AccessControl {
 
   public canUnreadyTeam(): boolean {
     return this.isGranted("UNREADY_TEAM");
+  }
+
+  public canSetTeamCaptain(): boolean {
+    return this.isGranted("SET_TEAM_CAPTAIN");
+  }
+
+  public canClearTeamCaptain(): boolean {
+    return this.isGranted("CLEAR_TEAM_CAPTAIN");
   }
 
   public canUnretireTeam(): boolean {

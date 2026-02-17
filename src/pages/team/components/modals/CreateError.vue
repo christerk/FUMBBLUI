@@ -18,6 +18,7 @@
       </p>
       <ul>
         <li
+          v-if="runCreateChecks()"
           v-for="error in teamManagementSettings.getErrorsForCreate(team)"
           :key="error"
         >
@@ -40,6 +41,13 @@
           <template v-if="error === 'specialRuleNotChosen'"
             >Special rules: team requires a choice from the list of special rule
             options.</template
+          >
+          <template v-if="error == 'needsTeamCaptain'"
+            >Must select a Team Captain (click player number).</template
+          >
+          <template v-if="error == 'insignificant'"
+            >Can not have more players with insignificant than
+            without.</template
           >
         </li>
       </ul>
@@ -75,6 +83,10 @@ class ActivateTeamModal extends Vue {
   @Emit("confirmed")
   public confirm() {
     this.hide();
+  }
+
+  public runCreateChecks(): boolean {
+    return !this.team.getTeamStatus().isPostMatch();
   }
 
   public show(specialRuleErrors: string[]) {

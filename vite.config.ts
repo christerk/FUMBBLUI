@@ -50,6 +50,7 @@ export default defineConfig({
         idt: resolve(__dirname, "htdocs", "idt.html"),
         statcentral: resolve(__dirname, "htdocs", "statcentral.html"),
         toplist: resolve(__dirname, "htdocs", "toplist.html"),
+        themeinfo: resolve(__dirname, "htdocs", "themeinfo.html"),
       },
       output: {
         format: "esm",

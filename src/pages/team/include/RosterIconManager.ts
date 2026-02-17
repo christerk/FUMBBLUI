@@ -94,6 +94,12 @@ export default class RosterIconManager {
       iconRowVersionPosition = 0;
     }
 
+    if (positionIconInfo.iconData.iconRowVersionPositions.length > 0) {
+      iconRowVersionPosition =
+        iconRowVersionPosition %
+        positionIconInfo.iconData.iconRowVersionPositions.length;
+    }
+
     const iconSize = positionIconInfo.iconData.size;
 
     const iconVersionPosition =

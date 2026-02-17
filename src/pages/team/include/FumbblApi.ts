@@ -511,6 +511,13 @@ export default class FumbblApi {
     );
   }
 
+  public async clearTeamCaptain(teamId: number): Promise<ApiResponse> {
+    return await this.simplePostWithOnlyTeamIdInBody(
+      teamId,
+      this.getUrl("/api/team/clearTeamCaptain"),
+    );
+  }
+
   public async unretireTeam(teamId: number): Promise<ApiResponse> {
     return await this.simplePostWithOnlyTeamIdInBody(
       teamId,
@@ -740,6 +747,18 @@ export default class FumbblApi {
     const data = {
       playerId: playerId,
       skillTypeId: skillTypeId,
+    };
+
+    return await this.enqueuePost(url, data);
+  }
+
+  public async setTeamCaptain(
+    teamId: number,
+    playerId: number,
+  ): Promise<ApiResponse> {
+    const url = this.getUrl("/api/team/setTeamCaptain/" + teamId);
+    const data = {
+      playerId: playerId,
     };
 
     return await this.enqueuePost(url, data);

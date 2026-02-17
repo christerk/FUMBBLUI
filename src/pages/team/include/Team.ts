@@ -27,6 +27,8 @@ export default class Team {
   private cheerleaders: number = 0;
   private apothecary: boolean = false;
   public allowEndSeason: boolean = true;
+  public allowTeamCaptain: boolean = false;
+
   public seasonInfo: {
     gamesPlayedInCurrentSeason: number;
     currentSeason: number;
@@ -175,6 +177,9 @@ export default class Team {
         ? rawApiTeam.tournament.allowEndSeason
         : true;
 
+    team.allowTeamCaptain =
+      rawApiTeam.specialRules["Team Captain"] != undefined;
+
     if (rawApiTeam.redraftingLimits != undefined) {
       team.redraftLimits.budget = rawApiTeam.redraftingLimits.budget;
       team.redraftLimits.treasury = rawApiTeam.redraftingLimits.treasury;
@@ -217,16 +222,24 @@ export default class Team {
     playerIconRowVersionPositions: any,
     teamManagementSettings: TeamManagementSettings,
   ) {
-    let iconRowVersionPosition =
-      rosterIconManager.getNextAvailableIconRowVersionPosition(
-        rawApiPlayer.positionId,
-        team.getTakenIconRowVersionPositionsOfPositionId(
+    let iconRowVersionPosition = rawApiPlayer.iconIndex;
+
+    console.log(iconRowVersionPosition);
+    if (iconRowVersionPosition === undefined) {
+      iconRowVersionPosition =
+        rosterIconManager.getNextAvailableIconRowVersionPosition(
           rawApiPlayer.positionId,
-        ),
-      );
-    if (playerIconRowVersionPositions[rawApiPlayer.id] !== undefined) {
-      iconRowVersionPosition = playerIconRowVersionPositions[rawApiPlayer.id];
+          team.getTakenIconRowVersionPositionsOfPositionId(
+            rawApiPlayer.positionId,
+          ),
+        );
+      if (playerIconRowVersionPositions[rawApiPlayer.id] !== undefined) {
+        iconRowVersionPosition = playerIconRowVersionPositions[rawApiPlayer.id];
+      }
+    } else {
+      iconRowVersionPosition = parseInt(iconRowVersionPosition);
     }
+
     const isJourneyman =
       rawApiPlayer.number > teamManagementSettings.maxPlayers;
 
@@ -309,7 +322,7 @@ export default class Team {
 
   public getRosteredPlayers(): Player[] {
     return this.players.filter(
-      (player) => !player.IsEmpty && !player.getIsJourneyman(),
+      (player) => !player.IsEmpty && !player.IsJourneyman,
     );
   }
 
@@ -341,7 +354,7 @@ export default class Team {
   }
 
   public hireJourneyman(player: Player): void {
-    if (!player.getIsJourneyman()) {
+    if (!player.IsJourneyman) {
       return;
     }
 
@@ -365,6 +378,27 @@ export default class Team {
   public findPlayerByNumber(playerNumber: number): Player | null {
     return this.players[playerNumber - 1];
   }
+
+  public findPlayerById(playerId: number): Player | null {
+    let p = this.players.find((p) => p.id == playerId);
+    if (p == undefined) {
+      return null;
+    }
+    return p;
+  }
+
+  public isNewOrRedrafting(): boolean {
+    return this.teamStatus.isNew() || this.teamStatus.isRedrafting();
+  }
+
+  public findTeamCaptain(): Player | null {
+    let p = this.players.find((p) => p.IsTeamCaptain);
+    if (p == undefined) {
+      return null;
+    }
+    return p;
+  }
+
   public firePlayer(player: Player): void {
     if (this.teamStatus.isRedrafting()) {
       this.treasury += player.getRedraftingCost();

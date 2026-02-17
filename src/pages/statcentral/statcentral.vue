@@ -260,6 +260,47 @@
         </TitledPanel>
       </div>
     </div>
+
+    <div class="panel" id="ctvprogression" v-if="page == 'ctvprogression'">
+      <div class="description cols6">
+        <Pill
+          class="row span2 start"
+          label="Season"
+          :values="[
+            { name: '1', label: '1' },
+            { name: '2+', label: '2+' },
+            { name: 'all', label: 'All' },
+          ]"
+          v-model="ctvSeason"
+          @change="reloadPage"
+        />
+        <Pill
+          class="row span2"
+          label="Roster"
+          type="select"
+          :values="rosterData"
+          v-model="ctvSelectedRoster"
+          @change="reloadPage"
+        />
+        <Pill
+          class="row span2 end"
+          label="Match Type"
+          :values="[
+            { name: 'all', label: 'Combined' },
+            { name: 'open', label: 'Open' },
+            { name: 'blackbox', label: 'Blackbox' },
+          ]"
+          v-model="ctvType"
+          @change="reloadPage"
+        />
+      </div>
+      <TitledPanel class="roster-results">
+        <template #header>CTV Progression </template>
+        <template #content>
+          <CtvProgressionChart ref="ctvProgressionChart" />
+        </template>
+      </TitledPanel>
+    </div>
   </div>
 </template>
 
@@ -280,6 +321,7 @@ import SkillSelectionChart from "./charts/skillselection.vue";
 import SkillChoiceChart from "./charts/skillchoice.vue";
 import VersusStatsChart from "./charts/versusstats.vue";
 import MatchupChart from "./charts/matchup.vue";
+import CtvProgressionChart from "./charts/ctvprogression.vue";
 
 import {
   PageHeader,
@@ -309,16 +351,18 @@ import {
     SkillChoiceChart,
     VersusStatsChart,
     MatchupChart,
+    CtvProgressionChart,
     Pill,
   },
 })
 class StatCentral extends Vue {
-  public fumbblApi!: FumbblApi = new FumbblApi();
+  public fumbblApi: FumbblApi = new FumbblApi();
   public navItems: any = [
     { label: "Dashboard", page: "dashboard" },
     { label: "Results", page: "results" },
     { label: "Versus", page: "versus" },
     { label: "Skills", page: "skills" },
+    { label: "CTV Progression", page: "ctvprogression" },
   ];
   public page: string = "dashboard";
 
@@ -326,6 +370,8 @@ class StatCentral extends Vue {
   public resultsRange: string = "30d";
   public resultsType: string = "all";
   public resultsCtvRange: string = "all";
+  public ctvSeason: string = "all";
+  public ctvType: string = "all";
   public resultsSelectedRoster: string = "All";
   public resultsSelectedPosition: string = "All";
   public resultsMirrors: boolean = true;
@@ -335,6 +381,7 @@ class StatCentral extends Vue {
   public rostersSelectedType: string = "all";
   public skillsSelectedRoster: string = "All";
   public skillsSelectedPosition: string = "All";
+  public ctvSelectedRoster: string = "All";
   public showMatchup: any | null = null;
   public positions: string[] = [];
   public rosterData: { [key: string]: any }[] = [];
@@ -356,6 +403,7 @@ class StatCentral extends Vue {
   @Ref("skillChoice") public skillChoice!: SkillChoiceChart;
   @Ref("versusStats") public versusStats!: VersusStatsChart;
   @Ref("matchupChart") public matchupChart!: MatchupChart;
+  @Ref("ctvProgressionChart") public ctvProgressionChart!: CtvProgressionChart;
 
   public mounted() {
     this.$nextTick(async () => {
@@ -406,6 +454,9 @@ class StatCentral extends Vue {
           break;
         case "skills":
           this.loadSkills();
+          break;
+        case "ctvprogression":
+          this.loadCtvProgression();
           break;
       }
     });
@@ -478,6 +529,19 @@ class StatCentral extends Vue {
         this.rosterAnalysisChart.load(data.data);
       });
     }
+  }
+
+  private loadCtvProgression() {
+    const roster =
+      this.ctvSelectedRoster !== "All" ? this.ctvSelectedRoster : null;
+    const type = this.ctvType;
+    const season = this.ctvSeason;
+
+    this.fumbblApi.Clickhouse.ctvProgression(roster, type, season).then(
+      (data: any) => {
+        this.ctvProgressionChart.load(data.data);
+      },
+    );
   }
 
   private loadVersusStats() {

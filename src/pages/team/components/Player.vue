@@ -23,7 +23,7 @@
       <div
         v-if="
           accessControl.canRenumberPlayers() &&
-          !player.getIsJourneyman() &&
+          !player.IsJourneyman &&
           !player.isTemporaryPlayer
         "
         class="cell draghandle handle"
@@ -55,7 +55,19 @@
         </svg>
       </div>
       <div v-else class="cell draghandledisabled"></div>
-      <div class="cell playernumber">
+      <div
+        :class="{
+          cell: true,
+          playernumber: true,
+          teamcaptain: isTeamCaptain(),
+          allowcaptain:
+            !isTeamCaptain() &&
+            !player.IsJourneyman &&
+            allowSetTeamCaptain() &&
+            player.AllowTeamCaptain,
+        }"
+        @click="interceptSetTeamCaptain"
+      >
         <span class="normalplayernumber">
           {{ player.playerNumber }}
         </span>
@@ -77,9 +89,7 @@
           <span v-if="player.isTemporaryPlayerWithoutName()">Loading...</span>
           <span
             v-else-if="
-              player.isTemporaryPlayer ||
-              player.getIsJourneyman() ||
-              player.IsEmpty
+              player.isTemporaryPlayer || player.IsJourneyman || player.IsEmpty
             "
             >{{ player.getPlayerName() }}</span
           >
@@ -200,7 +210,7 @@
         </div>
         <div class="playerskills" :title="player.getSkills().join(', ')">
           {{ player.getSkills().join(", ") }}
-          <template v-if="player.getIsJourneyman()">Loner</template>
+          <template v-if="player.IsJourneyman">Loner</template>
         </div>
       </div>
       <div
@@ -262,7 +272,7 @@
         v-if="!player.IsEmpty && accessControl.canCreate()"
         class="cell removenewplayer"
       >
-        <template v-if="!player.getIsJourneyman()">
+        <template v-if="!player.IsJourneyman">
           (<a href="#" @click.prevent="triggerRemovePlayer">Remove</a>)
         </template>
       </div>
@@ -270,7 +280,7 @@
         v-else-if="!player.IsEmpty && accessControl.canEdit()"
         class="cell retireplayer"
       >
-        <template v-if="!teamStatus.isSkill() && !player.getIsJourneyman()">
+        <template v-if="!teamStatus.isSkill() && !player.IsJourneyman">
           <template v-if="player.getIsRefundable()">
             (<a href="#" @click.prevent="triggerRefundPlayer">Refund</a>)
           </template>
@@ -438,6 +448,19 @@ class PlayerComponent extends Vue {
   @Emit("show-hire-rookies")
   public triggerShowHireRookies() {}
 
+  public interceptSetTeamCaptain() {
+    if (!this.allowSetTeamCaptain()) {
+      return;
+    }
+
+    this.setTeamCaptain();
+  }
+
+  @Emit("set-team-captain")
+  public setTeamCaptain() {
+    return this.player.id;
+  }
+
   readonly delayForFoldoutAnimations = 600;
   private intervalIdsScrollDuringCssTransition: number[] = [];
 
@@ -528,6 +551,32 @@ class PlayerComponent extends Vue {
     } else {
       this.performFoldOut("MORE", multipleOpenMode);
     }
+  }
+
+  public isTeamCaptain() {
+    return (
+      !this.player.IsEmpty &&
+      !this.player.IsJourneyman &&
+      this.player.IsTeamCaptain
+    );
+  }
+
+  public allowSetTeamCaptain() {
+    const team = this.player.team;
+
+    if (
+      !this.accessControl.canSetTeamCaptain() ||
+      !this.player.AllowTeamCaptain
+    ) {
+      return false;
+    }
+
+    return (
+      team.getTeamStatus().isNew() ||
+      team.getTeamStatus().isRedrafting() ||
+      (this.player.team.getTeamStatus().isPostMatch() &&
+        this.player.team.findTeamCaptain() == null)
+    );
   }
 
   public displayInjuries(injuries: string[]): string {

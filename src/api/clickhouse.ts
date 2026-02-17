@@ -36,6 +36,21 @@ export default class Clickhouse extends CategoryBase {
     );
   }
 
+  public async ctvProgression(
+    roster: string | null,
+    type: string | null,
+    season: string | null,
+  ): Promise<any> {
+    const opts: any = {
+      roster: roster,
+      type: type,
+      season: season,
+    };
+    return this.post(this.categoryPath, "ctvProgression", opts).then(
+      (res: any) => res.data,
+    );
+  }
+
   public async skillSelection(
     roster: String | null,
     position: String | null,

@@ -202,7 +202,7 @@
           {
             available:
               d8DieRoll > 0 &&
-              (d8DieRoll == 16 || (d8DieRoll >= 3 && d8DieRoll <= 6)),
+              (d8DieRoll == 8 || (d8DieRoll >= 3 && d8DieRoll <= 6)),
           },
         ]"
       >
@@ -322,7 +322,7 @@
 
     <div
       v-if="
-        (version == '2025' || !advancementLocked) &&
+        (version == '2025' || !advancementLocked || version == '2020') &&
         selectedCategory == category &&
         category[0] == 'C' &&
         selectedSkill != null
@@ -636,6 +636,11 @@ class SkillPanel extends Vue {
   }
 
   public selectSkill(event) {
+    console.log(
+      "selectSkill called",
+      this.advancementLocked,
+      this.selectedCategory,
+    );
     if (!this.advancementLocked) {
       let skill = event.target.innerText;
       if (
@@ -657,6 +662,21 @@ class SkillPanel extends Vue {
         skill = null;
       }
       this.selectedSkill = skill;
+    } else if (
+      this.version == "2020" &&
+      this.advancementLocked &&
+      this.selectedCategory[0] == "C"
+    ) {
+      let skill = event.target.innerText;
+      if (
+        this.selectedCategory[0] == "C" &&
+        !this.unpickableSkills.has(skill)
+      ) {
+        if (skill == this.selectedSkill) {
+          skill = null;
+        }
+        this.selectedSkill = skill;
+      }
     }
   }
 

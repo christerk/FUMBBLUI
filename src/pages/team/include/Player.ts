@@ -24,6 +24,10 @@ export default class Player {
   private iconRowVersionPosition: number; // allows selection of icon for display when position has multiple versions in the icon image
   private portrait: string = "";
   private position: Position | null;
+  private properties: {
+    teamCaptain: boolean;
+  } = { teamCaptain: false };
+
   private injuries: string[] = [];
   private injuryStatus: {
     injury: string;
@@ -135,6 +139,10 @@ export default class Player {
       0,
     );
 
+    player.properties.teamCaptain =
+      rawApiPlayer.properties != null &&
+      rawApiPlayer.properties["Team Captain"];
+
     player.skillRewards = rawApiPlayer.skillStatus.numRewards;
 
     player.record.seasons = rawApiPlayer.record.seasons;
@@ -245,6 +253,24 @@ export default class Player {
     return this.playerStatus == 12 || this.playerStatus == 13;
   }
 
+  public get IsTeamCaptain(): boolean {
+    return this.properties.teamCaptain;
+  }
+
+  public setTeamCaptain(): void {
+    this.properties.teamCaptain = true;
+  }
+
+  public clearTeamCaptain(): void {
+    this.properties.teamCaptain = false;
+  }
+
+  public get AllowTeamCaptain(): boolean {
+    return (
+      !this.IsEmpty && !this.position?.isBigGuy && this.team.allowTeamCaptain
+    );
+  }
+
   public set number(value) {
     this.playerNumber = value;
   }
@@ -298,7 +324,7 @@ export default class Player {
   }
 
   public getDisplayPositionName(): string {
-    const journeymanPrefix = this.getIsJourneyman() ? "Journeyman " : "";
+    const journeymanPrefix = this.IsJourneyman ? "Journeyman " : "";
     return journeymanPrefix + this.getPositionName();
   }
 
@@ -362,21 +388,24 @@ export default class Player {
   }
 
   public getSkills(): string[] {
+    if (this.IsTeamCaptain) {
+      return [...this.skills, "Team Captain"];
+    }
     return this.skills;
   }
 
-  public getIsJourneyman(): boolean {
+  public get IsJourneyman(): boolean {
     return this.isJourneyman;
   }
 
-  public setIsJourneyman(isJourneyman: boolean) {
+  public set IsJourneyman(isJourneyman: boolean) {
     this.isJourneyman = isJourneyman;
   }
 
   public permanentlyHireJourneyman(playerNumber: number) {
-    if (this.getIsJourneyman()) {
+    if (this.IsJourneyman) {
       this.setPlayerNumber(playerNumber);
-      this.setIsJourneyman(false);
+      this.IsJourneyman = false;
       this.isRefundable = true;
     }
   }

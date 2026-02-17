@@ -18,14 +18,15 @@ export default class TeamManagementSettings {
     rawApiRoster: any,
     hasLowCostLinemen: boolean,
   ) {
-    const dedicatedFansCost = 10000;
+    const dedicatedFansCost =
+      rawApiRuleset.options.teamSettings.dedicatedFanCost;
     const assistantCoachesCost = 10000;
     const cheerleadersCost = 10000;
     const apothecaryCost = 50000;
 
     const maxRerolls = 8;
     const maxAssistantCoaches = 6;
-    const maxCheerleaders = 12;
+    const maxCheerleaders = rawApiRuleset.options.teamSettings.maxCheerleaders;
 
     const setupTeamManagementSettings: SetupTeamManagementSettings = {
       roster: {
@@ -425,7 +426,7 @@ export default class TeamManagementSettings {
       },
       dedicatedFans: {
         add:
-          team.getDedicatedFans() < this.settings.rerolls.max &&
+          team.getDedicatedFans() < this.settings.dedicatedFans.maxStart &&
           team.canAfford(this.dedicatedFansCost),
         remove:
           team.getDedicatedFans() > this.settings.dedicatedFans.minStart &&
