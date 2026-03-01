@@ -8,7 +8,6 @@
     }"
     :key="key"
   >
-    {{ player.IsTemporarilyRetired }}
     <div
       class="main"
       :class="{
