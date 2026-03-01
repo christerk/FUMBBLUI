@@ -27,6 +27,9 @@ export default class Player {
   private properties: {
     teamCaptain: boolean;
   } = { teamCaptain: false };
+  private data: {
+    raiseSource?: string;
+  } = {};
 
   private injuries: string[] = [];
   private injuryStatus: {
@@ -174,6 +177,7 @@ export default class Player {
     player.isRefundable = rawApiPlayer.refundable;
 
     player.portrait = rawApiPlayer.portrait;
+    player.data = rawApiPlayer.data;
 
     return player;
   }
@@ -367,6 +371,14 @@ export default class Player {
     return this.getPositionCost() + this.getSkillCost();
   }
 
+  public canHireForFree(): boolean {
+    return (
+      this.rulesVersion == "2025" &&
+      this.data != null &&
+      this.data.raiseSource == "RaisedFromDead"
+    );
+  }
+
   public getIconRowVersionPosition(): number {
     return this.iconRowVersionPosition;
   }
@@ -437,12 +449,12 @@ export default class Player {
       .filter((skill) => skill === skillIncreaseIdentifier).length;
 
     const positiveStatIncreases =
-      this.rulesVersion == "2020"
+      this.rulesVersion == "2020" || this.rulesVersion == "2025"
         ? ["+MA", "+ST", "+AV"]
         : ["+MA", "+ST", "+AG", "+AV"];
 
     const negativeStatDecreases =
-      this.rulesVersion == "2020"
+      this.rulesVersion == "2020" || this.rulesVersion == "2025"
         ? ["-ma", "-st", "-av"]
         : ["-ma", "-st", "-ag", "-av"];
 
@@ -494,13 +506,13 @@ export default class Player {
   }
 
   public get hasAgilityIncrease(): boolean {
-    return this.rulesVersion == "2020"
+    return this.rulesVersion == "2020" || this.rulesVersion == "2025"
       ? this.agilityStat < this.getPositionStats().Agility
       : this.agilityStat > this.getPositionStats().Agility;
   }
 
   public get hasAgilityDecrease(): boolean {
-    return this.rulesVersion == "2020"
+    return this.rulesVersion == "2020" || this.rulesVersion == "2025"
       ? this.agilityStat > this.getPositionStats().Agility
       : this.agilityStat < this.getPositionStats().Agility;
   }

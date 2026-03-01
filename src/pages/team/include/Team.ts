@@ -427,14 +427,26 @@ export default class Team {
   }
 
   public removePlayer(player: Player): void {
-    if (this.teamStatus.isNew() || player.getIsRefundable()) {
+    if (
+      (this.teamStatus.isNew() || player.getIsRefundable()) &&
+      !player.canHireForFree()
+    ) {
       this.treasury += player.getPositionCost();
     }
     const index = this.players.findIndex(
       (playerToMatch) => playerToMatch.id === player.id,
     );
+
     if (index !== -1) {
       this.players[index] = Player.emptyPlayer(this, player.playerNumber);
+    }
+    if (player.getIsRefundable() && player.canHireForFree()) {
+      const newNumber = this.findFirstEmptyJourneymanNumber();
+      if (newNumber != null) {
+        player.setPlayerNumber(newNumber);
+      }
+      player.IsJourneyman = true;
+      this.players.push(player);
     }
   }
 
@@ -554,10 +566,16 @@ export default class Team {
     return this.redrafting.tooltip;
   }
 
-  public countPlayersOfPositionId(positionId: number): number {
-    return this.players.filter(
-      (player) => player.getPositionId() === positionId,
+  public countPlayersOfPositionId(
+    positionId: number,
+    includeTempRetired: boolean,
+  ): number {
+    const num = this.players.filter(
+      (player) =>
+        player.getPositionId() === positionId &&
+        (includeTempRetired || !player.IsTemporarilyRetired),
     ).length;
+    return num;
   }
 
   public getTakenIconRowVersionPositionsOfPositionId(
@@ -684,6 +702,22 @@ export default class Team {
     }
 
     return firstEmptyIndex !== undefined ? firstEmptyIndex + 1 : null;
+  }
+
+  public findFirstEmptyJourneymanNumber(): number | null {
+    const set = new Set();
+
+    for (let i = 0; i < this.players.length; i++) {
+      if (!this.players[i].IsEmpty) {
+        set.add(this.players[i].number);
+      }
+    }
+    for (let i = 17; i < 32; i++) {
+      if (!set.has(i)) {
+        return i;
+      }
+    }
+    return null;
   }
 
   public findLastEmptyNumber(): number | null {

@@ -178,7 +178,7 @@ class RetirePlayerComponent extends Vue {
     }
 
     if (
-      this.player.getSkills().length +
+      this.player.getSkills().filter((s) => s != "Team Captain").length +
         this.player.getPositionSkills().length !==
       rawApiPlayer.skills.length
     ) {
@@ -188,6 +188,15 @@ class RetirePlayerComponent extends Vue {
         "Position Skills: " + this.player.getPositionSkills().length,
       );
       this.errors.push("API Skills: " + rawApiPlayer.skills.length);
+    }
+
+    if (
+      this.player.getSkills().find((s) => s == "Team Captain") != undefined &&
+      this.player.getInjuries().filter((s) => s[0] == "-").length == 0
+    ) {
+      this.errors.push(
+        "Can not retire a Team Captain without characteristic reducing injuries",
+      );
     }
   }
 }

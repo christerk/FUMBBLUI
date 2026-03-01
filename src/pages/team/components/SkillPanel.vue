@@ -575,10 +575,16 @@ class SkillPanel extends Vue {
         this.d16Die?.roll(this.skillStatus.rolls[0].roll1);
       } else if (this.version == "2025") {
         if (this.skillStatus.rolls[0].length == 2) {
-          this.columnDie?.roll(this.skillStatus.rolls[0][0]);
-          this.rowDie?.roll(this.skillStatus.rolls[0][1]);
-          this.column2Die?.roll(this.skillStatus.rolls[1][0]);
-          this.row2Die?.roll(this.skillStatus.rolls[1][1]);
+          let category = this.selectedCategory;
+          let roll1 = this.skillStatus.rolls[0][0];
+          let roll2 = this.skillStatus.rolls[0][1];
+          let roll3 = this.skillStatus.rolls[1][0];
+          let roll4 = this.skillStatus.rolls[1][1];
+
+          this.columnDie?.roll(roll1);
+          this.rowDie?.roll(roll2);
+          this.column2Die?.roll(roll3);
+          this.row2Die?.roll(roll4);
         } else {
           this.lockAdvancement();
           this.d8Die?.roll(this.skillStatus.rolls[0].roll1);
@@ -608,12 +614,26 @@ class SkillPanel extends Vue {
     }
     this.initialized = true;
 
+    let category = this.selectedCategory;
+    let roll1 = parseInt(this.skillStatus.rolls[0].roll1);
+    let roll2 = parseInt(this.skillStatus.rolls[0].roll2);
+    let roll3 = parseInt(this.skillStatus.rolls[0].roll3);
+    let roll4 = parseInt(this.skillStatus.rolls[0].roll4);
+
     this.lockAdvancement();
     this.lockCategory();
-    this.columnDie?.roll(this.skillStatus.rolls[0].roll1);
-    this.rowDie?.roll(this.skillStatus.rolls[0].roll2);
-    this.column2Die?.roll(this.skillStatus.rolls[0].roll3);
-    this.row2Die?.roll(this.skillStatus.rolls[0].roll4);
+    this.columnDie?.roll(roll1);
+    this.rowDie?.roll(roll2);
+    this.column2Die?.roll(roll3);
+    this.row2Die?.roll(roll4);
+
+    let index1 = (roll1 > 3 ? 6 : 0) + roll2 - 1;
+    let index2 = (roll3 > 3 ? 6 : 0) + roll4 - 1;
+
+    this.rolledSkills = [
+      this.skills[category[1]][index1],
+      this.skills[category[1]][index2],
+    ];
   }
 
   private validateResponse(response) {
@@ -640,7 +660,12 @@ class SkillPanel extends Vue {
       "selectSkill called",
       this.advancementLocked,
       this.selectedCategory,
+      event.target,
     );
+    if (event.target.classList.contains("notrolled")) {
+      return false;
+    }
+
     if (!this.advancementLocked) {
       let skill = event.target.innerText;
       if (

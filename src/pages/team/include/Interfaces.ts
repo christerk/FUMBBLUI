@@ -209,6 +209,7 @@ export interface SetupTeamManagementSettings {
     };
     isProgression: boolean;
     minPlayers: number;
+    tempRetiredTakesPositionSlot: boolean;
   };
 }
 

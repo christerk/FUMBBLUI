@@ -51,6 +51,7 @@ export default defineConfig({
         statcentral: resolve(__dirname, "htdocs", "statcentral.html"),
         toplist: resolve(__dirname, "htdocs", "toplist.html"),
         themeinfo: resolve(__dirname, "htdocs", "themeinfo.html"),
+        clientoptions: resolve(__dirname, "htdocs", "clientoptions.html"),
       },
       output: {
         format: "esm",

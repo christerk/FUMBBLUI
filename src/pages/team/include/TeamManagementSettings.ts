@@ -114,6 +114,9 @@ export default class TeamManagementSettings {
         isProgression:
           rawApiRuleset.options.teamSettings.teamProgression === "standard",
         minPlayers: rawApiRuleset.options.clientOptions.playersOnField,
+        tempRetiredTakesPositionSlot:
+          rawApiRuleset.options.rulesetOptions.tempRetiredTakesPositionSlot ===
+          "true",
       },
     };
 
@@ -139,6 +142,10 @@ export default class TeamManagementSettings {
       }
     }
     return cleanSkills;
+  }
+
+  public get tempRetiredTakesPositionSlot() {
+    return this.settings.ruleset.tempRetiredTakesPositionSlot;
   }
 
   public get rosterName() {

@@ -8,6 +8,7 @@
     }"
     :key="key"
   >
+    {{ player.IsTemporarilyRetired }}
     <div
       class="main"
       :class="{
@@ -294,10 +295,21 @@
         </template>
         <template
           v-else-if="
-            !teamStatus.isSkill() && treasury >= player.getPlayerCost()
+            !teamStatus.isSkill() &&
+            (treasury >= player.getPlayerCost() || player.canHireForFree())
           "
         >
-          (<a href="#" @click.prevent="triggerHireJourneyman">Hire</a>)
+          (<a
+            v-show="!player.canHireForFree()"
+            href="#"
+            @click.prevent="triggerHireJourneyman"
+            >Hire</a
+          ><a
+            v-show="player.canHireForFree()"
+            href="#"
+            @click.prevent="triggerHireJourneyman"
+            >Recruit</a
+          >)
         </template>
         <template v-if="player.canSkill && accessControl.canSkill()">
           <a

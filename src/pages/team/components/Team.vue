@@ -1666,10 +1666,17 @@ class TeamComponent extends Vue {
   public get rosterPositionDataForBuyingPlayer(): PositionDataForBuyingPlayer[] {
     const positionQuantities: { positionId: number; quantity: number }[] = [];
 
+    console.log(
+      "rosterPositionData",
+      this.teamManagementSettings.tempRetiredTakesPositionSlot,
+    );
     for (const position of this.teamManagementSettings.positions) {
       const positionQuantity = {
         positionId: position.id,
-        quantity: this.team.countPlayersOfPositionId(position.id),
+        quantity: this.team.countPlayersOfPositionId(
+          position.id,
+          this.teamManagementSettings.tempRetiredTakesPositionSlot,
+        ),
       };
       positionQuantities.push(positionQuantity);
     }

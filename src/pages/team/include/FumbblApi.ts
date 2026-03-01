@@ -780,4 +780,42 @@ export default class FumbblApi {
 
     return await this.enqueuePost(url);
   }
+
+  public async getClientOptions(coach: string | null) {
+    let url = this.getUrl(
+      "/api/clientoptions/get" + (coach != null ? "/" + coach : ""),
+    );
+    return await this.enqueuePost(url);
+  }
+
+  public async getClientOptionsMarkings(coach: string | null) {
+    let url = this.getUrl(
+      "/api/clientoptions/get" + (coach != null ? "/" + coach : ""),
+    );
+    return await this.enqueuePost(url);
+  }
+
+  public async saveMarkings(markings: string) {
+    let url = this.getUrl("/api/clientoptions/setmarkings");
+    const data = {
+      autoMarkingRecords: markings,
+    };
+    return await this.enqueuePost(url, data);
+  }
+
+  public async setClientOptionsSeparator(separator: string) {
+    let url = this.getUrl("/api/clientoptions/setseparator");
+    const data = {
+      separator: JSON.stringify(separator),
+    };
+    return await this.enqueuePost(url, data);
+  }
+
+  public async setPitches(pitchData: any) {
+    let url = this.getUrl("/api/clientoptions/setpitches");
+    const data = {
+      pitches: JSON.stringify(pitchData),
+    };
+    return await this.enqueuePost(url, data);
+  }
 }
