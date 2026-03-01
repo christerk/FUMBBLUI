@@ -1,0 +1,401 @@
+@forest: #1a401c;
+@eggshell: #e7ddc7;
+@old-lace: #f8f5e7;
+@quicksilver: #999999;
+@carmine: #a10005;
+@jet: #2f2f2f;
+
+.header {
+    display: block;
+    position: relative;
+    height: 105px;
+    background: @old-lace;
+    border-bottom: solid 1px #bcb29d;
+
+    .title {
+        text-align: center;
+        font-size: 21px;
+        padding-top: 5px;
+    }
+
+    .tabs {
+        margin: 0;
+
+        position: absolute;
+        bottom: 0px;
+        height: 41px;
+
+        left: 50%;
+        margin-left: -150px;
+
+        li {
+            text-align: center;
+            display: inline-block;
+            position: relative;
+            color: @carmine;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 0 10px;
+            border: 0;
+            margin: 0;
+            list-style: none;
+            display: inline-block;
+            line-height: 31px;
+
+            height: 100%;
+            width: 150px;
+
+            &.active {
+                color: @jet;
+
+
+                &::after {
+                    content: url('/FUMBBL/Images/Icons/pagemarker.png');
+                    position: absolute;
+                    left: 50%;
+                    bottom: 10px;
+                    height: 9px;
+                    width: 19px;
+                    margin-left: -9px;
+                }
+            }
+
+            &.inactive:hover {
+                background: @quicksilver;
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+.content {
+    width: 100%;
+    min-height: 30em;
+    padding: 0;
+    position: relative;
+
+    .controlpanel {
+        padding: 2em;
+        margin: 1em 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+
+        &.pitches {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        #new {
+            justify-self: left;
+        }
+
+        #separator {
+            justify-self: center;
+            align-self: end;
+        }
+
+        #import {
+            justify-self: right;
+        }
+    }
+
+    .markings {
+        display: grid;
+        grid-template-columns: 1fr;
+
+        &.markingrows {
+            background: @forest;
+            grid-row-gap: 1px;
+
+            .ui-sortable-placeholder {
+                background: @quicksilver;
+                display: block;
+                height: 1.5rem;
+                width: 100%;
+            }
+        }
+
+        .header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 3fr 1fr;
+            height: auto;
+
+            div {
+                background: @forest;
+                color: white;
+                font-size: 10pt;
+                font-weight: bold;
+                padding: 5px;
+
+                &:first-child {
+                    border-top-left-radius: 5px;
+                }
+
+                &:last-child {
+                    border-top-right-radius: 5px;
+                }
+            }
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 3fr 1fr;
+            height: 1.5rem;
+
+            div {
+                background: @old-lace;
+                padding: 0.25em;
+            }
+
+            &:hover div {
+                cursor: pointer;
+                background: lighten(@old-lace, 5%);
+            }
+        }
+    }
+
+    .tablewrap {
+        width: 100%;
+        padding: 0 5px;
+        background: @old-lace;
+    }
+
+    .pitches {
+        width: 100%;
+
+        th {
+            font-weight: bold;
+            background: @forest;
+            color: white;
+
+            &:first-child {
+                border-top-left-radius: 5px;
+            }
+
+            &:last-child {
+                border-top-right-radius: 5px;
+            }
+        }
+
+        tbody {
+            background: @old-lace;
+
+            td {
+                padding: 0.25em 0.5em;
+            }
+
+            tr:first-child td {
+                border-top: 0;
+            }
+
+            td.separator {
+                padding: 0 0.25em;
+
+                div {
+                    height: 1px;
+                    background: @forest;
+                }
+            }
+
+            tr:last-child,
+            tr:first-child {
+                td.separator {
+                    div {
+                        background: transparent;
+                    }
+                }
+            }
+        }
+    }
+
+    .pitchColumns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-column-gap: 1em;
+        place-items: start start;
+    }
+
+    .dialog {
+        position: absolute;
+        background: @old-lace;
+        border-radius: 20px;
+        top: 243px;
+        left: 50%;
+        margin-left: -450px;
+        width: 900px;
+        border: solid 2px @forest;
+        padding: 2em 2em;
+        min-height: 30em;
+        padding-bottom: 85px;
+        z-index: 10;
+
+        .dialogtitle {
+            margin-bottom: 0.5em;
+            text-align: center;
+            font-size: 14pt;
+        }
+
+        .dialogcontrols {
+            margin-top: 1em;
+            padding: 1em 0;
+            border-top: solid 2px #1a401c;
+            text-align: center;
+            position: absolute;
+            bottom: 0px;
+            width: 90%;
+            left: 5%;
+            height: 75px;
+
+            .closeButton {
+                margin: 0 3em;
+            }
+        }
+    }
+
+    #importdialog {
+        #controls {
+            display: grid;
+            grid-template-columns: 1fr;
+            place-items: center center;
+            height: 25em;
+
+            #importname {
+                font-size: 18pt;
+            }
+        }
+    }
+
+    #markingdialog {
+
+        #controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        #settings {
+            display: grid;
+            grid-column-gap: 1em;
+            grid-row-gap: 0.5em;
+            grid-template-columns: auto 1fr;
+            height: fit-content;
+        }
+
+        #skills {
+            display: grid;
+            grid-template-columns: 1fr auto;
+
+            .section {
+                border-bottom: solid 1px @forest;
+                font-weight: bold;
+                background: @forest;
+                color: white;
+                padding: 0.5em 1em;
+                border-top-left-radius: 5px;
+                border-top-right-radius: 5px;
+
+                &.second {
+                    margin-top: 1em;
+                }
+            }
+
+            .span2 {
+                grid-column: 1 / span 2;
+            }
+
+            .skill {
+                border-top: 1px solid @forest;
+                padding: 0.25em 0.5em;
+                background: lighten(@old-lace, 5%);
+            }
+
+            .add {
+                margin-top: 0.5em;
+                text-align: right;
+            }
+
+            .removelink {
+                color: @carmine;
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+.controlbutton {
+    padding: 1em;
+    border-radius: 10px;
+    border: solid @quicksilver 2px;
+    color: @carmine;
+    font-weight: bold;
+    cursor: pointer;
+    background: @old-lace;
+
+    &:hover {
+        background: lighten(@old-lace, 5%);
+    }
+}
+
+
+.dialogbackpane {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.33);
+    z-index: 1;
+}
+
+
+.toggler-wrapper {
+    display: inline-block;
+    width: 45px;
+    height: 25px;
+    cursor: pointer;
+    position: relative;
+    margin-right: 1em;
+
+    input[type="checkbox"] {
+        display: none;
+
+        &:checked+.toggler-slider {
+            background-color: #44cc66;
+        }
+    }
+
+    .toggler-slider {
+        background-color: #ccc;
+        position: absolute;
+        border-radius: 100px;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        -webkit-transition: all 300ms ease;
+        transition: all 300ms ease;
+    }
+
+    .toggler-knob {
+        position: absolute;
+        -webkit-transition: all 300ms ease;
+        transition: all 300ms ease;
+    }
+}
+
+.toggler-wrapper.style-4 {
+    input[type="checkbox"]:checked+.toggler-slider .toggler-knob {
+        left: calc(100% - 19px - 3px);
+        background-color: @forest;
+    }
+
+    .toggler-knob {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        left: 0;
+        top: 0;
+        background-color: @carmine;
+        -webkit-box-shadow: 0 2px 6px rgba(153, 153, 153, 0.75);
+        box-shadow: 0 2px 6px rgba(153, 153, 153, 0.75);
+    }
+}
