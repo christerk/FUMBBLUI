@@ -2369,6 +2369,8 @@ class TeamComponent extends Vue {
         "An error occurred redrafting the team.",
         apiResponse.getErrorMessage(),
       );
+    } else {
+      this.redraftCompleteModal?.show(apiResponse.data, false);
     }
   }
 

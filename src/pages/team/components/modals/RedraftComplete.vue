@@ -12,18 +12,21 @@
     <template v-slot:body v-if="result != undefined">
       <template v-for="player in result.players" :key="player.id">
         <div
+          v-if="showHireStatus || player.actions.length > 1"
           class="playerEffects"
           :class="{ condensed: player.actions.length <= 1 }"
         >
           <div class="name">{{ player.number }} {{ player.name }}</div>
           <div class="actions" v-for="item in player.actions" :key="item">
-            <div class="type">&bull; {{ item.type }}</div>
-            <div class="roll" v-if="item.roll != undefined">
-              Roll: {{ item.roll }}
-              <span v-if="item.modifier != 0">{{ item.modifier }}</span
-              >, target {{ item.target }}
-            </div>
-            <div class="effect">{{ item.effect }}</div>
+            <template v-if="shouldShow(item)">
+              <div class="type">&bull; {{ item.type }}</div>
+              <div class="roll" v-if="item.roll != undefined">
+                Roll: {{ item.roll }}
+                <span v-if="item.modifier != 0">{{ item.modifier }}</span
+                >, target {{ item.target }}
+              </div>
+              <div class="effect">{{ item.effect }}</div>
+            </template>
           </div>
         </div>
       </template>
@@ -50,6 +53,7 @@ class RedraftCompleteModal extends Vue {
   public team!: Team;
 
   public isVisible: boolean = false;
+  public showHireStatus: boolean = false;
 
   public result: any | undefined = undefined;
 
@@ -63,9 +67,19 @@ class RedraftCompleteModal extends Vue {
     this.hide();
   }
 
-  public show(result: any) {
+  public shouldShow(item: any): boolean {
+    return (
+      this.showHireStatus ||
+      (item.type != "Hired" &&
+        item.type != "Retired" &&
+        item.type != "Re-hired")
+    );
+  }
+
+  public show(result: any, showHireStatus: boolean = true) {
     this.result = result;
     this.isVisible = true;
+    this.showHireStatus = showHireStatus;
   }
 
   public hide() {
