@@ -2369,7 +2369,7 @@ class TeamComponent extends Vue {
         "An error occurred redrafting the team.",
         apiResponse.getErrorMessage(),
       );
-    } else {
+    } else if (Object.keys(apiResponse.data.players).length > 0) {
       this.redraftCompleteModal?.show(apiResponse.data, false);
     }
   }
