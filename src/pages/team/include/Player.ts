@@ -95,6 +95,8 @@ export default class Player {
       interceptions: 0,
       deflections: 0,
       casualties: 0,
+      catches: 0,
+      landings: 0,
       mvps: 0,
       spp: { total: 0, extra: 0, spent: 0 },
     };
@@ -151,6 +153,8 @@ export default class Player {
     player.record.seasons = rawApiPlayer.record.seasons;
     player.record.games = rawApiPlayer.record.games;
     player.record.completions = rawApiPlayer.record.completions;
+    player.record.catches = rawApiPlayer.record.catches;
+    player.record.landings = rawApiPlayer.record.landings;
     player.record.touchdowns = rawApiPlayer.record.touchdowns;
     player.record.deflections = rawApiPlayer.record.deflections;
     player.record.interceptions = rawApiPlayer.record.interceptions;

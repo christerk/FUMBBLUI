@@ -1,37 +1,39 @@
 <template>
-  <div class="trinaryswitch" :key="currentState">
-    {{ currentState }}
+  <div class="trinaryswitch" :key="state">
+    {{ state }}
     <input
       type="radio"
       :id="idLeft"
       :name="name"
       value="L"
-      :checked="currentState == 'L'"
+      :checked="state == 'L'"
       v-on:change="changed"
     />
-    <label :for="idLeft" class="switch__label">No</label>
+    <label :for="idLeft" class="switch__label">{{ leftLabel }}</label>
 
     <input
       type="radio"
       :id="idMid"
       :name="name"
       value="M"
-      :checked="currentState != 'L' && currentState != 'R'"
+      :checked="state != 'L' && state != 'R'"
       v-on:change="changed"
     />
-    <label :for="idMid" class="switch__label">??</label>
+    <label :for="idMid" class="switch__label">{{ midLabel }}</label>
 
     <input
       type="radio"
       :id="idRight"
       :name="name"
       value="R"
-      :checked="currentState == 'R'"
+      :checked="state == 'R'"
       v-on:change="changed"
     />
-    <label :for="idRight" class="switch__label">Yes</label>
+    <label :for="idRight" class="switch__label">{{ rightLabel }}</label>
 
-    <div class="switch__indicator"><div class="int" /></div>
+    <div :data-before="selectedLabel()" class="switch__indicator">
+      <div class="int"></div>
+    </div>
   </div>
 </template>
 
@@ -47,11 +49,13 @@ class Trinary extends Vue {
   @Prop({ required: true }) name!: string;
   @Prop({ required: true }) state!: string;
 
+  @Prop({ default: "No" }) leftLabel!: string;
+  @Prop({ default: "??" }) midLabel!: string;
+  @Prop({ default: "Yes" }) rightLabel!: string;
+
   public idLeft!: string;
   public idMid!: string;
   public idRight!: string;
-
-  public currentState: string = "M";
 
   async beforeMount() {
     let componentId = this.uuid();
@@ -60,9 +64,7 @@ class Trinary extends Vue {
     this.idRight = componentId.replace("-", "R");
   }
 
-  public async mounted() {
-    this.currentState = this.state;
-  }
+  public async mounted() {}
 
   private uuid() {
     let re: any = /[018]/g;
@@ -74,13 +76,20 @@ class Trinary extends Vue {
     );
   }
 
+  public selectedLabel() {
+    return this.state == "L"
+      ? this.leftLabel
+      : this.state == "R"
+        ? this.rightLabel
+        : this.midLabel;
+  }
+
   public changed(event: any) {
     this.stateChanged(this.name, event.target.value);
   }
 
   @Emit("stateChanged")
   private stateChanged(name: string, newValue: string) {
-    this.currentState = newValue;
     return [name, newValue];
   }
 }

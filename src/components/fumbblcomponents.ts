@@ -8,6 +8,7 @@ import Trinary from "./trinary/trinary.vue";
 import ErrorModal from "./modals/Error.vue";
 import ConfirmModal from "./modals/Confirm.vue";
 import Pill from "./pill/pill.vue";
+import Toggle from "./toggle/toggle.vue";
 
 export {
   Die,
@@ -20,4 +21,5 @@ export {
   ErrorModal,
   ConfirmModal,
   Pill,
+  Toggle,
 };

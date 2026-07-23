@@ -1,22 +1,40 @@
 import CategoryBase from "./categoryBase";
-import SerializedApiRunner from "./serializedApiRunner";
 
 export default class Roster extends CategoryBase {
-  protected categoryPath = "roster";
+  protected readonly categoryPath = "roster";
 
-  constructor(runner: SerializedApiRunner) {
-    super(runner);
+  public list(ruleset: number): Promise<any> {
+    return this.get(this.categoryPath, "list/" + ruleset);
   }
 
-  public async list(ruleset: number): Promise<any> {
-    return this.get(this.categoryPath, "list/" + ruleset).then(
-      (res: any) => res.data,
-    );
+  public getRoster(rosterId: number): Promise<any> {
+    return this.get(this.categoryPath, "get/" + rosterId);
   }
 
-  public async getRoster(rosterId: number): Promise<any> {
-    return this.get(this.categoryPath, "get/" + rosterId).then(
-      (res: any) => res.data,
-    );
+  public add(rulesetId: number, rosterId: number): Promise<any> {
+    const opts: any = {
+      ruleset: rulesetId,
+      roster: rosterId,
+    };
+
+    return this.post(this.categoryPath, "add", opts);
+  }
+
+  public remove(rulesetId: number, rosterId: number): Promise<any> {
+    const opts: any = {
+      ruleset: rulesetId,
+      roster: rosterId,
+    };
+
+    return this.post(this.categoryPath, "remove", opts);
+  }
+
+  public cloneLocal(rulesetId: number, rosterId: number): Promise<any> {
+    const opts: any = {
+      ruleset: rulesetId,
+      roster: rosterId,
+    };
+
+    return this.post(this.categoryPath, "cloneLocal", opts);
   }
 }

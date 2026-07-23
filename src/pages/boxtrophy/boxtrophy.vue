@@ -45,7 +45,7 @@
             <div class="column">
               <div class="section">Squad Limits</div>
               <div>
-                Number of teams per squad: {{ selectedSeason.numTeams }}
+                Number of teams per squad: {{ selectedSeason?.numTeams }}
               </div>
               <div>Squad budget: {{ selectedSeason.totalTeamCost }} points</div>
               <div>&nbsp;</div>
@@ -256,7 +256,7 @@
     <div class="panel" id="mysquads" v-if="page == 'mySquads'">
       <div class="join" v-if="showPlayoffControls || squads.length == 0">
         <div v-if="!showPlayoffControls && squads.length == 0">
-          To join, create your {{ selectedSeason.numTeams }} competitive
+          To join, create your {{ selectedSeason?.numTeams }} competitive
           division teams and click the button below to sign up.
         </div>
 
@@ -548,6 +548,7 @@
           <option disabled="true">---</option>
           <option>Amazon</option>
           <option>Black Orc</option>
+          <option>Bretonnian</option>
           <option>Chaos Chosen</option>
           <option>Chaos Dwarf</option>
           <option>Chaos Renegade</option>
@@ -871,10 +872,10 @@ class BoxTrophy extends Vue {
   public renameSquadModal: InstanceType<typeof RenameSquadModal> | undefined;
 
   public get started() {
-    return this.progress.started;
+    return this.progress?.started;
   }
   public get ended() {
-    return this.progress.ended;
+    return this.progress?.ended;
   }
 
   @Ref
@@ -1181,7 +1182,9 @@ class BoxTrophy extends Vue {
   }
 
   private allowDesignate(team: any): boolean {
+    console.log(team.leagueId == this.selectedSeason?.requiredLeague, team);
     return (
+      team.leagueId == this.selectedSeason?.requiredLeague &&
       team.divisionId == 2 &&
       team.games == 0 &&
       team.status == "Active" &&
@@ -1206,7 +1209,7 @@ class BoxTrophy extends Vue {
   }
 
   public getSquadError(): string {
-    if (this.checkedTeams.length != this.selectedSeason.numTeams) {
+    if (this.checkedTeams.length != this.selectedSeason?.numTeams) {
       return (
         "The squad must have exactly " +
         this.selectedSeason.numTeams +

@@ -1,22 +1,17 @@
 import CategoryBase from "./categoryBase";
-import SerializedApiRunner from "./serializedApiRunner";
 
 export default class Coach extends CategoryBase {
-  protected categoryPath = "coach";
+  protected readonly categoryPath = "coach";
 
-  constructor(runner: SerializedApiRunner) {
-    super(runner);
+  public teams(coach: string): Promise<any> {
+    return this.get(this.categoryPath, "teams/" + coach);
   }
 
-  public async teams(coach: string): Promise<any> {
-    return this.get(this.categoryPath, "teams/" + coach).then(
-      (res: any) => res.data,
-    );
+  public activeTeams(coach: string) {
+    return this.get(this.categoryPath, "activeteams/" + coach);
   }
 
-  public async activeTeams(coach: string) {
-    return this.get(this.categoryPath, "activeteams/" + coach).then(
-      (res: any) => res.data,
-    );
+  public search(str: string) {
+    return this.get(this.categoryPath, "search/" + str);
   }
 }

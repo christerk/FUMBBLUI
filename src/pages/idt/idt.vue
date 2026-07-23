@@ -93,6 +93,7 @@
           <option disabled="true">---</option>
           <option>Amazon</option>
           <option>Black Orc</option>
+          <option>Bretonnian</option>
           <option>Chaos Chosen</option>
           <option>Chaos Dwarf</option>
           <option>Chaos Renegade</option>
@@ -257,7 +258,7 @@ class Idt extends Vue {
       .getAttribute("coach");
 
     this.$nextTick(async () => {
-      let season = await this.fumbblApi?.getSeasonConfig(0);
+      let season: any = await this.fumbblApi?.getSeasonConfig(0);
       await this.loadSeasons();
 
       let requestSeason = parseInt(
@@ -279,9 +280,13 @@ class Idt extends Vue {
       } else {
         this.setPage(this.page);
       }
+      if (this.fumbblApi != null) {
+        console.log(season);
+        this.rosters = (
+          await this.fumbblApi.getRosters(season?.ruleset ?? 3906)
+        ).data;
+      }
     });
-
-    this.rosters = (await this.fumbblApi.getRosters(4)).data;
   }
 
   public async loadSeasonData(season: any) {

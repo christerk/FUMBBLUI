@@ -84,6 +84,14 @@
             <td>{{ player ? player.getRecord().completions : "0" }}</td>
             <td>Completions</td>
           </tr>
+          <tr v-if="player && player.getRecord().catches > 0">
+            <td>{{ player ? player.getRecord().catches : "0" }}</td>
+            <td>Catches</td>
+          </tr>
+          <tr v-if="player && player.getRecord().landings > 0">
+            <td>{{ player ? player.getRecord().landings : "0" }}</td>
+            <td>Landings</td>
+          </tr>
           <tr>
             <td>{{ player ? player.getRecord().touchdowns : "0" }}</td>
             <td>Touchdowns</td>

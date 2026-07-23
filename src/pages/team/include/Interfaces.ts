@@ -133,6 +133,8 @@ export interface PlayerRecord {
   interceptions: number;
   deflections: number;
   casualties: number;
+  catches: number;
+  landings: number;
   mvps: number;
   spp: {
     total: number;

@@ -818,4 +818,12 @@ export default class FumbblApi {
     };
     return await this.enqueuePost(url, data);
   }
+
+  public async setJavaOptions(optionData: any) {
+    let url = this.getUrl("/api/clientoptions/setjavaoptions");
+    const data = {
+      options: JSON.stringify(optionData),
+    };
+    return await this.enqueuePost(url, data);
+  }
 }

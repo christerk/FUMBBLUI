@@ -5,8 +5,12 @@
     </div>
     <slot name="center"></slot>
 
-    <div class="left"></div>
-    <div class="right"></div>
+    <div class="left">
+      <slot name="left"></slot>
+    </div>
+    <div class="right">
+      <slot name="right"></slot>
+    </div>
 
     <ul class="pagenav">
       <template v-for="navItem in navItems" :key="navItem.page">
@@ -18,7 +22,7 @@
       </template>
 
       <img
-        v-if="pageMarkerPosition != 0"
+        v-if="navItems && pageMarkerPosition != 0"
         class="pagemarker"
         src="https://fumbbl.com/FUMBBL/Images/Icons/pagemarker.png"
         :style="{ display: 'block', left: pageMarkerPosition + 'px' }"

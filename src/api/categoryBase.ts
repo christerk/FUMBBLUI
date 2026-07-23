@@ -1,69 +1,34 @@
-import axios from "axios";
-import SerializedApiRunner from "./serializedApiRunner";
+import QueuedApiRunner from "./serializedApiRunner";
+import ApiClient from "./apiClient";
 
 export default abstract class CategoryBase {
-  protected runner: SerializedApiRunner;
-  protected abstract categoryPath: string;
-  protected apiBase = "";
+  protected runner: QueuedApiRunner;
+  protected client: ApiClient;
 
-  private enableOauth: boolean = false;
-  private accessToken: string = "";
-  private tokenExpiry: number = 0;
+  protected abstract readonly categoryPath: string;
+  protected readonly apiBase: string = "";
 
-  constructor(runner: SerializedApiRunner) {
+  constructor(runner: QueuedApiRunner, client: ApiClient) {
     const siteUrl = import.meta.env.VITE_API_URL || "https://fumbbl.com";
     this.apiBase = siteUrl + "/api";
 
-    if (import.meta.env.VITE_ENABLE_OAUTH == "true") {
-      this.enableOauth = true;
-    } else {
-      this.enableOauth = false;
-    }
     this.runner = runner;
+    this.client = client;
   }
 
-  protected async getAccessToken(): Promise<string> {
-    if (Date.now() > this.tokenExpiry) {
-      const data = {
-        grant_type: "client_credentials",
-        client_id: import.meta.env.VITE_CLIENT_ID,
-        client_secret: import.meta.env.VITE_CLIENT_SECRET,
-      };
-      this.enableOauth = false;
-      const result: any = await this.post("oauth", "token", data);
-      this.enableOauth = true;
-      const tokenData = result.data;
-
-      this.tokenExpiry = Date.now() + tokenData.expires_in * 1000 - 100;
-      this.accessToken = tokenData.access_token;
-    }
-    return this.accessToken;
-  }
-
-  protected async getAuthHeaders(): Promise<string | undefined> {
-    let headers: any = {};
-    if (this.enableOauth) {
-      const token = await this.getAccessToken();
-      headers = { headers: { Authorization: "Bearer " + token } };
-    }
-    return headers;
-  }
-
-  protected async get<T>(category: string, endpoint: string): Promise<T> {
-    const headers: any = await this.getAuthHeaders();
+  protected get<T>(category: string, endpoint: string): Promise<T> {
     return this.runner.run(() =>
-      axios.get(`${this.apiBase}/${category}/${endpoint}`, headers),
+      this.client.get<T>(`${category}/${endpoint}?v=${Date.now()}`),
     );
   }
 
-  protected async post<T>(
+  protected post<T>(
     category: string,
     endpoint: string,
-    data: any | null = null,
+    data?: unknown,
   ): Promise<T> {
-    const headers: any = await this.getAuthHeaders();
     return this.runner.run(() =>
-      axios.post(`${this.apiBase}/${category}/${endpoint}`, data, headers),
+      this.client.post<T>(`${category}/${endpoint}`, data),
     );
   }
 }

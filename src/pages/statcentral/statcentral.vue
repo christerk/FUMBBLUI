@@ -81,6 +81,7 @@
             { name: 'all', label: 'Combined' },
             { name: 'open', label: 'Open' },
             { name: 'blackbox', label: 'Blackbox' },
+            { name: 'eb', label: 'EB' },
           ]"
           v-model="resultsType"
           @change="reloadPage"

@@ -15,6 +15,12 @@
         >
           Pitches
         </li>
+        <li
+          @click="showTab('Java Options')"
+          :class="[activeTab == 'Java Options' ? 'active' : 'inactive']"
+        >
+          Java Options
+        </li>
       </ul>
     </div>
     <div class="content">
@@ -153,6 +159,47 @@
         </div>
       </div>
 
+      <div class="tabPage" v-show="activeTab == 'Java Options'">
+        <div class="controlpanel java-options">
+          This page lets you configure advanced Java settings, to compensate for
+          various driver incompatibilities.
+        </div>
+
+        <table class="pitches" id="roster">
+          <thead>
+            <tr>
+              <th>Java Options</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td class="separator"><div></div></td>
+            </tr>
+            <template v-for="(option, index) in javaOptions">
+              <tr>
+                <td>
+                  <Trinary
+                    :name="option.key"
+                    :state="option.value"
+                    :leftLabel="option.leftLabel ?? 'N'"
+                    midLabel="-"
+                    :rightLabel="option.rightLabel ?? 'Y'"
+                    @stateChanged="toggleJavaOption($event)"
+                    :index="index"
+                  />
+
+                  {{ option.name }} ({{ option.key }})
+                </td>
+              </tr>
+              <tr>
+                <td class="separator"><div></div></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+
       <div class="dialogbackpane" v-if="showMarkingDialog" @click="hideDialogs">
         <div id="markingdialog" class="dialog">
           <div class="dialogtitle">Edit Marking</div>
@@ -281,11 +328,12 @@ import FumbblApi from "../team/include/FumbblApi";
 import SeasonPicker from "../boxtrophy/seasonpicker.vue";
 
 import Axios from "axios";
-import { SortableTable } from "@components/fumbblcomponents";
+import { SortableTable, Trinary } from "@components/fumbblcomponents";
 
 @Component({
   components: {
     SortableTable,
+    Trinary,
   },
 })
 class ClientOptions extends Vue {
@@ -317,10 +365,41 @@ class ClientOptions extends Vue {
   startDragIndex: number | null = null;
   markingKey = 0;
 
+  javaOptions: any = [];
+
   async mounted() {
     if (window.location.host.indexOf("dev.") !== 0) {
       this.apiBase = "https://" + window.location.host;
     }
+
+    this.javaOptions = [
+      {
+        key: "sun.java2d.d3d",
+        name: "Enable Direct3D",
+        value: "M",
+      },
+      {
+        key: "sun.java2d.opengl",
+        name: "Enable OpenGL",
+        value: "M",
+      },
+      {
+        key: "sun.java2d.uiScale.enabled",
+        name: "Enable UI Scaling",
+        value: "L",
+      },
+      {
+        key: "sun.java2d.noddraw",
+        name: "Disable Direct Draw",
+        value: "M",
+      },
+      {
+        key: "sun.java2d.pmoffscreen",
+        name: "Store images in pixmaps",
+        value: "M",
+      },
+    ];
+
     this.pitches = [
       { category: "Special", key: "Blackbox", name: "Blackbox", enabled: true },
       {
@@ -529,6 +608,12 @@ class ClientOptions extends Vue {
         this.pitches[index].enabled = result.pitches[key];
       }
     }
+
+    for (var opt of this.javaOptions) {
+      if (result.javaOptions?.[opt.key] !== undefined) {
+        opt.value = result.javaOptions[opt.key] ? "R" : "L";
+      }
+    }
   }
 
   async saveMarkings() {
@@ -575,6 +660,13 @@ class ClientOptions extends Vue {
     this.savePitches();
   }
 
+  toggleJavaOption(ev: any) {
+    const option = this.javaOptions.find((opt: any) => opt.key == ev[0]);
+    option.value = ev[1];
+
+    this.saveJavaOptions();
+  }
+
   async savePitches() {
     var pitchData = Object.assign(
       {},
@@ -584,6 +676,19 @@ class ClientOptions extends Vue {
     );
 
     await this.fumbblApi.setPitches(pitchData);
+  }
+
+  async saveJavaOptions() {
+    var optionData = Object.assign(
+      {},
+      ...this.javaOptions
+        .map(({ key, name, value }) => ({
+          [key]: value == "L" ? false : value == "R" ? true : null,
+        }))
+        .filter((obj: any) => Object.values(obj)[0] !== null),
+    );
+
+    await this.fumbblApi.setJavaOptions(optionData);
   }
 }
 
