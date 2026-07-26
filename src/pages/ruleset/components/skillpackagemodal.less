@@ -1,0 +1,81 @@
+@import url("@style/fumbbl");
+
+.modal-skill-package {
+  :deep(.modalbody) {
+    padding: 0.5rem 1rem;
+  }
+
+  .allowances-header {
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+
+  .allowance-card {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #fafafa;
+  }
+
+  .hint {
+    font-size: 0.85em;
+    color: #888;
+    margin-left: 4px;
+  }
+
+  .skill-types-cell label {
+    margin-right: 12px;
+    white-space: nowrap;
+  }
+
+  .cost-matrix-wrap {
+    margin-top: 8px;
+    overflow-x: auto;
+  }
+
+  .cost-matrix {
+    border-collapse: collapse;
+
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 4px 8px;
+      text-align: center;
+    }
+
+    th {
+      background: #eee;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+  }
+
+  .slot-label {
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .cost-cell {
+    width: 70px;
+    text-align: center;
+  }
+
+  .btn-remove-allowance {
+    background: none;
+    border: none;
+    padding: 0;
+    margin-top: 8px;
+    color: #c00;
+    cursor: pointer;
+    font: inherit;
+
+    &:hover {
+      color: #800;
+    }
+  }
+
+  .add-allowance-wrap {
+    margin-top: 8px;
+  }
+}

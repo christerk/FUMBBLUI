@@ -1,0 +1,73 @@
+@import url("@style/fumbbl");
+
+.panel {
+  width: 100%;
+}
+.panel dl dt {
+  font-weight: bold;
+  margin-top: 1rem;
+}
+.panel dl dt:first-child {
+  margin-top: 0.5rem;
+}
+.panel dl dd {
+  margin-left: 1rem;
+  line-height: 2.0;
+}
+.col {
+  width: 100%;
+}
+.manager-list {
+  display: grid;
+  grid-template-columns: 1fr auto;
+
+  div,
+  a {
+    border-top: solid 1px @Quicksilver;
+    line-height: 2;
+
+    &:nth-child(-n+2) {
+      border: 0;
+    }
+  }
+}
+.center {
+  text-align: center;
+}
+
+.modal-add-manager {
+  :deep(.modalbody) {
+    padding: 0.5rem 1rem;
+    height: 20rem;
+
+    input {
+      width: 100%;
+      line-height: 2.5;
+      padding: 0 0.5rem;
+    }
+  }
+
+  .search-results-wrapper {
+    margin: 0.75rem 0.5rem 0;
+    border: solid 1px @Quicksilver;
+    border-radius: 5px;
+    overflow: hidden;
+    background: @OffWhite;
+
+    .search-results {
+      max-height: 250px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .search-result-item {
+      padding: 0 0.5rem;
+      line-height: 2rem;
+      cursor: pointer;
+
+      &:hover {
+        background: @Quicksilver;
+      }
+    }
+  }
+}

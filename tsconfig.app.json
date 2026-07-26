@@ -13,5 +13,8 @@
       "@api/*": ["src/api/*"]
     },
     "verbatimModuleSyntax": false
+  },
+  "vueCompilerOptions": {
+    "target": 3
   }
 }

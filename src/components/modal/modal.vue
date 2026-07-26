@@ -23,7 +23,7 @@
                         <button v-if="buttonSettings.cancel.enabled" class="teambutton" @click="triggerCancel">
                             {{ buttonSettings.cancel.label }}
                         </button>
-                        <button v-if="buttonSettings.confirm.enabled" class="teambutton" @click="triggerConfirm">
+                        <button v-if="buttonSettings.confirm.enabled" class="teambutton" :disabled="buttonSettings.confirm.disabled" @click="triggerConfirm">
                             {{ buttonSettings.confirm.label }}
                         </button>
                     </div>
@@ -43,7 +43,7 @@ import { Prop, Component, Vue, toNative, Emit } from "vue-facing-decorator";
 
 interface ModalButtonSettings {
     cancel: { enabled: boolean; label: string };
-    confirm: { enabled: boolean; label: string };
+    confirm: { enabled: boolean; label: string; disabled?: boolean };
 }
 
 @Component

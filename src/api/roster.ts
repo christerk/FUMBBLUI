@@ -37,4 +37,13 @@ export default class Roster extends CategoryBase {
 
     return this.post(this.categoryPath, "cloneLocal", opts);
   }
+
+  public search(query: string, version: string | null = null): Promise<any> {
+    console.log(version);
+    const opts: any = {
+      search: query,
+      version: version,
+    };
+    return this.post(this.categoryPath, "search", opts);
+  }
 }

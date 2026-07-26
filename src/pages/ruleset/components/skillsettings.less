@@ -1,0 +1,47 @@
+@import url("@style/fumbbl");
+
+.panel {
+  width: 100%;
+}
+.panel dl dt {
+  font-weight: bold;
+  margin-top: 1rem;
+}
+.panel dl dt:first-child {
+  margin-top: 0.5rem;
+}
+.panel dl dd {
+  margin-left: 1rem;
+  line-height: 2.0;
+}
+.cols3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.cols5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.skill {
+  font-size: 1rem;
+  line-height: 1.75rem;
+
+  label {
+    margin-left: 0.5rem;
+  }
+}
+#skillsettings {
+  :deep(.content) {
+    padding-top: 0.5rem;
+  }
+}
+span {
+  &.wide {
+    display: inline-block;
+    margin: 0 1rem;
+  }
+}

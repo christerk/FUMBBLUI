@@ -59,6 +59,8 @@
         }
 
         .modalbody {
+            padding: 0.5rem;
+
             ul {
                 list-style-type: disc;
             }
@@ -79,6 +81,17 @@
 
             button {
                 margin: 0 10px;
+            }
+
+            button:disabled {
+                background: #d8d8d8;
+                border-color: #c0c0c0;
+                color: #999;
+                cursor: default;
+
+                &:hover {
+                    border-color: #c0c0c0;
+                }
             }
         }
     }

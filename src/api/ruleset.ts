@@ -18,6 +18,14 @@ export default class Ruleset extends CategoryBase {
     return this.post(this.categoryPath, "setoptions/" + rulesetId, opts);
   }
 
+  public create(name: string, baseline: number): Promise<any> {
+    const opts: any = {
+      name: name,
+      baseline: baseline,
+    };
+    return this.post(this.categoryPath, "create", opts);
+  }
+
   public promoted(version: any): Promise<any> {
     return this.get(
       this.categoryPath,

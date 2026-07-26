@@ -1,0 +1,106 @@
+@import url("@style/fumbbl");
+
+.panel {
+    width: 100%;
+}
+
+.col {
+    width: 100%;
+}
+
+.tierwrap {
+    margin-bottom: 1rem;
+
+    &.new-tier,
+    &.empty {
+        padding-bottom: 3rem;
+    }
+}
+
+.tier-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    border-bottom: solid 2px @LightSilver;
+    padding: 0.25rem 0;
+
+    &:first-child {
+        margin-top: 0.5rem;
+    }
+}
+
+.tier {
+    font-size: 14pt;
+    font-weight: bold;
+
+    &.new,
+    &.empty {
+        color: @Quicksilver;
+    }
+
+    &.new {
+        font-style: italic;
+    }
+}
+
+.tier-detail {
+    font-size: 0.85em;
+    color: #777;
+}
+
+.btn-configure {
+    display: inline-block;
+    padding: 0.4rem 1.2rem;
+    border: solid 1px @Quicksilver;
+    border-radius: 4px;
+    background: @OffWhite;
+    color: @Jet;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+
+    &:hover {
+        background: @Quicksilver;
+    }
+}
+
+.roster {
+    display: inline-flex;
+    align-items: center;
+    background: @OffWhite;
+    border: solid 1px @LightSilver;
+    padding: 0.25rem 1rem 0.25rem 0.5rem;
+    border-radius: 2rem;
+    margin: 0.25rem 0.5rem;
+
+    &.draggable {
+        cursor: grab;
+
+        &:active {
+            cursor: grabbing;
+        }
+    }
+}
+
+.roster-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.roster-name {
+    line-height: 1;
+}
+
+.tierwrap {
+    &.drop-allowed {
+        border-radius: 4px;
+    }
+
+    &.drop-in {
+        border-radius: 4px;
+        background: fade(#44cc66, 10%);
+    }
+}
